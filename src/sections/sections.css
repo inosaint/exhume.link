@@ -223,6 +223,36 @@
   max-width: 480px;
 }
 
+/* Share button */
+.overview__share-btn {
+  margin-top: var(--space-6);
+  font-family: var(--font-heading);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+  background: transparent;
+  border: 1px solid var(--color-stone);
+  border-radius: 4px;
+  padding: var(--space-3) var(--space-5);
+  cursor: pointer;
+  transition:
+    color var(--duration-mid) var(--ease-out),
+    border-color var(--duration-mid) var(--ease-out),
+    background-color var(--duration-mid) var(--ease-out),
+    box-shadow var(--duration-mid) var(--ease-out);
+  animation: fadeUp var(--duration-slow) var(--ease-out) both;
+  animation-delay: 500ms;
+}
+
+.overview__share-btn:hover {
+  color: var(--color-accent);
+  border-color: var(--color-accent-dim);
+  background: rgba(201, 169, 110, 0.05);
+  box-shadow: 0 0 16px var(--color-accent-glow);
+}
+
 /* ── entrance animations ── */
 @keyframes fadeUp {
   from {

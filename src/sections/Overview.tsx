@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { ShareCard } from '../components/ShareCard'
 import './sections.css'
 
 /* ── static data (scorer wires this up in a later phase) ── */
@@ -72,6 +73,8 @@ function StatCard({ label, value, suffix, note }: StatDef) {
 
 /* ── Overview section ── */
 export function Overview() {
+  const [showShareCard, setShowShareCard] = useState(false)
+
   return (
     <section className="section section--overview">
       <div className="section__inner">
@@ -95,7 +98,20 @@ export function Overview() {
             <p className="personality-card__desc">{PERSONALITY.description}</p>
           </div>
         </div>
+
+        {/* share button */}
+        <button
+          className="overview__share-btn"
+          onClick={() => setShowShareCard(true)}
+        >
+          Share Your Results
+        </button>
       </div>
+
+      {/* share card modal */}
+      {showShareCard && (
+        <ShareCard onClose={() => setShowShareCard(false)} />
+      )}
     </section>
   )
 }
