@@ -1,0 +1,149 @@
+/* ──────────────────────────────────────────────
+   Gravestone component styles
+   ────────────────────────────────────────────── */
+
+.gravestone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  background: none;
+  border: none;
+  padding: var(--space-2);
+  cursor: pointer;
+  transition:
+    transform var(--duration-mid) var(--ease-out),
+    filter var(--duration-mid) var(--ease-out);
+  animation: graveRise var(--duration-slow) var(--ease-out) both;
+  animation-delay: var(--stagger-delay, 0ms);
+}
+
+.gravestone:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
+/* Hover state: rotation + glow + shadow shift */
+.gravestone--hovered {
+  transform: rotate(-3deg) translateY(-4px);
+}
+
+.gravestone--hovered .gravestone__svg {
+  filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.4))
+          drop-shadow(0 0 20px var(--color-accent-glow));
+}
+
+.gravestone--hovered .gravestone__stone {
+  stroke: var(--color-accent-dim);
+}
+
+.gravestone--hovered .gravestone__cross {
+  stroke: var(--color-accent);
+}
+
+/* SVG */
+.gravestone__svg {
+  width: 80px;
+  height: 100px;
+  transition:
+    filter var(--duration-mid) var(--ease-out);
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+}
+
+.gravestone__stone {
+  transition: stroke var(--duration-mid) var(--ease-out);
+}
+
+.gravestone__cross {
+  transition: stroke var(--duration-mid) var(--ease-out);
+}
+
+/* Text below gravestone */
+.gravestone__domain {
+  font-size: var(--text-xs);
+  color: var(--color-accent-dim);
+  letter-spacing: 0.05em;
+  max-width: 90px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gravestone__title {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  max-width: 90px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: 1.3;
+}
+
+/* Animation keyframe */
+@keyframes graveRise {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── Gravestone row (mobile horizontal scroll) ── */
+.gravestone-row {
+  display: flex;
+  gap: var(--space-3);
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: var(--space-2) 0;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+
+.gravestone-row::-webkit-scrollbar {
+  height: 4px;
+}
+
+.gravestone-row::-webkit-scrollbar-track {
+  background: var(--color-bg-surface);
+  border-radius: 2px;
+}
+
+.gravestone-row::-webkit-scrollbar-thumb {
+  background: var(--color-stone);
+  border-radius: 2px;
+}
+
+.gravestone-row .gravestone {
+  flex-shrink: 0;
+  scroll-snap-align: start;
+}
+
+/* ── Motion preferences ── */
+@media (prefers-reduced-motion: reduce) {
+  .gravestone {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  .gravestone--hovered {
+    /* No rotation, just glow */
+    transform: none;
+  }
+
+  .gravestone,
+  .gravestone__svg,
+  .gravestone__stone,
+  .gravestone__cross {
+    transition: none;
+  }
+
+  /* Still show the glow on hover for feedback */
+  .gravestone--hovered .gravestone__svg {
+    filter: drop-shadow(0 0 20px var(--color-accent-glow));
+  }
+}
