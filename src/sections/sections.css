@@ -5,7 +5,6 @@
 /* ── Common section wrapper ── */
 .section {
   width: 100%;
-  min-height: calc(100vh - 120px); /* subtract rail + nav footer approx */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -104,10 +103,6 @@
 
 /* ── Responsive ── */
 @media (max-width: 768px) {
-  .section {
-    min-height: calc(100vh - 100px);
-  }
-
   .landing__title {
     font-size: var(--text-2xl);
   }
