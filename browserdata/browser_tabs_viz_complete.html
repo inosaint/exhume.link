@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Browser Tabs circa 2026 - Feb 4</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #2d3748;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            padding: 40px 20px;
+        }
+        
+        h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .subtitle {
+            font-size: 1.2em;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+        
+        .browser-legend {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 15px;
+            font-size: 0.95em;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+        
+        .safari-color { background: #667eea; }
+        .quiche-color { background: #43e97b; }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.2s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-number {
+            font-size: 3em;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 0.9em;
+            color: #718096;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .chart-container {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .chart-title {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            color: #2d3748;
+            font-weight: 600;
+        }
+        
+        canvas {
+            max-height: 400px;
+        }
+        
+        .browser-comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        @media (max-width: 768px) {
+            .browser-comparison {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .browser-card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .browser-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .browser-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+        }
+        
+        .browser-name {
+            font-size: 1.5em;
+            font-weight: 600;
+        }
+        
+        .browser-stat {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .browser-stat:last-child {
+            border-bottom: none;
+        }
+        
+        .stat-value {
+            font-weight: 600;
+            color: #667eea;
+        }
+        
+        .insights-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .insight-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .insight-icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+        
+        .insight-title {
+            font-size: 1.1em;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #2d3748;
+        }
+        
+        .insight-text {
+            font-size: 0.9em;
+            color: #718096;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>My Browser Tabs</h1>
+            <div class="subtitle">circa Feb 4, 2026</div>
+            <div class="browser-legend">
+                <div class="legend-item">
+                    <div class="legend-color safari-color"></div>
+                    <span>Safari (500 tabs)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color quiche-color"></div>
+                    <span>Quiche (189 tabs)</span>
+                </div>
+            </div>
+        </header>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">689</div>
+                <div class="stat-label">Total Tabs</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">2</div>
+                <div class="stat-label">Browsers</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">500+</div>
+                <div class="stat-label">Unique Domains</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">72%</div>
+                <div class="stat-label">Safari Tabs</div>
+            </div>
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-title">Browser Distribution</div>
+            <canvas id="browserChart"></canvas>
+        </div>
+        
+        <div class="browser-comparison">
+            <div class="browser-card">
+                <div class="browser-header">
+                    <div class="browser-icon safari-color"></div>
+                    <div class="browser-name">Safari</div>
+                </div>
+                <div class="browser-stat">
+                    <span>Total Tabs</span>
+                    <span class="stat-value">500</span>
+                </div>
+                <div class="browser-stat">
+                    <span>Unique Domains</span>
+                    <span class="stat-value">386</span>
+                </div>
+                <div class="browser-stat">
+                    <span>Top Domain</span>
+                    <span class="stat-value">Medium (39)</span>
+                </div>
+                <div class="browser-stat">
+                    <span>Time Span</span>
+                    <span class="stat-value">2018-2026</span>
+                </div>
+                <div class="browser-stat">
+                    <span>Main Focus</span>
+                    <span class="stat-value">Design & UX (90)</span>
+                </div>
+            </div>
+            
+            <div class="browser-card">
+                <div class="browser-header">
+                    <div class="browser-icon quiche-color"></div>
+                    <div class="browser-name">Quiche</div>
+                </div>
+                <div class="browser-stat">
+                    <span>Total Tabs</span>
+                    <span class="stat-value">189</span>
+                </div>
+                <div class="browser-stat">
+                    <span>Top Domain</span>
+                    <span class="stat-value">Amazon.in (6)</span>
+                </div>
+                <div class="browser-stat">
+                    <span>AI/Tech Tools</span>
+                    <span class="stat-value">19 tabs</span>
+                </div>
+                <div class="browser-stat">
+                    <span>Design/Portfolio</span>
+                    <span class="stat-value">17 tabs</span>
+                </div>
+                <div class="browser-stat">
+                    <span>Sri Lanka Content</span>
+                    <span class="stat-value">8 tabs</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="insights-grid">
+            <div class="insight-card">
+                <div class="insight-icon">🌏</div>
+                <div class="insight-title">Geographic Context</div>
+                <div class="insight-text">
+                    Safari shows strong Indian presence (40 tabs with .in domains, Bangalore references). Quiche reveals Sri Lanka trip planning (8 tabs about Galle, Colombo).
+                </div>
+            </div>
+            
+            <div class="insight-card">
+                <div class="insight-icon">🎨</div>
+                <div class="insight-title">Design Professional</div>
+                <div class="insight-text">
+                    Combined 107 design/UX tabs across both browsers. Safari has historical design resources, Quiche shows current portfolio research and design tools.
+                </div>
+            </div>
+            
+            <div class="insight-card">
+                <div class="insight-icon">🤖</div>
+                <div class="insight-title">AI Era Adoption</div>
+                <div class="insight-text">
+                    Quiche browser (newer) shows 19 AI/tech tool tabs (Cursor, ChatGPT, Gemini, Figma AI), suggesting active exploration of AI-powered workflows.
+                </div>
+            </div>
+            
+            <div class="insight-card">
+                <div class="insight-icon">📚</div>
+                <div class="insight-title">Content Consumption</div>
+                <div class="insight-text">
+                    Safari: 85 article/blog tabs accumulated over years. Medium (39), YouTube (24), Substack newsletters showing sustained reading habits.
+                </div>
+            </div>
+            
+            <div class="insight-card">
+                <div class="insight-icon">🛠️</div>
+                <div class="insight-title">Tool Explorer</div>
+                <div class="insight-text">
+                    Quiche shows active tool discovery: Luma (4), GitHub, Notion, Cal.com. Pattern suggests evaluating productivity and collaboration tools.
+                </div>
+            </div>
+            
+            <div class="insight-card">
+                <div class="insight-icon">🛍️</div>
+                <div class="insight-title">Shopping Activity</div>
+                <div class="insight-text">
+                    15 shopping tabs in Quiche (Amazon.in, stores). Mix of practical items and Sri Lankan crafts/souvenirs, suggesting trip preparation.
+                </div>
+            </div>
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-title">Combined Top Domains</div>
+            <canvas id="domainsChart"></canvas>
+        </div>
+    </div>
+    
+    <script>
+        // Browser Distribution Chart
+        const browserCtx = document.getElementById('browserChart').getContext('2d');
+        new Chart(browserCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Safari', 'Quiche'],
+                datasets: [{
+                    data: [500, 189],
+                    backgroundColor: ['#667eea', '#43e97b'],
+                    borderWidth: 3,
+                    borderColor: '#fff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 20,
+                            font: { size: 14 }
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Top Domains Chart
+        const domainsCtx = document.getElementById('domainsChart').getContext('2d');
+        new Chart(domainsCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Medium', 'YouTube', 'Google.co.in', 'Twitter', 'Amazon', 'Reddit', 'UXDesign.cc', 'Wikipedia', 'Luma', 'Substack'],
+                datasets: [{
+                    label: 'Number of Tabs',
+                    data: [44, 27, 22, 14, 11, 9, 6, 5, 4, 4],
+                    backgroundColor: 'rgba(102, 126, 234, 0.8)',
+                    borderColor: 'rgba(102, 126, 234, 1)',
+                    borderWidth: 2,
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(0, 0, 0, 0.05)' }
+                    },
+                    x: {
+                        grid: { display: false }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

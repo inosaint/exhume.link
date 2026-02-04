@@ -1,0 +1,15 @@
+{
+  "metadata": {
+    "date": "2026-02-04",
+    "total_tabs": 689,
+    "browsers": {
+      "safari": 500,
+      "quiche": 189
+    }
+  },
+  "files": {
+    "safari_urls": "/tmp/all_urls.txt",
+    "quiche_urls": "/tmp/quiche_urls.txt",
+    "combined_clean": "/tmp/combined_urls.txt"
+  }
+}
