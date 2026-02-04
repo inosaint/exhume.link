@@ -111,6 +111,139 @@
   border-color: var(--color-stone-light);
 }
 
+/* ── Overview ── */
+.overview__stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-4);
+  margin-bottom: var(--space-8);
+}
+
+.stat-card {
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-stone);
+  border-radius: 6px;
+  padding: var(--space-4) var(--space-3);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  transition: border-color var(--duration-mid) var(--ease-out);
+  animation: fadeUp var(--duration-slow) var(--ease-out) both;
+}
+
+.stat-card:hover {
+  border-color: var(--color-accent-dim);
+}
+
+.stat-card__note {
+  font-size: var(--text-xs);
+  color: var(--color-accent-dim);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.stat-card__value {
+  font-family: var(--font-heading);
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  color: var(--color-accent);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.stat-card__label {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-top: var(--space-1);
+}
+
+/* ── Personality card ── */
+.personality-card {
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-stone);
+  border-radius: 8px;
+  padding: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-5);
+  position: relative;
+  overflow: hidden;
+  animation: fadeUp var(--duration-slow) var(--ease-out) both;
+}
+
+/* top-edge accent glow */
+.personality-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 20%;
+  right: 20%;
+  height: 1px;
+  background: var(--color-accent);
+  box-shadow: 0 0 12px var(--color-accent-glow);
+}
+
+.personality-card__image {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 0 24px var(--color-accent-glow);
+}
+
+.personality-card__body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.personality-card__volume {
+  font-size: var(--text-sm);
+  color: var(--color-accent-dim);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.personality-card__name {
+  font-size: var(--text-xl);
+  color: var(--color-accent);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.personality-card__desc {
+  font-size: var(--text-base);
+  color: var(--color-text-secondary);
+  line-height: 1.7;
+  max-width: 480px;
+}
+
+/* ── entrance animations ── */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* staggered delays — only when motion is OK */
+@media (prefers-reduced-motion: no-preference) {
+  .stat-card:nth-child(1) { animation-delay: 0ms;   }
+  .stat-card:nth-child(2) { animation-delay: 100ms; }
+  .stat-card:nth-child(3) { animation-delay: 200ms; }
+  .stat-card:nth-child(4) { animation-delay: 300ms; }
+  .personality-card       { animation-delay: 400ms; }
+}
+
 /* ── Responsive ── */
 @media (max-width: 768px) {
   .landing__title {
@@ -123,5 +256,18 @@
 
   .section__heading {
     font-size: var(--text-xl);
+  }
+
+  .overview__stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .personality-card {
+    padding: var(--space-5);
+  }
+
+  .personality-card__image {
+    width: 130px;
+    height: 130px;
   }
 }

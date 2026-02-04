@@ -28,7 +28,7 @@ export default function App() {
     <div className="app">
       {/* ── Progress rail ── */}
       <nav className="progress-rail" aria-label="Sections">
-        {SECTIONS.map((section, i) => (
+        {SECTIONS.map((section) => (
           <button
             key={section.id}
             className={`rail-dot ${currentSection === section.id ? 'active' : ''}`}
