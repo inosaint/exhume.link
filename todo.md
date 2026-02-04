@@ -4,13 +4,18 @@ Read `claude.md` first. It has all design decisions, the scoring rubric, and dat
 
 ---
 
-## Phase 0: Foundation & Scoring ← START HERE
+## Phase 0: Foundation & Scoring
 
+Scoring **design** is done — 6 archetypes, 8 dimensions, 3 axes. Full spec in
+`docs/personality-scoring.md`. The items below are the **implementation** work,
+which will be done after the visual shell is in place.
+
+- [x] Define personality scoring rubric — see `docs/personality-scoring.md`
 - [ ] Set up Vite + React + TypeScript project (`npm create vite`)
 - [ ] Install deps: react, react-dom, typescript, vite
 - [ ] Implement URL parser: extract domain from raw URL, dedupe, count
-- [ ] Implement category classifier: domain → category (10 categories, see claude.md)
-- [ ] Implement personality scorer: category tallies → weighted scores → archetype + suffix
+- [ ] Implement category classifier: domain → content-type buckets (see docs/personality-scoring.md §Step 1)
+- [ ] Implement 8-dimension scorer: content-type counts → dimension scores → 3-axis position → archetype + suffix
 - [ ] Wire up: load `browserdata/all_tabs_clean.txt` as static import, run parser + scorer, log output
 - [ ] Verify: scorer produces expected result against known dataset (Resurrectionist of the Horde)
 
