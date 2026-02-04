@@ -1,0 +1,168 @@
+/* ──────────────────────────────────────────────
+   App shell: layout, progress rail, nav footer
+   ────────────────────────────────────────────── */
+
+.app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  position: relative;
+}
+
+/* ── Section viewport: fills remaining height ── */
+.section-viewport {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-8) var(--space-6);
+  max-width: var(--max-width);
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* ── Progress rail (top, horizontal) ── */
+.progress-rail {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-5);
+  padding: var(--space-5) var(--space-4);
+  position: relative;
+  z-index: 10;
+}
+
+/* connecting line behind the dots */
+.progress-rail::before {
+  content: '';
+  position: absolute;
+  top: calc(var(--space-5) + 5px); /* vertically center on the dots */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  height: 1px;
+  background: var(--color-stone);
+}
+
+.rail-dot {
+  position: relative;
+  z-index: 1;
+  width: 12px;
+  height: 12px;
+  padding: 0;
+  border: 2px solid var(--color-stone);
+  border-radius: 50%;
+  background: var(--color-bg-deep);
+  cursor: pointer;
+  transition:
+    border-color var(--duration-mid) var(--ease-out),
+    background-color var(--duration-mid) var(--ease-out),
+    box-shadow var(--duration-mid) var(--ease-out);
+}
+
+.rail-dot:hover {
+  border-color: var(--color-accent-dim);
+}
+
+.rail-dot.active {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  box-shadow: 0 0 8px var(--color-accent-glow);
+}
+
+/* label: visible on hover / active, hidden otherwise */
+.rail-dot__label {
+  position: absolute;
+  top: calc(100% + var(--space-2));
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0;
+  transition: opacity var(--duration-mid) var(--ease-out);
+  pointer-events: none;
+}
+
+.rail-dot:hover .rail-dot__label,
+.rail-dot.active .rail-dot__label {
+  opacity: 1;
+  color: var(--color-text-secondary);
+}
+
+/* ── Nav footer (Prev / Next) ── */
+.nav-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4) var(--space-6);
+  max-width: var(--max-width);
+  width: 100%;
+  margin: 0 auto;
+}
+
+.nav-footer__counter {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  letter-spacing: 0.1em;
+  font-variant-numeric: tabular-nums;
+}
+
+.nav-btn {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  background: none;
+  border: 1px solid var(--color-stone);
+  border-radius: 4px;
+  padding: var(--space-2) var(--space-4);
+  cursor: pointer;
+  letter-spacing: 0.06em;
+  transition:
+    color var(--duration-fast) var(--ease-out),
+    border-color var(--duration-fast) var(--ease-out),
+    background-color var(--duration-fast) var(--ease-out);
+}
+
+.nav-btn:hover:not(:disabled) {
+  border-color: var(--color-accent-dim);
+  color: var(--color-accent);
+}
+
+.nav-btn:disabled {
+  opacity: 0.25;
+  cursor: not-allowed;
+}
+
+.nav-btn--next {
+  border-color: var(--color-accent-dim);
+  color: var(--color-accent);
+}
+
+.nav-btn--next:hover:not(:disabled) {
+  background: var(--color-accent-dim);
+  color: var(--color-bg-deep);
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .section-viewport {
+    padding: var(--space-6) var(--space-4);
+    align-items: flex-start;
+  }
+
+  .progress-rail {
+    gap: var(--space-4);
+  }
+
+  .progress-rail::before {
+    width: 70%;
+  }
+
+  .nav-footer {
+    padding: var(--space-3) var(--space-4);
+  }
+}
