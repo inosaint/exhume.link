@@ -5,7 +5,7 @@
  * Regions are sized proportionally to tab count, with organic
  * Perlin-noise coastlines, terrain icons, and a hand-drawn aesthetic.
  */
-import { useMemo, useState, useRef, useEffect } from 'react'
+import { type ReactNode, useMemo, useState, useRef, useEffect } from 'react'
 import { select } from 'd3-selection'
 import { zoom, zoomIdentity, type ZoomBehavior } from 'd3-zoom'
 import { seedNoise, noisyPolygon, smoothPath, fbm } from '../lib/noise'
@@ -41,7 +41,7 @@ function TerrainIcon({ type, x, y, scale = 1 }: {
   scale?: number
 }) {
   const s = scale
-  const icons: Record<NecropolisRegion['terrainType'], JSX.Element> = {
+  const icons: Record<NecropolisRegion['terrainType'], ReactNode> = {
     books: (
       <g transform={`translate(${x},${y}) scale(${s})`}>
         <rect x={-8} y={-3} width={16} height={3} rx={0.5} fill={COLORS.ink} opacity={0.35} />
@@ -456,7 +456,7 @@ interface NecropolisMapProps {
 export function NecropolisMap({ groups }: NecropolisMapProps) {
   const svgRef = useRef<SVGSVGElement>(null)
   const gRef = useRef<SVGGElement>(null)
-  const zoomBehaviorRef = useRef<ZoomBehavior<SVGSVGElement, unknown> | null>(null)
+  const zoomBehaviorRef = useRef<ZoomBehavior<SVGSVGElement> | null>(null)
   const [hoveredRegion, setHoveredRegion] = useState<string | null>(null)
 
   // Initialize noise with fixed seed for deterministic maps
@@ -561,12 +561,13 @@ export function NecropolisMap({ groups }: NecropolisMapProps) {
     const svg = svgRef.current
     if (!svg) return
 
-    const behavior = zoom<SVGSVGElement, unknown>()
+    const behavior = zoom<SVGSVGElement>()
       .scaleExtent([0.5, 3])
-      .on('zoom', (event) => {
+      .on('zoom', (event: unknown) => {
         const g = gRef.current
         if (!g) return
-        g.setAttribute('transform', event.transform.toString())
+        const e = event as { transform: { toString: () => string } }
+        g.setAttribute('transform', e.transform.toString())
       })
 
     zoomBehaviorRef.current = behavior

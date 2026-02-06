@@ -141,15 +141,13 @@ export function smoothPath(points: Array<{ x: number; y: number }>, closed = tru
     const curr = pts[i]
     const next = pts[i + 1]
 
-    const cpx1 = curr.x - (next.x - prev.x) / 6
-    const cpy1 = curr.y - (next.y - prev.y) / 6
-    const cpx2 = curr.x + (next.x - prev.x) / 6
-    const cpy2 = curr.y + (next.y - prev.y) / 6
+    const cpx = curr.x - (next.x - prev.x) / 6
+    const cpy = curr.y - (next.y - prev.y) / 6
 
     if (i === 1) {
-      d += ` Q ${cpx1.toFixed(1)} ${cpy1.toFixed(1)} ${curr.x.toFixed(1)} ${curr.y.toFixed(1)}`
+      d += ` Q ${cpx.toFixed(1)} ${cpy.toFixed(1)} ${curr.x.toFixed(1)} ${curr.y.toFixed(1)}`
     } else {
-      d += ` S ${cpx1.toFixed(1)} ${cpy1.toFixed(1)} ${curr.x.toFixed(1)} ${curr.y.toFixed(1)}`
+      d += ` S ${cpx.toFixed(1)} ${cpy.toFixed(1)} ${curr.x.toFixed(1)} ${curr.y.toFixed(1)}`
     }
   }
 
