@@ -222,11 +222,18 @@ export const SHARE_STATS = {
   uniqueDomains: 500,
   browsers: 2,
   topDomain: { name: 'Medium', count: 44 },
-  archetype: 'The Resurrectionist',
-  volumeSuffix: 'of the Horde',
+  archetype: 'Resurrectionist of the Horde',
+  volumeSuffix: '',
   topCategories: [
     { id: 'design' as CategoryId, label: 'Design & UX', count: 107 },
     { id: 'reading' as CategoryId, label: 'Reading', count: 85 },
     { id: 'portfolios' as CategoryId, label: 'Portfolios', count: 40 },
   ],
+}
+
+export const PERSONALITY_PROFILE = {
+  title: 'Resurrectionist of the Horde',
+  description:
+    'Every tab is a tool. Nothing open without reason. A workspace of design, portfolios, and purpose — scout activity high, depth earned.',
+  image: '/resurrectionist.png',
 }

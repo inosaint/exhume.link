@@ -1,38 +1,42 @@
-import { useState, useRef } from 'react'
-import { getClusteredLocations, type ClusteredLocation } from '../data/mockData'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { geoMercator, geoPath } from 'd3-geo'
+import { select } from 'd3-selection'
+import { zoom, zoomIdentity, type ZoomBehavior } from 'd3-zoom'
+import { feature } from 'topojson-client'
+import type { FeatureCollection, Geometry } from 'geojson'
+import type { Topology } from 'topojson-specification'
+import { CATEGORY_GROUPS, getClusteredLocations, type ClusteredLocation, type TabEntry } from '../data/mockData'
 import './sections.css'
 
-// Simplified world map SVG path (Natural Earth projection style)
-const WORLD_PATH = `M 50,120 C 55,110 65,105 80,100 L 120,95 C 140,90 160,85 180,80 L 220,75 C 250,70 280,65 310,60 L 350,55 C 380,50 410,48 440,50 L 480,55 C 510,60 540,70 560,85 L 580,100 C 590,110 595,120 590,135 L 580,155 C 570,170 555,180 535,185 L 500,190 C 470,195 440,198 410,195 L 370,188 C 340,182 310,175 280,180 L 240,190 C 210,200 180,210 150,205 L 120,195 C 95,185 75,170 60,150 L 50,130 Z
-M 620,80 C 640,75 660,72 680,75 L 710,82 C 735,90 755,100 770,115 L 780,135 C 785,155 780,175 765,190 L 740,205 C 715,218 685,225 655,220 L 625,210 C 600,198 580,180 575,158 L 578,130 C 585,105 600,88 620,80 Z`
+const MAP_WIDTH = 1000
+const MAP_HEIGHT = 600
 
-// Convert lat/lng to SVG coordinates (simple equirectangular)
-function latLngToXY(lat: number, lng: number): { x: number; y: number } {
-  // Map bounds: x: 0-800, y: 0-400
-  // Lng: -180 to 180 -> 0 to 800
-  // Lat: 90 to -90 -> 0 to 400
-  const x = ((lng + 180) / 360) * 800
-  const y = ((90 - lat) / 180) * 400
-  return { x, y }
+interface MapCluster {
+  id: string
+  x: number
+  y: number
+  members: ClusteredLocation[]
+  totalCount: number
+  domains: { domain: string; count: number }[]
+  label: string
+  tabs: { tab: TabEntry; location: string }[]
 }
 
 interface MarkerProps {
-  location: ClusteredLocation
+  cluster: MapCluster
   isSelected: boolean
   onSelect: () => void
   onDeselect: () => void
 }
 
-function GraveMarker({ location, isSelected, onSelect, onDeselect }: MarkerProps) {
-  const { x, y } = latLngToXY(location.lat, location.lng)
-
+function GraveMarker({ cluster, isSelected, onSelect, onDeselect }: MarkerProps) {
   // Size based on total count
-  const size = Math.min(8 + Math.log2(location.totalCount + 1) * 4, 24)
+  const size = Math.min(8 + Math.log2(cluster.totalCount + 1) * 4, 24)
 
   return (
     <g
       className={`map-marker ${isSelected ? 'map-marker--selected' : ''}`}
-      transform={`translate(${x}, ${y})`}
+      transform={`translate(${cluster.x}, ${cluster.y})`}
       onMouseEnter={onSelect}
       onMouseLeave={onDeselect}
       onClick={onSelect}
@@ -42,19 +46,21 @@ function GraveMarker({ location, isSelected, onSelect, onDeselect }: MarkerProps
         className="map-marker__glow"
         cx={0}
         cy={0}
-        r={size + 4}
+        r={size + 5}
         fill="none"
       />
-      {/* Cross/grave marker */}
-      <circle
-        className="map-marker__base"
-        cx={0}
-        cy={0}
-        r={size / 2}
+      {/* Tiny gravestone */}
+      <path
+        className="map-marker__stone"
+        d={`M ${-size * 0.35} ${size * 0.45}
+            V ${-size * 0.1}
+            C ${-size * 0.35} ${-size * 0.5} ${-size * 0.15} ${-size * 0.7} 0 ${-size * 0.7}
+            C ${size * 0.15} ${-size * 0.7} ${size * 0.35} ${-size * 0.5} ${size * 0.35} ${-size * 0.1}
+            V ${size * 0.45} Z`}
       />
       <path
         className="map-marker__cross"
-        d={`M 0,${-size/3} V ${size/3} M ${-size/3},0 H ${size/3}`}
+        d={`M 0,${-size * 0.45} V ${-size * 0.1} M ${-size * 0.14},${-size * 0.28} H ${size * 0.14}`}
         strokeWidth={2}
         strokeLinecap="round"
       />
@@ -63,11 +69,15 @@ function GraveMarker({ location, isSelected, onSelect, onDeselect }: MarkerProps
 }
 
 interface TooltipProps {
-  location: ClusteredLocation
+  cluster: MapCluster
+  debug?: boolean
+  onHoverStart: () => void
+  onHoverEnd: () => void
+  onViewAll: () => void
 }
 
-function Tooltip({ location }: TooltipProps) {
-  const { x: svgX, y: svgY } = latLngToXY(location.lat, location.lng)
+function Tooltip({ cluster, debug, onHoverStart, onHoverEnd, onViewAll }: TooltipProps) {
+  const { x: svgX, y: svgY } = cluster
 
   // Position tooltip above or below based on y position
   const tooltipY = svgY < 150 ? svgY + 30 : svgY - 80
@@ -76,193 +86,475 @@ function Tooltip({ location }: TooltipProps) {
     <foreignObject
       x={Math.max(10, Math.min(svgX - 80, 640))}
       y={tooltipY}
-      width={160}
-      height={100}
+      width={180}
+      height={140}
       className="map-tooltip"
+      onMouseEnter={onHoverStart}
+      onMouseLeave={onHoverEnd}
     >
       <div className="map-tooltip__content">
-        <span className="map-tooltip__city">{location.city}</span>
-        <span className="map-tooltip__count">{location.totalCount} tabs</span>
+        <span className="map-tooltip__city">{cluster.label}</span>
+        <span className="map-tooltip__count">{cluster.totalCount} tabs</span>
         <div className="map-tooltip__domains">
-          {location.domains.slice(0, 3).map(d => (
+          {cluster.domains.slice(0, 3).map(d => (
             <span key={d.domain} className="map-tooltip__domain">
               {d.domain} ({d.count})
             </span>
           ))}
-          {location.domains.length > 3 && (
+          {cluster.domains.length > 3 && (
             <span className="map-tooltip__more">
-              +{location.domains.length - 3} more
+              +{cluster.domains.length - 3} more
             </span>
           )}
         </div>
+        {cluster.tabs.length > 0 && (
+          <button
+            type="button"
+            className="map-tooltip__button"
+            onClick={onViewAll}
+          >
+            View all links ({cluster.tabs.length})
+          </button>
+        )}
+        {debug && (
+          <div className="map-tooltip__debug">
+            <span>members: {cluster.members.length}</span>
+            <span>x: {Math.round(svgX)} y: {Math.round(svgY)}</span>
+            <span>domains: {cluster.domains.length}</span>
+            <span>links: {cluster.tabs.length}</span>
+          </div>
+        )}
       </div>
     </foreignObject>
   )
 }
 
-export function WorldMap() {
-  const [selectedLocation, setSelectedLocation] = useState<ClusteredLocation | null>(null)
-  const [scale, setScale] = useState(1)
-  const [pan, setPan] = useState({ x: 0, y: 0 })
-  const [isDragging, setIsDragging] = useState(false)
-  const [dragStart, setDragStart] = useState({ x: 0, y: 0 })
-  const svgRef = useRef<SVGSVGElement>(null)
+export type WorldMapMode = 'map' | 'web'
 
-  const locations = getClusteredLocations()
+interface WorldMapProps {
+  locations?: ClusteredLocation[]
+  tabs?: TabEntry[]
+  title?: string
+  subtitle?: string
+  mode?: WorldMapMode
+}
+
+function closedPath(points: Array<{ x: number; y: number }>): string {
+  if (points.length === 0) return ''
+  let d = `M ${points[0].x} ${points[0].y}`
+  for (let i = 1; i < points.length; i++) {
+    d += ` L ${points[i].x} ${points[i].y}`
+  }
+  return d + ' Z'
+}
+
+export function WorldMap({
+  locations: locationsProp,
+  tabs: tabsProp,
+  title = 'The Map',
+  subtitle = 'Where your tabs came from. Tap markers to see domains. Larger marker = more tabs.',
+  mode = 'map',
+}: WorldMapProps) {
+  const [hoveredCluster, setHoveredCluster] = useState<MapCluster | null>(null)
+  const [selectedCluster, setSelectedCluster] = useState<MapCluster | null>(null)
+  const [linksCluster, setLinksCluster] = useState<MapCluster | null>(null)
+  const svgRef = useRef<SVGSVGElement>(null)
+  const gRef = useRef<SVGGElement>(null)
+  const zoomBehaviorRef = useRef<ZoomBehavior | null>(null)
+  const [landFeature, setLandFeature] = useState<FeatureCollection<Geometry> | null>(null)
+
+  const locations = useMemo(
+    () => locationsProp ?? getClusteredLocations(),
+    [locationsProp]
+  )
+  const allTabs = useMemo(
+    () => tabsProp ?? CATEGORY_GROUPS.flatMap((g) => g.tabs),
+    [tabsProp]
+  )
+  const debug = typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('mapdebug')
+
+  useEffect(() => {
+    let cancelled = false
+    fetch('/land-50m.json')
+      .then((res) => res.json())
+      .then((topology: Topology) => {
+        if (cancelled) return
+        const land = feature(topology, topology.objects.land) as FeatureCollection<Geometry>
+        setLandFeature(land)
+      })
+      .catch((error) => {
+        console.error('Failed to load land-50m.json:', error)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  const projection = useMemo(() => {
+    if (!landFeature) return null
+    return geoMercator().fitSize([MAP_WIDTH, MAP_HEIGHT], landFeature)
+  }, [landFeature])
+
+  const landPath = useMemo(() => {
+    if (!landFeature || !projection) return ''
+    return geoPath(projection)(landFeature) || ''
+  }, [landFeature, projection])
+
+  const domainTabs = useMemo(() => {
+    const map = new Map<string, TabEntry[]>()
+    for (const tab of allTabs) {
+      const list = map.get(tab.domain) || []
+      list.push(tab)
+      map.set(tab.domain, list)
+    }
+    return map
+  }, [allTabs])
+
+  const clusters = useMemo<MapCluster[]>(() => {
+    if (!projection) return []
+
+    const threshold = 26
+    const result: MapCluster[] = []
+
+    for (const loc of locations) {
+      const point = projection([loc.lng, loc.lat])
+      if (!point) continue
+      const [x, y] = point
+
+      let assigned: MapCluster | null = null
+      for (const cluster of result) {
+        const dx = cluster.x - x
+        const dy = cluster.y - y
+        if (Math.hypot(dx, dy) < threshold) {
+          assigned = cluster
+          break
+        }
+      }
+
+      if (!assigned) {
+        const tabs: { tab: TabEntry; location: string }[] = []
+        for (const domain of loc.domains) {
+          const domainList = domainTabs.get(domain.domain) || []
+          for (const tab of domainList) {
+            tabs.push({ tab, location: loc.city })
+          }
+        }
+        result.push({
+          id: loc.city,
+          x,
+          y,
+          members: [loc],
+          totalCount: loc.totalCount,
+          domains: [...loc.domains],
+          label: loc.city,
+          tabs,
+        })
+        continue
+      }
+
+      assigned.members.push(loc)
+      assigned.totalCount += loc.totalCount
+      assigned.x = (assigned.x * (assigned.members.length - 1) + x) / assigned.members.length
+      assigned.y = (assigned.y * (assigned.members.length - 1) + y) / assigned.members.length
+
+      const domainCounts = new Map<string, number>()
+      for (const entry of assigned.domains) {
+        domainCounts.set(entry.domain, entry.count)
+      }
+      for (const entry of loc.domains) {
+        domainCounts.set(entry.domain, (domainCounts.get(entry.domain) || 0) + entry.count)
+      }
+      assigned.domains = Array.from(domainCounts.entries())
+        .map(([domain, count]) => ({ domain, count }))
+        .sort((a, b) => b.count - a.count)
+
+      const tabMap = new Map<string, { tab: TabEntry; location: string }>()
+      for (const member of assigned.members) {
+        for (const domain of member.domains) {
+          const domainList = domainTabs.get(domain.domain) || []
+          for (const tab of domainList) {
+            tabMap.set(tab.url, { tab, location: member.city })
+          }
+        }
+      }
+      assigned.tabs = Array.from(tabMap.values())
+
+      assigned.label = assigned.members.length === 1
+        ? assigned.members[0].city
+        : `${assigned.members.length} places`
+    }
+
+    return result
+  }, [locations, projection, domainTabs])
+
+  const web = useMemo(() => {
+    if (mode !== 'web') return null
+    if (clusters.length < 3) return null
+
+    const centerX = clusters.reduce((acc, c) => acc + c.x, 0) / clusters.length
+    const centerY = clusters.reduce((acc, c) => acc + c.y, 0) / clusters.length
+
+    const ordered = [...clusters].sort((a, b) => {
+      const aAngle = Math.atan2(a.y - centerY, a.x - centerX)
+      const bAngle = Math.atan2(b.y - centerY, b.x - centerX)
+      return aAngle - bAngle
+    })
+
+    const base = ordered.map((c) => ({ x: c.x, y: c.y }))
+    const rings = [0.66, 0.33].map((scale) =>
+      base.map((p) => ({
+        x: centerX + (p.x - centerX) * scale,
+        y: centerY + (p.y - centerY) * scale,
+      }))
+    )
+
+    const rays = base.map((p) => ({
+      x1: centerX,
+      y1: centerY,
+      x2: p.x,
+      y2: p.y,
+    }))
+
+    return {
+      ring: closedPath(base),
+      rings: rings.map((points) => closedPath(points)),
+      rays,
+    }
+  }, [mode, clusters])
+
+  useEffect(() => {
+    const svg = svgRef.current
+    if (!svg) return
+
+    const behavior = zoom()
+      .scaleExtent([0.5, 4])
+      .on('zoom', (event: unknown) => {
+        const maybe = event as { transform?: { toString?: () => string } } | null
+        const t = maybe?.transform
+        if (!t || typeof t.toString !== 'function') return
+        const g = gRef.current
+        if (!g) return
+        g.setAttribute('transform', t.toString())
+      })
+
+    zoomBehaviorRef.current = behavior
+
+    const selection = select(svg)
+    selection.call(behavior)
+    return () => {
+      selection.on('.zoom', null)
+      zoomBehaviorRef.current = null
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!projection || clusters.length === 0) return
+    const behavior = zoomBehaviorRef.current
+    if (!behavior) return
+    const points = clusters.map((cluster) => [cluster.x, cluster.y] as [number, number])
+    if (points.length === 0) return
+
+    let minX = Infinity
+    let minY = Infinity
+    let maxX = -Infinity
+    let maxY = -Infinity
+    for (const [x, y] of points) {
+      minX = Math.min(minX, x)
+      minY = Math.min(minY, y)
+      maxX = Math.max(maxX, x)
+      maxY = Math.max(maxY, y)
+    }
+
+    const padding = 40
+    minX -= padding
+    minY -= padding
+    maxX += padding
+    maxY += padding
+
+    const boundsWidth = Math.max(1, maxX - minX)
+    const boundsHeight = Math.max(1, maxY - minY)
+    const fitScale = Math.min(MAP_WIDTH / boundsWidth, MAP_HEIGHT / boundsHeight)
+    const targetScale = Math.min(4, fitScale)
+
+    const boundsCenterX = (minX + maxX) / 2
+    const boundsCenterY = (minY + maxY) / 2
+    const translateX = MAP_WIDTH / 2 - boundsCenterX * targetScale
+    const translateY = MAP_HEIGHT / 2 - boundsCenterY * targetScale
+
+    const transform = zoomIdentity.translate(translateX, translateY).scale(targetScale)
+    const svg = svgRef.current
+    if (gRef.current) {
+      gRef.current.setAttribute('transform', transform.toString())
+    }
+    if (svg) {
+      select(svg).call(behavior.transform, transform)
+    }
+  }, [projection, clusters])
 
   // Zoom handlers
-  const handleZoomIn = () => setScale(s => Math.min(s * 1.5, 4))
-  const handleZoomOut = () => setScale(s => Math.max(s / 1.5, 0.5))
+  const handleZoomIn = () => {
+    const svg = svgRef.current
+    const behavior = zoomBehaviorRef.current
+    if (!svg || !behavior) return
+    select(svg).call(behavior.scaleBy, 1.5)
+  }
+
+  const handleZoomOut = () => {
+    const svg = svgRef.current
+    const behavior = zoomBehaviorRef.current
+    if (!svg || !behavior) return
+    select(svg).call(behavior.scaleBy, 1 / 1.5)
+  }
+
   const handleReset = () => {
-    setScale(1)
-    setPan({ x: 0, y: 0 })
+    const svg = svgRef.current
+    const behavior = zoomBehaviorRef.current
+    if (!svg || !behavior) return
+    select(svg).call(behavior.transform, zoomIdentity)
   }
 
-  // Pan handlers
-  const handleMouseDown = (e: React.MouseEvent) => {
-    setIsDragging(true)
-    setDragStart({ x: e.clientX - pan.x, y: e.clientY - pan.y })
-  }
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!isDragging) return
-    setPan({
-      x: e.clientX - dragStart.x,
-      y: e.clientY - dragStart.y,
-    })
-  }
-
-  const handleMouseUp = () => setIsDragging(false)
-
-  // Touch handlers for mobile
-  const handleTouchStart = (e: React.TouchEvent) => {
-    if (e.touches.length === 1) {
-      setIsDragging(true)
-      setDragStart({
-        x: e.touches[0].clientX - pan.x,
-        y: e.touches[0].clientY - pan.y,
-      })
-    }
-  }
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (!isDragging || e.touches.length !== 1) return
-    setPan({
-      x: e.touches[0].clientX - dragStart.x,
-      y: e.touches[0].clientY - dragStart.y,
-    })
-  }
-
-  const handleTouchEnd = () => setIsDragging(false)
-
-  return (
-    <section className="section section--worldmap">
-      <div className="worldmap__container">
-        <h2 className="section__heading">The Map</h2>
-        <p className="worldmap__subtitle">
-          Where your tabs came from. Tap markers to see domains.
-        </p>
-
-        {/* Zoom controls */}
-        <div className="worldmap__controls">
-          <button
-            className="worldmap__control"
-            onClick={handleZoomIn}
-            aria-label="Zoom in"
-          >
-            +
-          </button>
-          <button
-            className="worldmap__control"
-            onClick={handleZoomOut}
-            aria-label="Zoom out"
-          >
-            −
-          </button>
-          <button
-            className="worldmap__control worldmap__control--reset"
-            onClick={handleReset}
-            aria-label="Reset view"
-          >
-            ⟲
-          </button>
-        </div>
+	  return (
+	    <section className="section section--worldmap">
+	      <div className="worldmap__container">
+	        <h2 className="section__heading">{title}</h2>
+	        <p className="worldmap__subtitle">{subtitle}</p>
 
         {/* Map SVG */}
         <div className="worldmap__viewport">
+          {/* Zoom controls */}
+          <div className="worldmap__controls">
+            <button
+              className="worldmap__control"
+              onClick={handleZoomIn}
+              aria-label="Zoom in"
+            >
+              +
+            </button>
+            <button
+              className="worldmap__control"
+              onClick={handleZoomOut}
+              aria-label="Zoom out"
+            >
+              −
+            </button>
+            <button
+              className="worldmap__control worldmap__control--reset"
+              onClick={handleReset}
+              aria-label="Reset view"
+            >
+              ⟲
+            </button>
+          </div>
           <svg
             ref={svgRef}
             className="worldmap__svg"
-            viewBox="0 0 800 400"
+            viewBox={`0 0 ${MAP_WIDTH} ${MAP_HEIGHT}`}
             preserveAspectRatio="xMidYMid meet"
-            onMouseDown={handleMouseDown}
-            onMouseMove={handleMouseMove}
-            onMouseUp={handleMouseUp}
-            onMouseLeave={handleMouseUp}
-            onTouchStart={handleTouchStart}
-            onTouchMove={handleTouchMove}
-            onTouchEnd={handleTouchEnd}
-            style={{
-              cursor: isDragging ? 'grabbing' : 'grab',
-            }}
           >
-            <g
-              transform={`translate(${pan.x}, ${pan.y}) scale(${scale})`}
-              style={{ transformOrigin: 'center' }}
-            >
-              {/* World outline */}
-              <path
-                className="worldmap__land"
-                d={WORLD_PATH}
-                fill="var(--color-bg-raised)"
-                stroke="var(--color-stone)"
-                strokeWidth="1"
-              />
+            <g ref={gRef}>
+              {/* World outline (D3 geo) */}
+              {landPath && (
+                <path
+                  className="worldmap__land"
+                  d={landPath}
+                />
+              )}
 
-              {/* Grid lines for visual reference */}
-              <g className="worldmap__grid" opacity="0.1">
-                {[0, 100, 200, 300, 400].map(y => (
-                  <line key={`h${y}`} x1="0" y1={y} x2="800" y2={y} stroke="var(--color-stone)" />
-                ))}
-                {[0, 100, 200, 300, 400, 500, 600, 700, 800].map(x => (
-                  <line key={`v${x}`} x1={x} y1="0" x2={x} y2="400" stroke="var(--color-stone)" />
-                ))}
-              </g>
+	              {/* Grid lines for visual reference */}
+	              {mode === 'map' && (
+	                <g className="worldmap__grid" opacity="0.1">
+	                  {[0, 150, 300, 450, 600].map(y => (
+	                    <line key={`h${y}`} x1="0" y1={y} x2={MAP_WIDTH} y2={y} stroke="var(--color-stone)" />
+	                  ))}
+	                  {[0, 200, 400, 600, 800, 1000].map(x => (
+	                    <line key={`v${x}`} x1={x} y1="0" x2={x} y2={MAP_HEIGHT} stroke="var(--color-stone)" />
+	                  ))}
+	                </g>
+	              )}
+
+	              {/* Web overlay */}
+	              {mode === 'web' && web && (
+	                <g className="worldmap__web">
+	                  {web.rings.map((d, i) => (
+	                    <path key={`ring${i}`} className="worldmap__web-ring" d={d} />
+	                  ))}
+	                  <path className="worldmap__web-ring worldmap__web-ring--outer" d={web.ring} />
+	                  {web.rays.map((ray, i) => (
+	                    <line
+	                      key={`ray${i}`}
+	                      className="worldmap__web-ray"
+	                      x1={ray.x1}
+	                      y1={ray.y1}
+	                      x2={ray.x2}
+	                      y2={ray.y2}
+	                    />
+	                  ))}
+	                </g>
+	              )}
 
               {/* Markers */}
-              {locations.map(loc => (
+              {projection && clusters.map(cluster => (
                 <GraveMarker
-                  key={loc.city}
-                  location={loc}
-                  isSelected={selectedLocation?.city === loc.city}
-                  onSelect={() => setSelectedLocation(loc)}
-                  onDeselect={() => setSelectedLocation(null)}
+                  key={cluster.id}
+                  cluster={cluster}
+                  isSelected={selectedCluster?.id === cluster.id}
+                  onSelect={() => setSelectedCluster((current) => current?.id === cluster.id ? null : cluster)}
+                  onDeselect={() => setHoveredCluster((current) => current?.id === cluster.id ? null : current)}
                 />
               ))}
 
               {/* Tooltip */}
-              {selectedLocation && (
-                <Tooltip location={selectedLocation} />
+              {(selectedCluster || hoveredCluster) && (
+                <Tooltip
+                  cluster={selectedCluster || hoveredCluster!}
+                  debug={debug}
+                  onHoverStart={() => setHoveredCluster(selectedCluster || hoveredCluster!)}
+                  onHoverEnd={() => setHoveredCluster(null)}
+                  onViewAll={() => {
+                    const active = selectedCluster || hoveredCluster
+                    if (!active) return
+                    setSelectedCluster(active)
+                    setLinksCluster(active)
+                  }}
+                />
               )}
             </g>
           </svg>
         </div>
 
-        {/* Legend */}
-        <div className="worldmap__legend">
-          <span className="worldmap__legend-item">
-            <span className="worldmap__legend-marker worldmap__legend-marker--small" />
-            1-10 tabs
-          </span>
-          <span className="worldmap__legend-item">
-            <span className="worldmap__legend-marker worldmap__legend-marker--medium" />
-            11-50 tabs
-          </span>
-          <span className="worldmap__legend-item">
-            <span className="worldmap__legend-marker worldmap__legend-marker--large" />
-            50+ tabs
-          </span>
-        </div>
+        {/* Legend removed (size is described in subtitle) */}
+        {linksCluster && (
+          <div className="map-links-modal" onClick={() => setLinksCluster(null)}>
+            <div className="map-links-panel" onClick={(e) => e.stopPropagation()}>
+              <button
+                className="map-links-close"
+                onClick={() => setLinksCluster(null)}
+                aria-label="Close links"
+              >
+                ×
+              </button>
+              <h3 className="map-links-title">{linksCluster.label}</h3>
+              <p className="map-links-subtitle">
+                Showing {linksCluster.tabs.length} links from mapped domains.
+              </p>
+              <div className="map-links-list">
+	                {linksCluster.tabs.map(({ tab, location }, i) => (
+	                  <a
+	                    key={`${tab.url}:${location}:${i}`}
+	                    className="map-links-item"
+	                    href={tab.url}
+	                    target="_blank"
+	                    rel="noreferrer"
+                  >
+                    <span className="map-links-domain">{tab.domain}</span>
+                    <span className="map-links-title-text">{tab.title || tab.url}</span>
+                    <span className="map-links-location">{location}</span>
+                  </a>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </section>
   )

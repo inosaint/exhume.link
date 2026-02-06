@@ -1,5 +1,6 @@
-import { useRef, useCallback, useState } from 'react'
-import { SHARE_STATS, CATEGORIES } from '../data/mockData'
+import { useRef, useCallback, useState, useEffect } from 'react'
+import { PersonalityCard } from './PersonalityCard'
+import type { ExhumeStats, PersonalityProfile } from '../data/tabsAnalysis'
 import './ShareCard.css'
 
 // Card dimensions for OG/social share
@@ -19,25 +20,114 @@ const COLORS = {
   accentDim: '#7a6540',
 }
 
-// Load font for canvas (Cinzel from Google Fonts)
+function drawLetterSpacedText(
+  ctx: CanvasRenderingContext2D,
+  text: string,
+  x: number,
+  y: number,
+  spacing: number,
+  align: CanvasTextAlign = 'left'
+) {
+  if (!text) return
+
+  if (spacing <= 0) {
+    ctx.textAlign = align
+    ctx.fillText(text, x, y)
+    return
+  }
+
+  const chars = text.split('')
+  const totalWidth = chars.reduce((acc, ch, i) => {
+    const w = ctx.measureText(ch).width
+    return acc + w + (i < chars.length - 1 ? spacing : 0)
+  }, 0)
+
+  let cursorX = x
+  if (align === 'center') cursorX = x - totalWidth / 2
+  if (align === 'right') cursorX = x - totalWidth
+
+  for (let i = 0; i < chars.length; i++) {
+    const ch = chars[i]
+    ctx.fillText(ch, cursorX, y)
+    cursorX += ctx.measureText(ch).width + spacing
+  }
+}
+
+// Wait for document fonts to be ready (Cinzel/Inter loaded via CSS)
 async function loadFont(): Promise<void> {
-  const font = new FontFace(
-    'Cinzel',
-    'url(https://fonts.gstatic.com/s/cinzel/v23/8vIU7ww63mVu7gtR-kwKxNvkNOjw-tbnTYrvDE5ZdqU.woff2)'
-  )
-  await font.load()
-  document.fonts.add(font)
+  if (document.fonts?.ready) {
+    await document.fonts.ready
+  }
+}
+
+function loadImage(src: string): Promise<HTMLImageElement> {
+  return new Promise((resolve, reject) => {
+    const img = new Image()
+    img.onload = () => resolve(img)
+    img.onerror = () => reject(new Error(`Failed to load image: ${src}`))
+    img.src = src
+  })
+}
+
+function wrapText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number) {
+  const words = text.split(' ')
+  const lines: string[] = []
+  let current = ''
+
+  for (const word of words) {
+    const next = current ? `${current} ${word}` : word
+    if (ctx.measureText(next).width <= maxWidth) {
+      current = next
+    } else {
+      if (current) lines.push(current)
+      current = word
+    }
+  }
+  if (current) lines.push(current)
+  return lines
+}
+
+function drawRoundedRect(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  radius: number
+) {
+  const maybeRoundRect = (ctx as CanvasRenderingContext2D & { roundRect?: unknown }).roundRect
+  if (typeof maybeRoundRect === 'function') {
+    ctx.beginPath()
+    ;(ctx as CanvasRenderingContext2D & { roundRect: (x: number, y: number, w: number, h: number, r: number) => void })
+      .roundRect(x, y, width, height, radius)
+    return
+  }
+
+  const r = Math.min(radius, width / 2, height / 2)
+  ctx.beginPath()
+  ctx.moveTo(x + r, y)
+  ctx.lineTo(x + width - r, y)
+  ctx.quadraticCurveTo(x + width, y, x + width, y + r)
+  ctx.lineTo(x + width, y + height - r)
+  ctx.quadraticCurveTo(x + width, y + height, x + width - r, y + height)
+  ctx.lineTo(x + r, y + height)
+  ctx.quadraticCurveTo(x, y + height, x, y + height - r)
+  ctx.lineTo(x, y + r)
+  ctx.quadraticCurveTo(x, y, x + r, y)
 }
 
 interface ShareCardProps {
-  onClose?: () => void
+  profile: PersonalityProfile
+  stats: ExhumeStats
 }
 
-export function ShareCard({ onClose }: ShareCardProps) {
+export function ShareCard({ profile, stats }: ShareCardProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [isGenerating, setIsGenerating] = useState(false)
   const [isGenerated, setIsGenerated] = useState(false)
   const [copySuccess, setCopySuccess] = useState(false)
+  const [linkCopied, setLinkCopied] = useState(false)
+  const [showShareModal, setShowShareModal] = useState(false)
 
   const generateCard = useCallback(async () => {
     const canvas = canvasRef.current
@@ -46,8 +136,9 @@ export function ShareCard({ onClose }: ShareCardProps) {
     setIsGenerating(true)
 
     try {
-      // Load Cinzel font
+      // Ensure fonts are ready
       await loadFont()
+      const portrait = await loadImage(profile.image)
 
       const ctx = canvas.getContext('2d')
       if (!ctx) return
@@ -63,119 +154,89 @@ export function ShareCard({ onClose }: ShareCardProps) {
       ctx.fillStyle = gradient
       ctx.fillRect(0, 0, CARD_WIDTH, CARD_HEIGHT)
 
-      // Border
-      ctx.strokeStyle = COLORS.stone
-      ctx.lineWidth = 2
-      ctx.strokeRect(20, 20, CARD_WIDTH - 40, CARD_HEIGHT - 40)
+      // Portrait (preserve aspect ratio)
+      const portraitBox = 220
+      const portraitX = (CARD_WIDTH - portraitBox) / 2
+      const portraitY = 80
+      const scale = Math.min(portraitBox / portrait.width, portraitBox / portrait.height)
+      const drawW = portrait.width * scale
+      const drawH = portrait.height * scale
+      ctx.drawImage(
+        portrait,
+        portraitX + (portraitBox - drawW) / 2,
+        portraitY + (portraitBox - drawH) / 2,
+        drawW,
+        drawH
+      )
 
-      // Top accent line
-      ctx.beginPath()
-      ctx.moveTo(CARD_WIDTH / 4, 20)
-      ctx.lineTo((CARD_WIDTH * 3) / 4, 20)
-      ctx.strokeStyle = COLORS.accent
-      ctx.lineWidth = 3
-      ctx.stroke()
-
-      // Logo text
-      ctx.fillStyle = COLORS.textPrimary
-      ctx.font = '28px Cinzel, serif'
-      ctx.textAlign = 'center'
-      ctx.letterSpacing = '8px'
-      ctx.fillText('EXHUME.LINK', CARD_WIDTH / 2, 80)
-
-      // Tagline
-      ctx.fillStyle = COLORS.textMuted
-      ctx.font = '16px Inter, sans-serif'
-      ctx.letterSpacing = '2px'
-      ctx.fillText('YOUR DIGITAL REMAINS, EXHUMED', CARD_WIDTH / 2, 110)
-
-      // Archetype section
-      // Volume suffix
-      ctx.fillStyle = COLORS.accentDim
-      ctx.font = '18px Cinzel, serif'
-      ctx.fillText(SHARE_STATS.volumeSuffix.toUpperCase(), CARD_WIDTH / 2, 200)
-
-      // Archetype name
+      // Title
+      const titleText = profile.title.toUpperCase()
       ctx.fillStyle = COLORS.accent
-      ctx.font = 'bold 56px Cinzel, serif'
-      ctx.fillText(SHARE_STATS.archetype.toUpperCase(), CARD_WIDTH / 2, 270)
+      ctx.font = 'bold 48px Cinzel, serif'
+      ctx.textAlign = 'center'
+      const titleLines = wrapText(ctx, titleText, CARD_WIDTH * 0.78)
+      const titleStartY = portraitY + portraitBox + 70
+      titleLines.slice(0, 2).forEach((line, index) => {
+        ctx.fillText(line, CARD_WIDTH / 2, titleStartY + index * 52)
+      })
 
-      // Decorative line under archetype
-      ctx.beginPath()
-      ctx.moveTo(CARD_WIDTH / 3, 300)
-      ctx.lineTo((CARD_WIDTH * 2) / 3, 300)
-      ctx.strokeStyle = COLORS.stoneLlight
-      ctx.lineWidth = 1
-      ctx.stroke()
+      // Description
+      ctx.fillStyle = COLORS.textSecondary
+      ctx.font = '18px Inter, sans-serif'
+      const descLines = wrapText(ctx, profile.description, CARD_WIDTH * 0.76)
+      const descStartY = titleStartY + 70
+      descLines.slice(0, 2).forEach((line, index) => {
+        ctx.fillText(line, CARD_WIDTH / 2, descStartY + index * 26)
+      })
 
       // Stats row
-      const statsY = 380
-      const statWidth = 200
+      const statsY = CARD_HEIGHT - 110
+      const statWidth = 260
       const startX = (CARD_WIDTH - statWidth * 3) / 2
 
-      const stats = [
-        { value: SHARE_STATS.totalTabs.toString(), label: 'TABS BURIED' },
-        { value: SHARE_STATS.uniqueDomains + '+', label: 'DOMAINS' },
-        { value: SHARE_STATS.browsers.toString(), label: 'BROWSERS' },
+      const shareStats = [
+        { value: stats.totalTabs.toString(), label: 'TABS' },
+        { value: stats.uniqueDomains.toString(), label: 'DOMAINS' },
+        { value: `${stats.topDomain?.domain ?? '—'} (${stats.topDomain?.count ?? 0})`, label: 'TOP DOMAIN' },
       ]
 
-      stats.forEach((stat, i) => {
+      shareStats.forEach((stat, i) => {
         const x = startX + i * statWidth + statWidth / 2
+        const chipWidth = 220
+        const chipHeight = 56
+        const chipX = x - chipWidth / 2
+        const chipY = statsY - 36
 
-        // Value
-        ctx.fillStyle = COLORS.accent
-        ctx.font = 'bold 48px Cinzel, serif'
-        ctx.fillText(stat.value, x, statsY)
+        ctx.fillStyle = 'rgba(10, 10, 14, 0.5)'
+        drawRoundedRect(ctx, chipX, chipY, chipWidth, chipHeight, 10)
+        ctx.fill()
 
-        // Label
+        ctx.fillStyle = COLORS.textPrimary
+        ctx.font = 'bold 18px Cinzel, serif'
+        ctx.fillText(stat.value, x, statsY - 6)
+
         ctx.fillStyle = COLORS.textMuted
         ctx.font = '12px Inter, sans-serif'
-        ctx.letterSpacing = '2px'
-        ctx.fillText(stat.label, x, statsY + 30)
+        drawLetterSpacedText(ctx, stat.label, x, statsY + 16, 2, 'center')
       })
-
-      // Top categories section
-      ctx.fillStyle = COLORS.textSecondary
-      ctx.font = '14px Inter, sans-serif'
-      ctx.letterSpacing = '3px'
-      ctx.fillText('TOP CATEGORIES', CARD_WIDTH / 2, 480)
-
-      const categoryY = 520
-      const categoryWidth = 250
-      const categoryStartX = (CARD_WIDTH - categoryWidth * 3) / 2
-
-      SHARE_STATS.topCategories.forEach((cat, i) => {
-        const x = categoryStartX + i * categoryWidth + categoryWidth / 2
-        const categoryDef = CATEGORIES.find(c => c.id === cat.id)
-        const icon = categoryDef?.icon || ''
-
-        // Icon
-        ctx.font = '24px sans-serif'
-        ctx.fillText(icon, x, categoryY)
-
-        // Category name
-        ctx.fillStyle = COLORS.textPrimary
-        ctx.font = '14px Inter, sans-serif'
-        ctx.fillText(cat.label, x, categoryY + 30)
-
-        // Count
-        ctx.fillStyle = COLORS.accentDim
-        ctx.font = '12px Inter, sans-serif'
-        ctx.fillText(`${cat.count} tabs`, x, categoryY + 50)
-      })
-
-      // Footer
-      ctx.fillStyle = COLORS.textMuted
-      ctx.font = '12px Inter, sans-serif'
-      ctx.letterSpacing = '1px'
-      ctx.fillText('exhume.link — discover what your tabs say about you', CARD_WIDTH / 2, CARD_HEIGHT - 40)
 
       setIsGenerated(true)
     } catch (error) {
       console.error('Error generating share card:', error)
+      setIsGenerated(false)
     } finally {
       setIsGenerating(false)
     }
+  }, [profile, stats])
+
+  const handleDownload = useCallback(() => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+
+    const link = document.createElement('a')
+    link.download = 'exhume-link-results.png'
+    link.href = canvas.toDataURL('image/png')
+    link.click()
   }, [])
 
   const handleCopyToClipboard = useCallback(async () => {
@@ -201,64 +262,99 @@ export function ShareCard({ onClose }: ShareCardProps) {
       // Fallback: download instead
       handleDownload()
     }
+  }, [handleDownload])
+
+  const handleCopyShareLink = useCallback(async () => {
+    try {
+      const payload = {
+        title: profile.title,
+        description: profile.description,
+        image: profile.image,
+        stats: {
+          totalTabs: stats.totalTabs,
+          uniqueDomains: stats.uniqueDomains,
+          topDomain: stats.topDomain,
+        },
+      }
+
+      const json = JSON.stringify(payload)
+      const base64 = btoa(unescape(encodeURIComponent(json)))
+      const base64Url = base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '')
+      const shareUrl = `${window.location.origin}${window.location.pathname}?share=${base64Url}`
+
+      await navigator.clipboard.writeText(shareUrl)
+      setLinkCopied(true)
+      setTimeout(() => setLinkCopied(false), 2000)
+    } catch (error) {
+      console.error('Failed to copy share link:', error)
+    }
+  }, [profile, stats])
+
+  useEffect(() => {
+    function handleShareRequest() {
+      setShowShareModal(true)
+    }
+
+    window.addEventListener('share-card-request', handleShareRequest)
+    return () => window.removeEventListener('share-card-request', handleShareRequest)
   }, [])
 
-  const handleDownload = useCallback(() => {
-    const canvas = canvasRef.current
-    if (!canvas) return
-
-    const link = document.createElement('a')
-    link.download = 'exhume-link-results.png'
-    link.href = canvas.toDataURL('image/png')
-    link.click()
-  }, [])
+  useEffect(() => {
+    if (showShareModal && !isGenerated && !isGenerating) {
+      generateCard()
+    }
+  }, [showShareModal, isGenerated, isGenerating, generateCard])
 
   return (
-    <div className="share-card-modal" onClick={onClose}>
-      <div className="share-card-content" onClick={e => e.stopPropagation()}>
-        <button className="share-card-close" onClick={onClose} aria-label="Close">
-          ×
-        </button>
+    <>
+      <PersonalityCard profile={profile} />
 
-        <h3 className="share-card-title">Share Your Results</h3>
-
-        <div className="share-card-preview">
-          <canvas
-            ref={canvasRef}
-            width={CARD_WIDTH}
-            height={CARD_HEIGHT}
-            className="share-card-canvas"
-          />
-          {!isGenerated && (
-            <div className="share-card-placeholder">
+      {showShareModal && (
+        <div className="share-card-modal" onClick={() => setShowShareModal(false)}>
+          <div className="share-card-modal__content" onClick={e => e.stopPropagation()}>
+            <div className="share-card-modal__header">
+              <span className="share-card-modal__eyebrow">Share</span>
               <button
-                className="share-card-generate"
-                onClick={generateCard}
-                disabled={isGenerating}
+                className="share-card-close"
+                onClick={() => setShowShareModal(false)}
+                aria-label="Close"
               >
-                {isGenerating ? 'Generating...' : 'Generate Card'}
+                ×
               </button>
             </div>
-          )}
-        </div>
-
-        {isGenerated && (
-          <div className="share-card-actions">
-            <button
-              className="share-card-button share-card-button--copy"
-              onClick={handleCopyToClipboard}
-            >
-              {copySuccess ? 'Copied!' : 'Copy to Clipboard'}
-            </button>
-            <button
-              className="share-card-button share-card-button--download"
-              onClick={handleDownload}
-            >
-              Download PNG
-            </button>
+            <p className="share-card-modal__title">Choose your ritual.</p>
+            <div className="share-card-actions">
+              <button
+                className="share-card-button share-card-button--copy"
+                onClick={handleCopyToClipboard}
+              >
+                {copySuccess ? 'Copied!' : 'Copy to Clipboard'}
+              </button>
+              <button
+                className="share-card-button share-card-button--download"
+                onClick={handleDownload}
+              >
+                Download PNG
+              </button>
+              <button
+                className="share-card-button share-card-button--link"
+                onClick={handleCopyShareLink}
+              >
+                {linkCopied ? 'Link Copied' : 'Copy Share Link'}
+              </button>
+            </div>
+            <p className="share-card-modal__note">
+              Link includes a compact JSON snapshot in the URL.
+            </p>
+            <canvas
+              ref={canvasRef}
+              width={CARD_WIDTH}
+              height={CARD_HEIGHT}
+              className="share-card-canvas share-card-canvas--hidden"
+            />
           </div>
-        )}
-      </div>
-    </div>
+        </div>
+      )}
+    </>
   )
 }

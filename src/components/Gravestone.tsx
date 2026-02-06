@@ -76,7 +76,7 @@ export function GravestoneRow({ tabs, startIndex }: GravestoneRowProps) {
   return (
     <div className="gravestone-row">
       {tabs.map((tab, i) => (
-        <Gravestone key={tab.url} tab={tab} index={startIndex + i} />
+        <Gravestone key={`${tab.url}:${startIndex + i}`} tab={tab} index={startIndex + i} />
       ))}
     </div>
   )

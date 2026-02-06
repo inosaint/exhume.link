@@ -1,6 +1,20 @@
 /* ──────────────────────────────────────────────
-   Share Card Modal styles
+   Share Card Panel styles
    ────────────────────────────────────────────── */
+
+.share-card-canvas {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.share-card-canvas--hidden {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  width: 1px;
+  height: 1px;
+}
 
 .share-card-modal {
   position: fixed;
@@ -23,20 +37,22 @@
   }
 }
 
-.share-card-content {
+.share-card-modal__content {
   position: relative;
   max-width: 90vw;
   max-height: 90vh;
+  max-height: 90svh;
+  width: min(720px, 90vw);
   background: var(--color-bg-surface);
-  border: 1px solid var(--color-stone);
   border-radius: 12px;
-  padding: var(--space-6);
+  padding: var(--space-5);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--space-5);
+  gap: var(--space-4);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   animation: modalSlideUp var(--duration-mid) var(--ease-out);
-  overflow: auto;
 }
 
 @keyframes modalSlideUp {
@@ -50,10 +66,36 @@
   }
 }
 
+.share-card-modal__header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.share-card-modal__eyebrow {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.share-card-modal__title {
+  font-family: var(--font-heading);
+  font-size: var(--text-lg);
+  color: var(--color-text-primary);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.share-card-modal__note {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
 .share-card-close {
-  position: absolute;
-  top: var(--space-3);
-  right: var(--space-3);
+  position: static;
   width: 32px;
   height: 32px;
   display: flex;
@@ -73,74 +115,14 @@
   background: var(--color-bg-raised);
 }
 
-.share-card-title {
-  font-family: var(--font-heading);
-  font-size: var(--text-xl);
-  color: var(--color-accent);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  text-align: center;
-}
-
-.share-card-preview {
-  position: relative;
-  width: 100%;
-  max-width: 600px;
-  aspect-ratio: 1200 / 630;
-  background: var(--color-bg-deep);
-  border: 1px solid var(--color-stone);
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-.share-card-canvas {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
-
-.share-card-placeholder {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(10, 10, 14, 0.8);
-}
-
-.share-card-generate {
-  font-family: var(--font-heading);
-  font-size: var(--text-md);
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--color-bg-deep);
-  background: var(--color-accent);
-  border: none;
-  border-radius: 4px;
-  padding: var(--space-3) var(--space-6);
-  cursor: pointer;
-  transition:
-    background-color var(--duration-mid) var(--ease-out),
-    box-shadow var(--duration-mid) var(--ease-out);
-}
-
-.share-card-generate:hover:not(:disabled) {
-  background: #dbb97a;
-  box-shadow: 0 0 20px var(--color-accent-glow);
-}
-
-.share-card-generate:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
 
 .share-card-actions {
-  display: flex;
-  gap: var(--space-4);
-  flex-wrap: wrap;
-  justify-content: center;
+  display: grid;
+  gap: var(--space-3);
+  width: 100%;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
 }
+
 
 .share-card-button {
   font-family: var(--font-body);
@@ -169,48 +151,58 @@
 }
 
 .share-card-button--download {
-  color: var(--color-text-secondary);
-  background: transparent;
-  border: 1px solid var(--color-stone);
+  color: var(--color-bg-deep);
+  background: var(--color-accent);
+  border: none;
 }
 
 .share-card-button--download:hover {
-  color: var(--color-text-primary);
-  border-color: var(--color-stone-light);
-  background: var(--color-bg-raised);
+  background: #dbb97a;
+  box-shadow: 0 0 12px var(--color-accent-glow);
+}
+
+.share-card-button--link {
+  color: var(--color-bg-deep);
+  background: var(--color-accent);
+  border: none;
+}
+
+.share-card-button--link:hover {
+  background: #dbb97a;
+  box-shadow: 0 0 12px var(--color-accent-glow);
 }
 
 /* Responsive */
 @media (max-width: 768px) {
-  .share-card-content {
-    padding: var(--space-4);
-    margin: var(--space-2);
-  }
-
   .share-card-title {
     font-size: var(--text-lg);
   }
 
   .share-card-actions {
-    flex-direction: column;
-    width: 100%;
+    grid-template-columns: 1fr;
   }
 
   .share-card-button {
     width: 100%;
     text-align: center;
+    min-height: 44px;
+  }
+
+  .share-card-close {
+    width: 44px;
+    height: 44px;
+  }
+
+  .share-card-modal__content {
+    padding: var(--space-4);
+    padding-bottom: max(var(--space-4), env(safe-area-inset-bottom, 0px));
   }
 }
 
 /* Motion preferences */
 @media (prefers-reduced-motion: reduce) {
   .share-card-modal,
-  .share-card-content {
-    animation: none;
-  }
-
-  .share-card-close,
-  .share-card-generate,
+  .share-card-modal__content,
   .share-card-button {
     transition: none;
   }

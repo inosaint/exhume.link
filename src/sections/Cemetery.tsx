@@ -3,9 +3,6 @@ import { Gravestone, GravestoneRow } from '../components/Gravestone'
 import { CATEGORY_GROUPS, type CategoryGroup } from '../data/mockData'
 import './sections.css'
 
-// Filter to show only categories with tabs
-const activeCategories = CATEGORY_GROUPS.filter(g => g.tabs.length > 0)
-
 function CategorySection({ group, index }: { group: CategoryGroup; index: number }) {
   const [isVisible, setIsVisible] = useState(false)
   const sectionRef = useRef<HTMLDivElement>(null)
@@ -48,7 +45,7 @@ function CategorySection({ group, index }: { group: CategoryGroup; index: number
       {/* Desktop: Grid layout */}
       <div className="cemetery__grid">
         {group.tabs.map((tab, i) => (
-          <Gravestone key={tab.url} tab={tab} index={i} />
+          <Gravestone key={`${tab.url}:${i}`} tab={tab} index={i} />
         ))}
       </div>
 
@@ -58,7 +55,13 @@ function CategorySection({ group, index }: { group: CategoryGroup; index: number
   )
 }
 
-export function Cemetery() {
+interface CemeteryProps {
+  groups?: CategoryGroup[]
+}
+
+export function Cemetery({ groups }: CemeteryProps) {
+  const categoryGroups = groups ?? CATEGORY_GROUPS
+  const activeCategories = categoryGroups.filter(g => g.tabs.length > 0)
   const containerRef = useRef<HTMLDivElement>(null)
   const [scrollY, setScrollY] = useState(0)
 

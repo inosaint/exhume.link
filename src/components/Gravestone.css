@@ -96,6 +96,7 @@
 .gravestone-row {
   display: flex;
   gap: var(--space-3);
+  justify-content: center;
   overflow-x: auto;
   overflow-y: hidden;
   padding: var(--space-2) 0;

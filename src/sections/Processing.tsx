@@ -1,68 +1,72 @@
-import { useState, useEffect, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import './sections.css'
 
-const LINES = [
+const DEFAULT_LINES = [
   'Unearthing your digital remains…',
   'Cross-referencing the dead…',
   'Preparing the resurrection…',
 ]
 
-const INITIAL_DELAY  = 200   // ms before first line appears
-const LINE_GAP       = 600   // ms between each subsequent line
-const ADVANCE_PAUSE  = 2000  // ms after last line before auto-advancing
+const ADVANCE_PAUSE = 1200 // ms after last line before auto-advancing
 
 interface ProcessingProps {
   onNext: () => void
+  lines?: string[]
+  activeIndex?: number
+  isReadyToAdvance?: boolean
 }
 
-export function Processing({ onNext }: ProcessingProps) {
-  const [visibleCount, setVisibleCount] = useState(0)
+export function Processing({
+  onNext,
+  lines = DEFAULT_LINES,
+  activeIndex = 0,
+  isReadyToAdvance = true,
+}: ProcessingProps) {
   const onNextRef = useRef(onNext)
-  onNextRef.current = onNext
+
+  useEffect(() => {
+    onNextRef.current = onNext
+  }, [onNext])
 
   const reducedMotion =
     typeof window !== 'undefined' &&
     window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
   useEffect(() => {
-    if (reducedMotion) {
-      setVisibleCount(LINES.length)
-      return
-    }
+    if (reducedMotion) return
+    if (!isReadyToAdvance) return
+    if (activeIndex < lines.length - 1) return
 
-    const timers: ReturnType<typeof setTimeout>[] = []
+    const timer = setTimeout(() => onNextRef.current(), ADVANCE_PAUSE)
+    return () => clearTimeout(timer)
+  }, [reducedMotion, isReadyToAdvance, activeIndex, lines.length])
 
-    LINES.forEach((_, i) => {
-      timers.push(
-        setTimeout(() => setVisibleCount(i + 1), INITIAL_DELAY + LINE_GAP * i)
-      )
-    })
-
-    const lastLineTime = INITIAL_DELAY + LINE_GAP * (LINES.length - 1)
-    timers.push(
-      setTimeout(() => onNextRef.current(), lastLineTime + ADVANCE_PAUSE)
-    )
-
-    return () => timers.forEach(clearTimeout)
-  }, [reducedMotion])
+  const displayCount = Math.min(activeIndex + 1, lines.length)
 
   return (
     <section className="section section--processing">
       <div className="section__inner">
         <div className="processing__lines" role="status" aria-live="polite">
-          {LINES.map((line, i) => (
+          {lines.map((line, i) => (
             <p
               key={i}
-              className={`processing__line${i < visibleCount ? ' visible' : ''}`}
+              className={`processing__line${i < displayCount ? ' visible' : ''}${i === activeIndex ? ' processing__line--active' : ''}`}
             >
               {line}
             </p>
           ))}
         </div>
 
-        <button className="processing__skip" onClick={onNext}>
-          {reducedMotion ? 'Continue →' : 'Skip →'}
-        </button>
+        {reducedMotion && (
+          <button
+            className="landing__cta"
+            type="button"
+            onClick={onNext}
+            disabled={!isReadyToAdvance}
+          >
+            {isReadyToAdvance ? 'Continue →' : 'Unearthing…'}
+          </button>
+        )}
       </div>
     </section>
   )
