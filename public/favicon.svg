@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+  <defs>
+    <radialGradient id="bgGrad" cx="50%" cy="45%" r="50%">
+      <stop offset="0%"   stop-color="#1e1e2a"/>
+      <stop offset="100%" stop-color="#0a0a0e"/>
+    </radialGradient>
+    <radialGradient id="glowRing" cx="50%" cy="50%" r="50%">
+      <stop offset="70%" stop-color="rgba(201,169,110,0)"   />
+      <stop offset="90%" stop-color="rgba(201,169,110,0.12)"/>
+      <stop offset="100%" stop-color="rgba(201,169,110,0)"  />
+    </radialGradient>
+  </defs>
+
+  <!-- background fill -->
+  <circle cx="200" cy="200" r="200" fill="url(#bgGrad)"/>
+
+  <!-- subtle gold glow ring -->
+  <circle cx="200" cy="200" r="200" fill="url(#glowRing)"/>
+
+  <!-- gold border -->
+  <circle cx="200" cy="200" r="196" fill="none" stroke="#7a6540" stroke-width="1"/>
+
+  <!-- ── hooded figure silhouette ── -->
+
+  <!-- hood -->
+  <path d="M200,100
+           C172,100 150,118 146,145
+           C144,158 148,168 158,173
+           L158,155
+           C160,130 175,117 200,117
+           C225,117 240,130 242,155
+           L242,173
+           C252,168 256,158 254,145
+           C250,118 228,100 200,100 Z"
+        fill="#252533"/>
+
+  <!-- head -->
+  <circle cx="200" cy="152" r="22" fill="#2e2e3e"/>
+
+  <!-- robe -->
+  <path d="M158,174
+           L135,325
+           L265,325
+           L242,174
+           C235,178 220,182 200,182
+           C180,182 165,178 158,174 Z"
+        fill="#2e2e3e"/>
+
+  <!-- gold accent divider -->
+  <line x1="148" y1="352" x2="252" y2="352" stroke="#c9a96e" stroke-width="1" opacity="0.6"/>
+
+  <!-- placeholder label -->
+  <text x="200" y="374"
+        text-anchor="middle"
+        fill="#5a5a6a"
+        font-size="11"
+        font-family="sans-serif"
+        letter-spacing="3">PLACEHOLDER</text>
+</svg>

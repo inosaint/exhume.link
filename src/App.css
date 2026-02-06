@@ -3,22 +3,30 @@
    ────────────────────────────────────────────── */
 
 .app {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
   min-height: 100vh;
+  height: 100vh;
+  height: 100dvh;
   position: relative;
+  overflow: hidden;
 }
 
 /* ── Section viewport: fills remaining height ── */
 .section-viewport {
-  flex: 1;
+  min-height: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: var(--space-8) var(--space-6);
+  padding: clamp(1.5rem, 4vh, 3rem) var(--space-6);
   max-width: var(--max-width);
   width: 100%;
   margin: 0 auto;
+  overflow: auto;
+}
+
+.app--cemetery .section-viewport {
+  overflow: hidden;
 }
 
 /* ── Progress rail (top, horizontal) ── */
@@ -69,6 +77,16 @@
   box-shadow: 0 0 8px var(--color-accent-glow);
 }
 
+.rail-dot:disabled,
+.rail-dot--disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.rail-dot:disabled:hover {
+  border-color: var(--color-stone);
+}
+
 /* label: visible on hover / active, hidden otherwise */
 .rail-dot__label {
   position: absolute;
@@ -101,6 +119,7 @@
   max-width: var(--max-width);
   width: 100%;
   margin: 0 auto;
+  background: linear-gradient(180deg, rgba(10, 10, 14, 0) 0%, rgba(10, 10, 14, 0.9) 45%, rgba(10, 10, 14, 1) 100%);
 }
 
 .nav-footer__counter {
@@ -147,22 +166,117 @@
   color: var(--color-bg-deep);
 }
 
+.nav-btn--share {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: var(--color-bg-deep);
+  box-shadow: 0 0 16px var(--color-accent-glow);
+}
+
+.nav-btn--share:hover:not(:disabled) {
+  background: #dbb97a;
+  border-color: #dbb97a;
+}
+
+/* ── Touch device: always show active rail label ── */
+@media (hover: none) {
+  .rail-dot.active .rail-dot__label {
+    opacity: 1;
+    color: var(--color-text-secondary);
+  }
+}
+
+/* ── Safe-area insets for notches / home indicator ── */
+@supports (padding: env(safe-area-inset-top)) {
+  .progress-rail {
+    padding-top: max(var(--space-5), env(safe-area-inset-top));
+    padding-left: max(var(--space-4), env(safe-area-inset-left));
+    padding-right: max(var(--space-4), env(safe-area-inset-right));
+  }
+
+  .nav-footer {
+    padding-bottom: max(var(--space-4), env(safe-area-inset-bottom));
+    padding-left: max(var(--space-6), env(safe-area-inset-left));
+    padding-right: max(var(--space-6), env(safe-area-inset-right));
+  }
+}
+
 /* ── Responsive ── */
 @media (max-width: 768px) {
   .section-viewport {
     padding: var(--space-6) var(--space-4);
     align-items: flex-start;
+    -webkit-overflow-scrolling: touch;
   }
 
   .progress-rail {
-    gap: var(--space-4);
+    gap: var(--space-3);
   }
 
   .progress-rail::before {
-    width: 70%;
+    width: 80%;
+  }
+
+  /* Increase tap targets to 44px minimum */
+  .rail-dot {
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+  }
+
+  .rail-dot::after {
+    content: '';
+    display: block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid var(--color-stone);
+    background: var(--color-bg-deep);
+    transition:
+      border-color var(--duration-mid) var(--ease-out),
+      background-color var(--duration-mid) var(--ease-out),
+      box-shadow var(--duration-mid) var(--ease-out);
+  }
+
+  .rail-dot.active::after {
+    border-color: var(--color-accent);
+    background: var(--color-accent);
+    box-shadow: 0 0 8px var(--color-accent-glow);
+  }
+
+  .nav-btn {
+    min-height: 44px;
+    padding: var(--space-2) var(--space-3);
   }
 
   .nav-footer {
     padding: var(--space-3) var(--space-4);
+    padding-bottom: max(var(--space-3), env(safe-area-inset-bottom, 0px));
+  }
+}
+
+/* ── Narrow screens: stack footer ── */
+@media (max-width: 480px) {
+  .nav-footer {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-2);
+  }
+
+  .nav-footer__counter {
+    order: -1;
+    width: 100%;
+    text-align: center;
+  }
+
+  .nav-btn {
+    flex: 1;
+    text-align: center;
+    min-width: 0;
   }
 }

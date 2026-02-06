@@ -1,5 +1,11 @@
 # exhume.link — Project Context for Claude
 
+## Before you start
+Read `memory.md` for the latest changes made by other agents. It logs file-level diffs
+and design decisions that may affect your work. Check it every session to avoid conflicts
+or duplicated effort. Update memory.md with your changes to the codebase after they are completed.
+If you make a change that affects developer workflow or file locations, update any references in agent docs (e.g., `claude.md`, `todo.md`).
+
 ## What this is
 A narrative data visualization app that takes a user's browser tabs and turns them into a
 gothic "exhumation" story. Think Spotify Wrapped, but for your tab addiction, with gravestones.
@@ -17,7 +23,7 @@ Copy should be dry, slightly unsettling, occasionally funny. Never campy.
 
 ## Settled design decisions
 - **Navigation**: Click-driven between sections (Next/Prev). Scroll-driven parallax WITHIN the cemetery/gravestone scene only. `prefers-reduced-motion` disables all parallax and transitions — sections still navigate, gravestones still show, everything just becomes static.
-- **Mobile**: Gravestones become a horizontal scrollable row. World map becomes zoomable.
+- **Mobile**: Gravestones become a horizontal scrollable row. World map becomes zoomable. Backlog is at mobile.md.
 - **Gravestone hover**: slight rotation + glow + shadow shift. Tactile, physical feel. Motion-reduced fallback: just the glow, no rotation.
 - **Processing page**: Keep it as a transition beat even in v1 (we load static data). Flavor text like "Unearthing your digital remains..." with a staged fake delay (~2s). Skippable.
 - **Categorization**: Rule-based from domain extraction. No LLM for v1.

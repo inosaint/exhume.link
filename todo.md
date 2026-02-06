@@ -7,76 +7,98 @@ Read `claude.md` first. It has all design decisions, the scoring rubric, and dat
 ## Phase 0: Foundation & Scoring
 
 Scoring **design** is done — 6 archetypes, 8 dimensions, 3 axes. Full spec in
-`docs/personality-scoring.md`. The items below are the **implementation** work,
-which will be done after the visual shell is in place.
+`docs/personality-scoring.md`. The items below are the **implementation** work.
 
 - [x] Define personality scoring rubric — see `docs/personality-scoring.md`
-- [ ] Set up Vite + React + TypeScript project (`npm create vite`)
-- [ ] Install deps: react, react-dom, typescript, vite
-- [ ] Implement URL parser: extract domain from raw URL, dedupe, count
-- [ ] Implement category classifier: domain → content-type buckets (see docs/personality-scoring.md §Step 1)
-- [ ] Implement 8-dimension scorer: content-type counts → dimension scores → 3-axis position → archetype + suffix
-- [ ] Wire up: load `browserdata/all_tabs_clean.txt` as static import, run parser + scorer, log output
-- [ ] Verify: scorer produces expected result against known dataset (Resurrectionist of the Horde)
+- [x] Set up Vite + React + TypeScript project (`npm create vite`)
+- [x] Install deps: react, react-dom, typescript, vite
+- [x] Implement URL parser: extract domain from raw URL, dedupe, count
+- [x] Implement category classifier: domain → content-type buckets (see docs/personality-scoring.md §Step 1)
+- [x] Implement 8-dimension scorer: content-type counts → dimension scores → 3-axis position → archetype + suffix
+- [x] Wire up: load `browserdata/all_tabs_clean.txt` as static import, run parser + scorer, log output
+- [x] Verify: scorer produces expected result against known dataset (Resurrectionist of the Horde) ✅
 
 ## Phase 1: Visual Shell & Navigation
 
-- [ ] Dark gothic design system: CSS custom properties for color palette, spacing scale
-- [ ] Typography: Google Fonts — Cinzel (headings), Inter (body). Import in index.html
-- [ ] Section shell: 5 sections rendered, click-based Next / Prev navigation
-- [ ] Section titles: Landing, Processing, Overview, Cemetery, World Map
-- [ ] `prefers-reduced-motion` media query: disable all CSS transitions and animations globally when set
-- [ ] Responsive layout scaffold: mobile breakpoint at 768px
+- [x] Dark gothic design system: CSS custom properties for color palette, spacing scale
+- [x] Typography: Google Fonts — Cinzel (headings), Inter (body). Import in index.html
+- [x] Section shell: 7 sections rendered, click-based Next / Prev navigation
+- [x] Section titles: Surface, Unearthing, The Dead, The Ledger, Cemetery, The Map, Share
+- [x] `prefers-reduced-motion` media query: disable all CSS transitions and animations globally when set
+- [x] Responsive layout scaffold: mobile breakpoint at 768px
 
 ## Phase 2: Processing Beat
 
-- [ ] Processing section: fake staged loading with flavor text
-  - "Unearthing your digital remains..."
-  - "Cross-referencing the dead..."
-  - "Preparing the resurrection..."
-- [ ] Staged reveal: each line appears on a timer (~600ms apart), auto-advances to Overview after ~2s
-- [ ] Motion-reduced fallback: skip animation, show all text, add manual "Continue" button
+- [x] Processing section: staged loading with flavor text tied to real analysis steps
+  - "Gathering the bones…"
+  - "Listening for links…"
+  - "Scraping rust from URLs…"
+  - "Counting the haunts…"
+  - "Sorting remains into plots…"
+  - "Pinning souls to the globe…"
+  - "Consulting the archetypes…"
+- [x] Staged reveal: each line appears as analysis progresses, auto-advances when done
+- [x] Motion-reduced fallback: skip animation, show all text, add manual "Continue" button
 
-## Phase 3: Overview & Personality Reveal
+## Phase 3: Personality Reveal + The Ledger
 
-- [ ] Stats cards: Total Tabs, Unique Domains, Browsers (Safari / Quiche), Top Domain
-- [ ] Personality card: archetype name in Cinzel, flavor subtitle, short description
-- [ ] Stats cards animate in on section enter (counter tick-up). Motion fallback: show final number immediately
-- [ ] Visual style: stats as tombstone-shaped cards on dark ground
+- [x] Dedicated archetype reveal page: full-screen personality card with art, title, description
+- [x] "Dig Deeper →" CTA to advance to stats
+- [x] Stats cards on separate "Ledger" page: Total Tabs, Unique Domains, Haunts, Unresolved Searches, Mapped Locations, Top Domain
+- [x] Stats cards animate in on section enter (counter tick-up). Motion fallback: show final number immediately
 
 ## Phase 4: The Cemetery (Category Scene)
 
-- [ ] Gravestone SVG component: base shape, category icon slot, hover states
-- [ ] Hover behavior: slight rotation (3-5deg) + glow (box-shadow) + shadow shift. Motion fallback: glow only
-- [ ] Click behavior: opens the URL in a new tab
-- [ ] Group gravestones by category. Each group has a category header
-- [ ] Desktop: grid layout within each category group
-- [ ] Mobile: each category group is a horizontal scrollable row
-- [ ] Parallax depth on scroll within this section (background layers shift at different speeds). Motion fallback: static layers
+- [x] Gravestone SVG component: base shape, category icon slot, hover states
+- [x] Hover behavior: slight rotation (3-5deg) + glow (box-shadow) + shadow shift. Motion fallback: glow only
+- [x] Click behavior: opens the URL in a new tab
+- [x] Group gravestones by category. Each group has a category header
+- [x] Desktop: grid layout within each category group
+- [x] Mobile: each category group is a horizontal scrollable row
+- [x] Parallax depth on scroll within this section (background layers shift at different speeds). Motion fallback: static layers
 
-## Phase 5: The World Map
+## Phase 5: The Necropolis (Fantasy Map) — Flow A
 
-- [ ] Domain-to-region mapping: static lookup table (top ~20 domains → approximate lat/lng)
-  - e.g. medium.com → San Francisco, youtube.com → Mountain View, amazon.in → Bangalore, reddit.com → San Francisco
-- [ ] Render world map (SVG-based, react-simple-maps or hand-rolled)
-- [ ] Plot grave markers at mapped locations. Cluster nearby graves
-- [ ] Mobile: pinch-to-zoom or zoom buttons
-- [ ] Hover on grave marker: tooltip with domain name + tab count
+- [x] Perlin noise utility: 2D noise, FBM, noisy polygon generation, smooth SVG path output
+- [x] Region definitions: 12 categories → fantasy regions with positions, terrain types, fill colors
+- [x] Procedural continent coastline: convex hull of all regions + noise-based organic edges
+- [x] Individual region polygons: Perlin-noise boundaries, sized by tab count
+- [x] Terrain icons: geometric placeholder symbols per region type (books, compass, anvil, etc.)
+- [x] Compass rose: procedural SVG with cardinal/intercardinal points
+- [x] Edge decorations: wavy ocean lines, "Here be dragons" text, sea serpent hint
+- [x] Map cartouche: "THE NECROPOLIS" title banner
+- [x] Parchment texture: SVG filter (feTurbulence), vignette gradient, sepia palette
+- [x] Region tooltips: hover shows name, description, tab count, top domains
+- [x] Legend: interactive region list below map, sorted by count, hover-linked to map
+- [x] Zoom controls (+/−/reset) via D3 zoom
+- [x] Wired into Flow A, replacing geographic WorldMap (Flow B keeps WorldMap)
+
+## Phase 5b: The World Map — Flow B (geographic, retained)
+
+- [x] Domain-to-region mapping: known domains + ccTLD fallback for geo-location
+- [x] Render world map (D3 geo + TopoJSON)
+- [x] Plot grave markers at mapped locations. Cluster by city
+- [x] Zoom controls (+/−/reset)
+- [x] Hover on grave marker: tooltip with domain name + tab count
 
 ## Phase 6: Share Card
 
-- [ ] Canvas-rendered summary card (1200x630 for OG)
-- [ ] Card contents: "exhume.link" logo text, archetype, top 3 stats, a few category icons
-- [ ] Gothic dark aesthetic on the card, Cinzel font rendered to canvas
-- [ ] "Share" button: renders card → copies PNG to clipboard + offers download
-- [ ] Share button placement: end of the Overview section (after personality reveal)
+- [x] Canvas-rendered summary card (1200x630 for OG)
+- [x] Card contents: archetype art, title, description, top stats
+- [x] Gothic dark aesthetic on the card, Cinzel font rendered to canvas
+- [x] "Share with Your Cult" button: opens modal with copy/download/link options
+- [x] Shareable URL with encoded JSON snapshot
 
 ---
 
 ## Backlog (not scheduled)
 
-- [ ] Shareable URL: encode processed JSON → compressed base64 URL param. Recipient loads URL and sees the same data without uploading
 - [ ] Open Graph / Twitter Card meta tags: dynamically set based on the rendered data so link previews show the card
 - [ ] Ambient soundscape: opt-in toggle, looping low-reverb audio. Plays across all sections. Mutes on `prefers-reduced-motion`
-- [ ] Input screens: paste URLs into textarea or upload CSV. Runs the same parser pipeline. Replaces the static data load
 - [ ] LLM categorization: optional v2 mode where categories are assigned via API call instead of rule-based matching
+- [ ] Necropolis map: replace geometric terrain icons with hand-drawn SVGs (see `docs/necropolis-map-assets.md`)
+- [ ] Necropolis map: add custom compass rose SVG
+- [ ] Necropolis map: add sea monster / edge decoration SVGs
+- [ ] Necropolis map: finalize color palette and font choice with user
+- [ ] Necropolis map: click region to show all tabs in that category
+- [ ] Improve category classifier to reduce "other" bucket (currently ~248/689 for sample data)
