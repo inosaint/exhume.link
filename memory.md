@@ -197,3 +197,247 @@ Agent/Model: Claude (claude-code)
 - `src/App.tsx` — Import NecropolisMap, conditionally render for Flow A; update CTA text
 - `src/sections/config.ts` — Flow A worldmap label changed to "Necropolis"
 - `todo.md` — Phase 5 split into 5 (Necropolis) and 5b (WorldMap); backlog updated
+
+---
+
+# Mobile Section Scroll Fix
+
+Date: 2026-02-06
+Agent/Model: GPT-5.2 (Codex)
+
+## Summary
+- Switched general sections to use `min-height: 100%` so tall content can scroll on mobile.
+- Kept the cemetery section at fixed height to preserve its internal parallax scroll container.
+
+## Files Updated
+- `src/sections/sections.css`
+
+## Notes
+- `npm run lint` fails due to existing `Math.random` usage in `src/sections/NecropolisMap.tsx` (react-hooks/purity). Build succeeds.
+
+---
+
+# Progress Rail Mobile Refinement
+
+Date: 2026-02-06
+Agent/Model: GPT-5.2 (Codex)
+
+## Summary
+- Added rail sizing variables and alignment to keep the connector line centered on dots.
+- Reduced mobile dot size while preserving tap target, and removed the oversized active background.
+
+## Files Updated
+- `src/App.css`
+
+## Notes
+- `npm run lint` still fails due to existing `Math.random` usage in `src/sections/NecropolisMap.tsx` (react-hooks/purity). Build succeeds.
+
+---
+
+# Flow B Landing Layout + Copy Update
+
+Date: 2026-02-06
+Agent/Model: GPT-5.2 (Codex)
+
+## Summary
+- Added a Flow B-specific landing layout with left-aligned title, top-right file actions, and a bottom CTA.
+- Updated Flow B landing copy to frame the user on the surface facing the graves.
+- Adjusted Flow B form structure and labels; CTA now disables until input is provided.
+
+## Files Updated
+- `src/sections/Landing.tsx`
+- `src/sections/sections.css`
+- `src/App.tsx`
+
+## Notes
+- `npm run lint` still fails due to existing `Math.random` usage in `src/sections/NecropolisMap.tsx` (react-hooks/purity). Build succeeds.
+
+---
+
+# Progress Rail Gating + Hover Label Fix
+
+Date: 2026-02-06
+Agent/Model: GPT-5.2 (Codex)
+
+## Summary
+- Disabled progress-rail hover labels (active label only) to prevent overlap on hover.
+- Prevented user navigation to the processing/Unearthing step via the rail.
+- Enforced input requirement before starting analysis in both flows.
+
+## Files Updated
+- `src/App.css`
+- `src/App.tsx`
+- `src/sections/Landing.tsx`
+
+## Notes
+- `npm run lint` still fails due to existing `Math.random` usage in `src/sections/NecropolisMap.tsx` (react-hooks/purity). Build succeeds.
+
+---
+
+# Flow B Landing Actions Moved Into Panel
+
+Date: 2026-02-06
+Agent/Model: GPT-5.2 (Codex)
+
+## Summary
+- Moved the Flow B file/sample actions into the paste panel header instead of beside the title.
+- Added panel header layout styles to keep the label and actions aligned.
+
+## Files Updated
+- `src/sections/Landing.tsx`
+- `src/sections/sections.css`
+
+## Notes
+- `npm run lint` still fails due to existing `Math.random` usage in `src/sections/NecropolisMap.tsx` (react-hooks/purity). Build succeeds.
+
+---
+
+# Flow B Landing Actions Embedded In Textarea Shell
+
+Date: 2026-02-06
+Agent/Model: GPT-5.2 (Codex)
+
+## Summary
+- Moved Flow B action buttons into the textarea shell and added a shared border/background wrapper.
+- Added focus-within styling for the shell; removed textarea border for the integrated look.
+
+## Files Updated
+- `src/sections/Landing.tsx`
+- `src/sections/sections.css`
+
+## Notes
+- `npm run lint` still fails due to existing `Math.random` usage in `src/sections/NecropolisMap.tsx` (react-hooks/purity). Build succeeds.
+
+---
+
+# Installed Agentation Dependency
+
+Date: 2026-02-06
+Agent/Model: GPT-5.2 (Codex)
+
+## Summary
+- Installed `agentation` via npm for in-app annotation tooling.
+
+## Files Updated
+- `package.json`
+- `package-lock.json`
+
+## Notes
+- Installation required network access to npm.
+
+---
+
+# Flow B Landing Copy + Centered Tagline
+
+Date: 2026-02-06
+Agent/Model: GPT-5.2 (Codex)
+
+## Summary
+- Updated Flow B paste label copy to mention file types.
+- Centered the Flow B surface tagline while keeping the layout left-aligned elsewhere.
+
+## Files Updated
+- `src/sections/Landing.tsx`
+- `src/sections/sections.css`
+
+## Notes
+- `npm run lint` still fails due to existing `Math.random` usage in `src/sections/NecropolisMap.tsx` (react-hooks/purity). Build succeeds.
+
+---
+
+# Flow B Landing Panel Wrapper Removal
+
+Date: 2026-02-06
+Agent/Model: GPT-5.2 (Codex)
+
+## Summary
+- Removed the extra Flow B panel wrapper so the input shell is the only container.
+- Kept label/actions/textarea/meta/error inside the input shell for a single integrated box.
+
+## Files Updated
+- `src/sections/Landing.tsx`
+- `src/sections/sections.css`
+
+## Notes
+- `npm run lint` still fails due to existing `Math.random` usage in `src/sections/NecropolisMap.tsx` (react-hooks/purity). Build succeeds.
+
+---
+
+# Agentation MCP Server (Local)
+
+Date: 2026-02-06
+Agent/Model: GPT-5.2 (Codex)
+
+## Summary
+- Started `agentation-mcp` server in the background on the default port (4747).
+- Log output captured at `/tmp/agentation-mcp.log`.
+
+## Files Updated
+- None
+
+## Notes
+- Server is an API endpoint (no UI). Root path returns `{"error":"Not found"}`.
+
+---
+
+# Agentation Toolbar Wired (Dev Only)
+
+Date: 2026-02-06
+Agent/Model: GPT-5.2 (Codex)
+
+## Summary
+- Added the Agentation React toolbar in dev mode and pointed it to the local MCP server at `http://localhost:4747`.
+
+## Files Updated
+- `src/App.tsx`
+
+## Notes
+- `npm run lint` still fails due to existing `Math.random` usage in `src/sections/NecropolisMap.tsx` (react-hooks/purity). Build succeeds.
+
+---
+
+# Flow B Input Panel Restyle
+
+Date: 2026-02-06
+Agent/Model: GPT-5.2 (Codex)
+
+## Summary
+- Reworked the Flow B input panel to match the reference: label on top, textarea with its own border, and a bottom row with file/sample buttons.
+- Simplified the input shell styling to be the primary panel (surface background + padding).
+
+## Files Updated
+- `src/sections/Landing.tsx`
+- `src/sections/sections.css`
+
+## Notes
+- `npm run lint` still fails due to existing `Math.random` usage in `src/sections/NecropolisMap.tsx` (react-hooks/purity). Build succeeds.
+
+---
+
+# Gravestone Input Panel + Agentation Server Stop
+
+Date: 2026-02-06
+Agent/Model: GPT-5.2 (Codex)
+
+## Summary
+- Gave the Flow B input panel a gravestone silhouette using a domed top border radius and full-width layout.
+- Stopped the local Agentation MCP server running on port 4747.
+
+## Files Updated
+- `src/sections/sections.css`
+
+## Notes
+- Agentation MCP server was stopped (no process on 4747).
+
+---
+
+# Revert Gravestone Panel Shape
+
+Date: 2026-02-06
+Agent/Model: GPT-5.2 (Codex)
+
+## Summary
+- Reverted the domed gravestone border radius and padding on the Flow B input shell.
+
+## Files Updated
+- `src/sections/sections.css`

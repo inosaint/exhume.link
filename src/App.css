@@ -33,17 +33,21 @@
 .progress-rail {
   display: flex;
   justify-content: center;
+  align-items: center;
   gap: var(--space-5);
   padding: var(--space-5) var(--space-4);
   position: relative;
   z-index: 10;
+  --rail-dot-size: 12px;
+  --rail-hit-size: 12px;
+  --rail-pad-y: var(--space-5);
 }
 
 /* connecting line behind the dots */
 .progress-rail::before {
   content: '';
   position: absolute;
-  top: calc(var(--space-5) + 5px); /* vertically center on the dots */
+  top: calc(var(--rail-pad-y) + (var(--rail-hit-size) / 2)); /* align to dot center */
   left: 50%;
   transform: translateX(-50%);
   width: 60%;
@@ -54,8 +58,8 @@
 .rail-dot {
   position: relative;
   z-index: 1;
-  width: 12px;
-  height: 12px;
+  width: var(--rail-hit-size);
+  height: var(--rail-hit-size);
   padding: 0;
   border: 2px solid var(--color-stone);
   border-radius: 50%;
@@ -87,7 +91,7 @@
   border-color: var(--color-stone);
 }
 
-/* label: visible on hover / active, hidden otherwise */
+/* label: visible only on active, hidden otherwise */
 .rail-dot__label {
   position: absolute;
   top: calc(100% + var(--space-2));
@@ -104,7 +108,6 @@
   pointer-events: none;
 }
 
-.rail-dot:hover .rail-dot__label,
 .rail-dot.active .rail-dot__label {
   opacity: 1;
   color: var(--color-text-secondary);
@@ -211,6 +214,11 @@
 
   .progress-rail {
     gap: var(--space-3);
+    padding-top: var(--space-4);
+    padding-bottom: var(--space-4);
+    --rail-dot-size: 10px;
+    --rail-hit-size: 40px;
+    --rail-pad-y: var(--space-4);
   }
 
   .progress-rail::before {
@@ -219,8 +227,8 @@
 
   /* Increase tap targets to 44px minimum */
   .rail-dot {
-    width: 44px;
-    height: 44px;
+    width: var(--rail-hit-size);
+    height: var(--rail-hit-size);
     padding: 0;
     display: flex;
     align-items: center;
@@ -232,8 +240,8 @@
   .rail-dot::after {
     content: '';
     display: block;
-    width: 12px;
-    height: 12px;
+    width: var(--rail-dot-size);
+    height: var(--rail-dot-size);
     border-radius: 50%;
     border: 2px solid var(--color-stone);
     background: var(--color-bg-deep);
@@ -241,6 +249,11 @@
       border-color var(--duration-mid) var(--ease-out),
       background-color var(--duration-mid) var(--ease-out),
       box-shadow var(--duration-mid) var(--ease-out);
+  }
+
+  .rail-dot.active {
+    background: transparent;
+    box-shadow: none;
   }
 
   .rail-dot.active::after {
@@ -260,8 +273,19 @@
   }
 }
 
-/* ── Narrow screens: stack footer ── */
+/* ── Narrow screens: stack footer + shrink rail ── */
 @media (max-width: 480px) {
+  .progress-rail {
+    gap: var(--space-2);
+    padding: var(--space-4) var(--space-2);
+    --rail-hit-size: 28px;
+    --rail-dot-size: 8px;
+  }
+
+  .rail-dot__label {
+    display: none;
+  }
+
   .nav-footer {
     flex-wrap: wrap;
     justify-content: center;
