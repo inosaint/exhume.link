@@ -340,15 +340,15 @@ const SHOPPING_DOMAINS = new Set([
   'steampowered.com', 'shopartshop.com', 'upwithpaper.com',
 ])
 
-const GAMING_DOMAINS = new Set([
+const _GAMING_DOMAINS = new Set([
   'steampowered.com', 'store.steampowered.com', 'pcgamesn.com',
   'itch.io', 'myanimelist.net', 'ign.com', 'kotaku.com', 'polygon.com',
 ])
+void _GAMING_DOMAINS // reserved for future classifier expansion
 
 function classifyCategory(url: URL, domain: string): CategoryId {
   const host = url.hostname.toLowerCase()
   const path = url.pathname.toLowerCase()
-  const fullUrl = url.toString().toLowerCase()
 
   // PDFs are reading material
   if (path.endsWith('.pdf')) return 'reading'
