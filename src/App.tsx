@@ -1,4 +1,5 @@
 import { useMemo, useState, useCallback } from 'react'
+import { Agentation } from 'agentation'
 import { type FlowVariant, type SectionId, SECTIONS_A, SECTIONS_B } from './sections/config'
 import { analyzeInputToSession, extractUrlsFromText, type ExhumeSession } from './data/tabsAnalysis'
 import SAMPLE_TABS from '../browserdata/all_tabs_clean.txt?raw'
@@ -53,14 +54,11 @@ export default function App() {
   const isReady = analysisStatus === 'done' && session !== null
 
   const goTo = useCallback((id: SectionId) => {
-    const canNavigate =
-      id === 'landing' ||
-      (id === 'processing' && analysisStatus !== 'idle') ||
-      (id !== 'processing' && isReady)
-
+    if (id === 'processing') return
+    const canNavigate = id === 'landing' || isReady
     if (!canNavigate) return
     setCurrentSection(id)
-  }, [analysisStatus, isReady])
+  }, [isReady])
 
   const prev = useCallback(() => {
     if (currentIndex > 0) setCurrentSection(sections[currentIndex - 1].id)
@@ -123,9 +121,8 @@ export default function App() {
       <nav className="progress-rail" aria-label="Sections">
         {sections.map((section) => {
           const disabled =
-            section.id !== 'landing' &&
-            !(section.id === 'processing' && analysisStatus !== 'idle') &&
-            !isReady
+            section.id === 'processing' ||
+            (section.id !== 'landing' && !isReady)
 
           return (
           <button
@@ -221,6 +218,10 @@ export default function App() {
                   : 'Continue →'}
           </button>
         </footer>
+      )}
+
+      {import.meta.env.DEV && (
+        <Agentation endpoint="http://localhost:4747" />
       )}
     </div>
   )

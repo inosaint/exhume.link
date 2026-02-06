@@ -8,7 +8,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 100%;
+  min-height: 100%;
 }
 
 .section__inner {
@@ -50,11 +50,55 @@
   margin-bottom: var(--space-4);
 }
 
-.landing__tagline {
-  font-size: var(--text-lg);
-  color: var(--color-text-secondary);
-  line-height: 1.7;
-  margin-bottom: var(--space-8);
+/* ── Tombstone container ── */
+.tombstone {
+  width: min(560px, 100%);
+  margin: 0 auto;
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-stone);
+  border-radius: 280px 280px 0 0;
+  padding: var(--space-12) var(--space-6) var(--space-5);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  text-align: center;
+}
+
+.tombstone .landing__title {
+  font-size: var(--text-3xl);
+  letter-spacing: 0.05em;
+  color: var(--color-accent);
+  margin-bottom: calc(-1 * var(--space-2));
+}
+
+.tombstone__epitaph {
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  font-weight: 400;
+  line-height: 1.5;
+  color: #5a5a69;
+  padding-bottom: var(--space-4);
+  border-bottom: 1px solid var(--color-stone);
+  width: 100%;
+}
+
+.tombstone .surface__panel {
+  width: 100%;
+  background: transparent;
+  border: 1px solid var(--color-stone);
+}
+
+.tombstone .surface__textarea {
+  min-height: 100px;
+}
+
+.section--landing {
+  align-items: center;
+}
+
+.section--landing .surface__form {
+  gap: var(--space-3);
 }
 
 .landing__cta {
@@ -68,6 +112,7 @@
   border: none;
   border-radius: 4px;
   padding: var(--space-3) var(--space-6);
+  width: min(560px, 100%);
   cursor: pointer;
   transition:
     background-color var(--duration-mid) var(--ease-out),
@@ -77,6 +122,13 @@
 .landing__cta:hover {
   background: #dbb97a;
   box-shadow: 0 0 20px var(--color-accent-glow);
+}
+
+.landing__cta:disabled {
+  background: var(--color-stone);
+  color: var(--color-text-muted);
+  cursor: not-allowed;
+  box-shadow: none;
 }
 
 /* ── Surface input panel ── */
@@ -200,6 +252,80 @@
   letter-spacing: 0.06em;
   max-width: 560px;
   text-wrap: balance;
+}
+
+/* ── Error toast (blood drip) ── */
+.error-toast {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  width: min(480px, 90vw);
+  animation: dripIn var(--duration-slow) var(--ease-out) both;
+}
+
+.error-toast__drip {
+  height: 6px;
+  background: linear-gradient(90deg, transparent 0%, #8b2020 15%, #a03030 50%, #8b2020 85%, transparent 100%);
+  border-radius: 0 0 3px 3px;
+  position: relative;
+}
+
+.error-toast__drip::before,
+.error-toast__drip::after {
+  content: '';
+  position: absolute;
+  bottom: -12px;
+  width: 4px;
+  height: 12px;
+  background: #8b2020;
+  border-radius: 0 0 50% 50%;
+  animation: drip var(--duration-slow) var(--ease-out) 200ms both;
+}
+
+.error-toast__drip::before {
+  left: 25%;
+}
+
+.error-toast__drip::after {
+  left: 65%;
+  animation-delay: 350ms;
+  height: 8px;
+  bottom: -8px;
+}
+
+.error-toast__message {
+  background: linear-gradient(180deg, #2a1010 0%, #1a0a0a 100%);
+  border: 1px solid #5a2020;
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--text-sm);
+  color: #d48a8a;
+  text-align: center;
+  letter-spacing: 0.04em;
+}
+
+@keyframes dripIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+@keyframes drip {
+  from {
+    height: 0;
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 /* ── Processing ── */
@@ -420,6 +546,7 @@
 .section--cemetery {
   position: relative;
   overflow: hidden;
+  height: 100%;
 }
 
 .cemetery__parallax {
@@ -984,11 +1111,16 @@
 @media (max-width: 768px) {
   .landing__title {
     font-size: var(--text-2xl);
-    letter-spacing: 0.08em; /* reduce wide spacing on small screens */
+    letter-spacing: 0.08em;
   }
 
-  .landing__tagline {
-    font-size: var(--text-base);
+  .tombstone {
+    border-radius: 180px 180px 0 0;
+    padding: var(--space-6) var(--space-3) var(--space-4);
+  }
+
+  .tombstone .landing__title {
+    font-size: var(--text-xl);
   }
 
   .section__heading {
@@ -1026,5 +1158,31 @@
   .worldmap__svg,
   .necropolis__svg {
     touch-action: pan-y pinch-zoom;
+  }
+}
+
+/* ── Narrow screens: further shrink tombstone ── */
+@media (max-width: 480px) {
+  .tombstone {
+    border-radius: 140px 140px 0 0;
+    padding: var(--space-5) var(--space-3) var(--space-3);
+  }
+
+  .tombstone .landing__title {
+    font-size: var(--text-lg);
+    letter-spacing: 0.03em;
+  }
+
+  .tombstone__epitaph {
+    font-size: var(--text-sm);
+  }
+
+  .tombstone .surface__textarea {
+    min-height: 80px;
+  }
+
+  .landing__cta {
+    font-size: var(--text-sm);
+    padding: var(--space-2) var(--space-4);
   }
 }

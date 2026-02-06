@@ -91,6 +91,11 @@ Scoring **design** is done — 6 archetypes, 8 dimensions, 3 axes. Full spec in
 
 ---
 
+## Next up
+
+- [ ] Mobile testing on real device — CSS fixes are in, needs visual QA
+- [ ] DNS: point `exhume.link` A records to GitHub Pages IPs (185.199.108–111.153) and set custom domain in repo Settings → Pages
+
 ## Backlog (not scheduled)
 
 - [ ] Open Graph / Twitter Card meta tags: dynamically set based on the rendered data so link previews show the card
@@ -102,3 +107,4 @@ Scoring **design** is done — 6 archetypes, 8 dimensions, 3 axes. Full spec in
 - [ ] Necropolis map: finalize color palette and font choice with user
 - [ ] Necropolis map: click region to show all tabs in that category
 - [ ] Improve category classifier to reduce "other" bucket (currently ~248/689 for sample data)
+- [ ] "How to export your tabs" guide — step-by-step instructions for Chrome, Safari, Firefox, Arc, etc. (copy tab URLs, use built-in export, or third-party tools like OneTab). Show on landing page or as a help link next to the paste input
