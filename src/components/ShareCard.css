@@ -53,6 +53,7 @@
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   animation: modalSlideUp var(--duration-mid) var(--ease-out);
+  perspective: 1000px;
 }
 
 @keyframes modalSlideUp {
@@ -92,6 +93,18 @@
   font-size: var(--text-sm);
   color: var(--color-text-muted);
   text-align: center;
+}
+
+.share-card-section {
+  width: 100%;
+}
+
+.share-card-section__title {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-2);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
 }
 
 .share-card-close {
@@ -172,6 +185,80 @@
   box-shadow: 0 0 12px var(--color-accent-glow);
 }
 
+.share-card-button--native {
+  color: var(--color-bg-deep);
+  background: var(--color-accent);
+  border: none;
+  margin-top: var(--space-2);
+}
+
+.share-card-button--native:hover {
+  background: #dbb97a;
+  box-shadow: 0 0 12px var(--color-accent-glow);
+}
+
+/* Social sharing buttons */
+.share-card-social {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+
+.share-card-social-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  padding: var(--space-3) var(--space-4);
+  border-radius: 4px;
+  border: 1px solid var(--color-stone-light);
+  background: var(--color-bg-raised);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition:
+    background-color var(--duration-fast),
+    border-color var(--duration-fast),
+    transform var(--duration-fast);
+}
+
+.share-card-social-button:hover {
+  background: var(--color-stone);
+  border-color: var(--color-accent);
+  transform: translateY(-2px);
+}
+
+.share-card-social-button svg {
+  flex-shrink: 0;
+}
+
+.share-card-social-button--twitter:hover {
+  background: rgba(29, 155, 240, 0.1);
+  border-color: rgb(29, 155, 240);
+  color: rgb(29, 155, 240);
+}
+
+.share-card-social-button--facebook:hover {
+  background: rgba(24, 119, 242, 0.1);
+  border-color: rgb(24, 119, 242);
+  color: rgb(24, 119, 242);
+}
+
+.share-card-social-button--linkedin:hover {
+  background: rgba(0, 119, 181, 0.1);
+  border-color: rgb(0, 119, 181);
+  color: rgb(0, 119, 181);
+}
+
+.share-card-social-button--reddit:hover {
+  background: rgba(255, 69, 0, 0.1);
+  border-color: rgb(255, 69, 0);
+  color: rgb(255, 69, 0);
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .share-card-title {
@@ -185,6 +272,15 @@
   .share-card-button {
     width: 100%;
     text-align: center;
+    min-height: 44px;
+  }
+
+  .share-card-social {
+    grid-template-columns: 1fr;
+  }
+
+  .share-card-social-button {
+    width: 100%;
     min-height: 44px;
   }
 
