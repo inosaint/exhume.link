@@ -90,8 +90,8 @@ export const NECROPOLIS_REGIONS: NecropolisRegion[] = [
   },
   {
     id: 'portfolios',
-    name: 'The Gallery of the Dead',
-    description: 'Portraits of the departed, immortalized',
+    name: 'The Stream of Sorrows',
+    description: 'A dark current where memories drift and gather',
     cx: 360, cy: 400,
     baseRadius: 68,
     noiseSeedX: 3.3, noiseSeedY: 5.5,
@@ -140,7 +140,7 @@ export const NECROPOLIS_REGIONS: NecropolisRegion[] = [
   },
   {
     id: 'travel',
-    name: 'The Docks',
+    name: 'The Phantom Port',
     description: 'Ships depart for unknown shores',
     cx: 620, cy: 570,
     baseRadius: 64,

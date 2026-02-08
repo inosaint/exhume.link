@@ -1,21 +1,28 @@
-import { PersonalityCard } from '../components/PersonalityCard'
-import type { PersonalityProfile } from '../data/tabsAnalysis'
+import { useEffect, useState } from 'react'
+import type { GrimReport } from '../data/tabsAnalysis'
 import './sections.css'
 
 interface PersonalityProps {
-  profile: PersonalityProfile
-  onNext: () => void
+  report: GrimReport
 }
 
-export function Personality({ profile, onNext }: PersonalityProps) {
+export function Personality({ report }: PersonalityProps) {
+  const [visible, setVisible] = useState(false)
+
+  useEffect(() => {
+    const timer = setTimeout(() => setVisible(true), 400)
+    return () => clearTimeout(timer)
+  }, [])
+
   return (
     <section className="section section--personality">
       <div className="section__inner">
-        <PersonalityCard profile={profile} />
-
-        <button className="landing__cta" type="button" onClick={onNext}>
-          Dig Deeper →
-        </button>
+        <div className="verdict-reveal">
+          <div className="verdict-reveal__rule" />
+          <p className={`verdict-reveal__text${visible ? ' verdict-reveal__text--visible' : ''}`}>
+            {report.verdict}
+          </p>
+        </div>
       </div>
     </section>
   )

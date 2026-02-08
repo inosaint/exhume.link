@@ -14,110 +14,142 @@
 
 /* ── Section viewport: fills remaining height ── */
 .section-viewport {
+  position: relative;
   min-height: 0;
+  width: 100%;
+  overflow: hidden;
+}
+
+/* Framer-motion slide wrapper — fills the viewport.
+   IMPORTANT: No app--* class overrides on this element!
+   Changing layout based on currentSection causes jumps during
+   exit animations. Sections handle their own alignment/bleed. */
+.section-slide {
+  width: 100%;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: clamp(1.5rem, 4vh, 3rem) var(--space-6);
   max-width: var(--max-width);
-  width: 100%;
   margin: 0 auto;
   overflow: auto;
-}
-
-.app--cemetery .section-viewport {
-  overflow: hidden;
 }
 
 /* ── Progress rail (top, horizontal) ── */
 .progress-rail {
   display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-4) var(--space-6);
+  position: relative;
+  z-index: 10;
+  --rail-dot-size: 10px;
+}
+
+.progress-rail__phase {
+  font-family: var(--font-heading);
+  font-size: var(--text-xs);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
+}
+
+.progress-rail__phase-count {
+  color: var(--color-accent);
+}
+
+.progress-rail__phase-label {
+  color: var(--color-text-muted);
+}
+
+.progress-rail__dots {
+  display: flex;
   justify-content: center;
   align-items: center;
   gap: var(--space-5);
-  padding: var(--space-5) var(--space-4);
   position: relative;
-  z-index: 10;
-  --rail-dot-size: 12px;
-  --rail-hit-size: 12px;
-  --rail-pad-y: var(--space-5);
 }
 
-/* connecting line behind the dots */
-.progress-rail::before {
+/* Connecting line — spans between first and last dot centers.
+   Uses a gradient so it fades at the edges. Positioned behind dots. */
+.progress-rail__dots::before {
   content: '';
   position: absolute;
-  top: calc(var(--rail-pad-y) + (var(--rail-hit-size) / 2)); /* align to dot center */
-  left: 50%;
-  transform: translateX(-50%);
-  width: 60%;
+  top: 50%;
+  /* Inset by half a dot from each side so line starts/ends at dot centers */
+  left: calc(var(--rail-dot-size) / 2);
+  right: calc(var(--rail-dot-size) / 2);
   height: 1px;
   background: var(--color-stone);
+  transform: translateY(-0.5px);
 }
 
+/* ── Rail dot ── */
 .rail-dot {
   position: relative;
   z-index: 1;
-  width: var(--rail-hit-size);
-  height: var(--rail-hit-size);
+  width: var(--rail-dot-size);
+  height: var(--rail-dot-size);
   padding: 0;
-  border: 2px solid var(--color-stone);
+  border: none;
   border-radius: 50%;
-  background: var(--color-bg-deep);
+  background: transparent;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Expand tap target without affecting layout */
+  margin: 0;
+}
+
+/* Invisible tap target expansion */
+.rail-dot::before {
+  content: '';
+  position: absolute;
+  inset: -10px;
+}
+
+/* The visible dot */
+.rail-dot__inner {
+  width: var(--rail-dot-size);
+  height: var(--rail-dot-size);
+  border-radius: 50%;
+  border: 2px solid var(--color-stone);
+  background: var(--color-bg-deep);
+  pointer-events: none;
   transition:
     border-color var(--duration-mid) var(--ease-out),
     background-color var(--duration-mid) var(--ease-out),
-    box-shadow var(--duration-mid) var(--ease-out);
+    box-shadow var(--duration-mid) var(--ease-out),
+    transform var(--duration-mid) var(--ease-out);
 }
 
-.rail-dot:hover {
-  border-color: var(--color-accent-dim);
-}
-
-.rail-dot.active {
+/* Active dot */
+.rail-dot.active .rail-dot__inner {
   border-color: var(--color-accent);
   background: var(--color-accent);
   box-shadow: 0 0 8px var(--color-accent-glow);
+  transform: scale(1.4);
 }
 
+/* Disabled state */
 .rail-dot:disabled,
 .rail-dot--disabled {
   opacity: 0.35;
   cursor: not-allowed;
 }
 
-.rail-dot:disabled:hover {
-  border-color: var(--color-stone);
-}
-
-/* label: visible only on active, hidden otherwise */
-.rail-dot__label {
-  position: absolute;
-  top: calc(100% + var(--space-2));
-  left: 50%;
-  transform: translateX(-50%);
-  white-space: nowrap;
-  font-family: var(--font-body);
-  font-size: var(--text-xs);
-  color: var(--color-text-muted);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  opacity: 0;
-  transition: opacity var(--duration-mid) var(--ease-out);
-  pointer-events: none;
-}
-
-.rail-dot.active .rail-dot__label {
-  opacity: 1;
-  color: var(--color-text-secondary);
-}
-
-/* ── Nav footer (Prev / Next) ── */
+/* ── Nav footer (single centered CTA) ── */
 .nav-footer {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   padding: var(--space-4) var(--space-6);
   max-width: var(--max-width);
   width: 100%;
@@ -125,74 +157,51 @@
   background: linear-gradient(180deg, rgba(10, 10, 14, 0) 0%, rgba(10, 10, 14, 0.9) 45%, rgba(10, 10, 14, 1) 100%);
 }
 
-.nav-footer__counter {
-  font-size: var(--text-sm);
-  color: var(--color-text-muted);
-  letter-spacing: 0.1em;
-  font-variant-numeric: tabular-nums;
-}
-
-.nav-btn {
+/* Footer CTA — outlined, fills on hover */
+.nav-footer__cta {
   font-family: var(--font-body);
   font-size: var(--text-sm);
   font-weight: 500;
-  color: var(--color-text-secondary);
-  background: none;
-  border: 1px solid var(--color-stone);
-  border-radius: 4px;
-  padding: var(--space-2) var(--space-4);
-  cursor: pointer;
   letter-spacing: 0.06em;
+  color: var(--color-accent);
+  background: none;
+  border: 1px solid var(--color-accent-dim);
+  border-radius: 4px;
+  padding: var(--space-2) var(--space-5);
+  cursor: pointer;
   transition:
     color var(--duration-fast) var(--ease-out),
     border-color var(--duration-fast) var(--ease-out),
     background-color var(--duration-fast) var(--ease-out);
 }
 
-.nav-btn:hover:not(:disabled) {
-  border-color: var(--color-accent-dim);
-  color: var(--color-accent);
+.nav-footer__cta:hover:not(:disabled) {
+  background: var(--color-accent-dim);
+  border-color: var(--color-accent);
+  color: var(--color-bg-deep);
 }
 
-.nav-btn:disabled {
+.nav-footer__cta:disabled {
   opacity: 0.25;
   cursor: not-allowed;
 }
 
-.nav-btn--next {
-  border-color: var(--color-accent-dim);
-  color: var(--color-accent);
-}
-
-.nav-btn--next:hover:not(:disabled) {
-  background: var(--color-accent-dim);
-  color: var(--color-bg-deep);
-}
-
-.nav-btn--share {
+.nav-footer__cta--share {
   background: var(--color-accent);
   border-color: var(--color-accent);
   color: var(--color-bg-deep);
   box-shadow: 0 0 16px var(--color-accent-glow);
 }
 
-.nav-btn--share:hover:not(:disabled) {
+.nav-footer__cta--share:hover:not(:disabled) {
   background: #dbb97a;
   border-color: #dbb97a;
-}
-
-/* ── Touch device: always show active rail label ── */
-@media (hover: none) {
-  .rail-dot.active .rail-dot__label {
-    opacity: 1;
-    color: var(--color-text-secondary);
-  }
 }
 
 /* ── Safe-area insets for notches / home indicator ── */
 @supports (padding: env(safe-area-inset-top)) {
   .progress-rail {
-    padding-top: max(var(--space-5), env(safe-area-inset-top));
+    padding-top: max(var(--space-4), env(safe-area-inset-top));
     padding-left: max(var(--space-4), env(safe-area-inset-left));
     padding-right: max(var(--space-4), env(safe-area-inset-right));
   }
@@ -206,65 +215,26 @@
 
 /* ── Responsive ── */
 @media (max-width: 768px) {
-  .section-viewport {
+  .section-slide {
     padding: var(--space-6) var(--space-4);
     align-items: flex-start;
     -webkit-overflow-scrolling: touch;
   }
 
   .progress-rail {
-    gap: var(--space-3);
-    padding-top: var(--space-4);
-    padding-bottom: var(--space-4);
-    --rail-dot-size: 10px;
-    --rail-hit-size: 40px;
-    --rail-pad-y: var(--space-4);
+    gap: var(--space-2);
+    padding-top: var(--space-3);
+    padding-bottom: var(--space-5);
+    --rail-dot-size: 8px;
   }
 
-  .progress-rail::before {
-    width: 80%;
+  .progress-rail__dots {
+    gap: var(--space-4);
   }
 
-  /* Increase tap targets to 44px minimum */
-  .rail-dot {
-    width: var(--rail-hit-size);
-    height: var(--rail-hit-size);
-    padding: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: transparent;
-    border: none;
-  }
-
-  .rail-dot::after {
-    content: '';
-    display: block;
-    width: var(--rail-dot-size);
-    height: var(--rail-dot-size);
-    border-radius: 50%;
-    border: 2px solid var(--color-stone);
-    background: var(--color-bg-deep);
-    transition:
-      border-color var(--duration-mid) var(--ease-out),
-      background-color var(--duration-mid) var(--ease-out),
-      box-shadow var(--duration-mid) var(--ease-out);
-  }
-
-  .rail-dot.active {
-    background: transparent;
-    box-shadow: none;
-  }
-
-  .rail-dot.active::after {
-    border-color: var(--color-accent);
-    background: var(--color-accent);
-    box-shadow: 0 0 8px var(--color-accent-glow);
-  }
-
-  .nav-btn {
+  .nav-footer__cta {
     min-height: 44px;
-    padding: var(--space-2) var(--space-3);
+    min-width: 200px;
   }
 
   .nav-footer {
@@ -277,30 +247,16 @@
 @media (max-width: 480px) {
   .progress-rail {
     gap: var(--space-2);
-    padding: var(--space-4) var(--space-2);
-    --rail-hit-size: 28px;
-    --rail-dot-size: 8px;
+    padding: var(--space-3) var(--space-2) var(--space-5);
+    --rail-dot-size: 7px;
   }
 
-  .rail-dot__label {
-    display: none;
+  .progress-rail__dots {
+    gap: var(--space-3);
   }
+
 
   .nav-footer {
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: var(--space-2);
-  }
-
-  .nav-footer__counter {
-    order: -1;
-    width: 100%;
-    text-align: center;
-  }
-
-  .nav-btn {
-    flex: 1;
-    text-align: center;
-    min-width: 0;
+    padding: var(--space-3) var(--space-2);
   }
 }

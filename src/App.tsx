@@ -1,6 +1,7 @@
 import { useMemo, useState, useCallback } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
 import { Agentation } from 'agentation'
-import { type FlowVariant, type SectionId, SECTIONS_A, SECTIONS_B } from './sections/config'
+import { type FlowVariant, type SectionId, SECTIONS_A, SECTIONS_B, SECTIONS_C } from './sections/config'
 import { analyzeInputToSession, extractUrlsFromText, type ExhumeSession } from './data/tabsAnalysis'
 import SAMPLE_TABS from '../browserdata/all_tabs_clean.txt?raw'
 import { Landing } from './sections/Landing'
@@ -10,8 +11,14 @@ import { Numbers } from './sections/Numbers'
 import { Cemetery } from './sections/Cemetery'
 import { WorldMap } from './sections/WorldMap'
 import { NecropolisMap } from './sections/NecropolisMap'
+import { HexMap } from './sections/HexMap'
+import { GrimReport } from './sections/GrimReport'
 import { Share } from './sections/Share'
 import './App.css'
+
+const prefersReducedMotion =
+  typeof window !== 'undefined' &&
+  window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
 type AnalysisStatus = 'idle' | 'running' | 'done' | 'error'
 
@@ -25,24 +32,36 @@ const PROCESSING_LINES = [
   'Consulting the archetypes…',
 ]
 
+const PHASE_TITLES: Partial<Record<SectionId, string>> = {
+  landing: 'Surface Rite',
+  processing: 'Unearthing',
+  personality: 'The Verdict',
+  numbers: 'Ledger Reading',
+  cemetery: 'Cemetery Assembly',
+  worldmap: 'Territory Alignment',
+  hexmap: 'Territory Alignment',
+  grimreport: 'Bone Reading',
+  share: 'The Rite',
+}
+
 function resolveFlowVariant(): FlowVariant {
   if (typeof window === 'undefined') return 'a'
 
   const params = new URLSearchParams(window.location.search)
   const fromUrl = params.get('flow')
-  if (fromUrl === 'a' || fromUrl === 'b') {
+  if (fromUrl === 'a' || fromUrl === 'b' || fromUrl === 'c') {
     window.localStorage.setItem('exhume.flow', fromUrl)
     return fromUrl
   }
 
-  // Default to flow A for now (still overridable via `?flow=b`).
+  // Default to flow A for now (still overridable via `?flow=b` or `?flow=c`).
   window.localStorage.setItem('exhume.flow', 'a')
   return 'a'
 }
 
 export default function App() {
   const [flow] = useState<FlowVariant>(() => resolveFlowVariant())
-  const sections = useMemo(() => (flow === 'b' ? SECTIONS_B : SECTIONS_A), [flow])
+  const sections = useMemo(() => (flow === 'c' ? SECTIONS_C : flow === 'b' ? SECTIONS_B : SECTIONS_A), [flow])
   const [currentSection, setCurrentSection] = useState<SectionId>('landing')
   const [analysisStatus, setAnalysisStatus] = useState<AnalysisStatus>('idle')
   const [analysisStepIndex, setAnalysisStepIndex] = useState(0)
@@ -52,6 +71,7 @@ export default function App() {
   const currentIndex = Math.max(0, sections.findIndex(s => s.id === currentSection))
   const isShareSection = currentSection === 'share'
   const isReady = analysisStatus === 'done' && session !== null
+  const phaseTitle = PHASE_TITLES[currentSection] ?? sections[currentIndex]?.label ?? 'Ritual Phase'
 
   const goTo = useCallback((id: SectionId) => {
     if (id === 'processing') return
@@ -59,10 +79,6 @@ export default function App() {
     if (!canNavigate) return
     setCurrentSection(id)
   }, [isReady])
-
-  const prev = useCallback(() => {
-    if (currentIndex > 0) setCurrentSection(sections[currentIndex - 1].id)
-  }, [currentIndex, sections])
 
   const next = useCallback(() => {
     if (currentIndex < sections.length - 1) setCurrentSection(sections[currentIndex + 1].id)
@@ -111,111 +127,135 @@ export default function App() {
   }, [analysisStatus])
 
   const showFooter =
+    currentSection === 'personality' ||
+    currentSection === 'numbers' ||
     currentSection === 'cemetery' ||
     currentSection === 'worldmap' ||
+    currentSection === 'hexmap' ||
+    currentSection === 'grimreport' ||
     currentSection === 'share'
 
   return (
     <div className={`app app--${currentSection}`}>
       {/* ── Progress rail ── */}
       <nav className="progress-rail" aria-label="Sections">
-        {sections.map((section) => {
-          const disabled =
-            section.id === 'processing' ||
-            (section.id !== 'landing' && !isReady)
+        <div className="progress-rail__phase">
+          <span className="progress-rail__phase-count">Phase {currentIndex + 1} of {sections.length}</span>
+          <span className="progress-rail__phase-label">· {phaseTitle}</span>
+        </div>
+        <div className="progress-rail__dots">
+          {sections.map((section) => {
+            const disabled =
+              section.id === 'processing' ||
+              (section.id !== 'landing' && !isReady)
 
-          return (
-          <button
-            key={section.id}
-            className={`rail-dot ${currentSection === section.id ? 'active' : ''}${disabled ? ' rail-dot--disabled' : ''}`}
-            onClick={() => goTo(section.id)}
-            aria-label={section.label}
-            aria-current={currentSection === section.id ? 'step' : undefined}
-            disabled={disabled}
-          >
-            <span className="rail-dot__inner" />
-            <span className="rail-dot__label">{section.label}</span>
-          </button>
-        )})}
+            return (
+            <button
+              key={section.id}
+              className={`rail-dot ${currentSection === section.id ? 'active' : ''}${disabled ? ' rail-dot--disabled' : ''}`}
+              onClick={() => goTo(section.id)}
+              aria-label={section.label}
+              aria-current={currentSection === section.id ? 'step' : undefined}
+              disabled={disabled}
+              type="button"
+            >
+              <span className="rail-dot__inner" />
+            </button>
+          )})}
+        </div>
       </nav>
 
       {/* ── Active section ── */}
       <main className="section-viewport">
-        {currentSection === 'landing' && (
-          <Landing
-            isBusy={analysisStatus === 'running'}
-            error={analysisError}
-            sampleText={SAMPLE_TABS}
-            onBegin={handleBegin}
-          />
-        )}
-        {currentSection === 'processing' && (
-          <Processing
-            onNext={next}
-            lines={PROCESSING_LINES}
-            activeIndex={analysisStepIndex}
-            isReadyToAdvance={analysisStatus === 'done'}
-          />
-        )}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={currentSection}
+            className="section-slide"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: prefersReducedMotion ? 0.15 : 0.35, ease: 'easeInOut' }}
+          >
+            {currentSection === 'landing' && (
+              <Landing
+                isBusy={analysisStatus === 'running'}
+                error={analysisError}
+                sampleText={SAMPLE_TABS}
+                onBegin={handleBegin}
+              />
+            )}
+            {currentSection === 'processing' && (
+              <Processing
+                onNext={next}
+                lines={PROCESSING_LINES}
+                activeIndex={analysisStepIndex}
+                isReadyToAdvance={analysisStatus === 'done'}
+              />
+            )}
 
-        {currentSection === 'personality' && session && (
-          <Personality profile={session.personality} onNext={next} />
-        )}
+            {currentSection === 'personality' && session && (
+              <Personality report={session.grimReport} />
+            )}
 
-        {currentSection === 'numbers' && session && (
-          <Numbers stats={session.stats} onNext={next} />
-        )}
+            {currentSection === 'numbers' && session && (
+              <Numbers stats={session.stats} />
+            )}
 
-        {currentSection === 'cemetery' && session && (
-          <Cemetery groups={session.categoryGroups} />
-        )}
+            {currentSection === 'cemetery' && session && (
+              <Cemetery groups={session.categoryGroups} />
+            )}
 
-        {currentSection === 'worldmap' && session && (
-          flow === 'a' ? (
-            <NecropolisMap groups={session.categoryGroups} />
-          ) : (
-            <WorldMap
-              locations={session.locations}
-              tabs={session.tabs}
-              title="The Web"
-              subtitle="A spiderweb of the domains we could map. The rest remain unmarked."
-              mode="web"
-            />
-          )
-        )}
+            {currentSection === 'worldmap' && session && (
+              flow === 'b' ? (
+                <WorldMap
+                  locations={session.locations}
+                  tabs={session.tabs}
+                  title="The Web"
+                  subtitle="A spiderweb of the domains we could map. The rest remain unmarked."
+                  mode="web"
+                />
+              ) : (
+                <NecropolisMap groups={session.categoryGroups} />
+              )
+            )}
 
-        {currentSection === 'share' && session && (
-          <Share profile={session.personality} stats={session.stats} />
-        )}
+            {currentSection === 'hexmap' && session && (
+              <HexMap groups={session.categoryGroups} />
+            )}
+
+            {currentSection === 'grimreport' && session && (
+              <GrimReport report={session.grimReport} />
+            )}
+
+            {currentSection === 'share' && session && (
+              <Share profile={session.personality} stats={session.stats} />
+            )}
+          </motion.div>
+        </AnimatePresence>
       </main>
 
-      {/* ── Prev / Next nav (results only) ── */}
+      {/* ── Nav footer (single centered button) ── */}
       {showFooter && (
         <footer className="nav-footer">
           <button
-            className="nav-btn nav-btn--prev"
-            onClick={prev}
-            disabled={currentIndex === 0}
-            aria-label="Previous section"
-          >
-            ← Back
-          </button>
-          <span className="nav-footer__counter">
-            {currentIndex + 1} / {sections.length}
-          </span>
-          <button
-            className={`nav-btn nav-btn--next${isShareSection ? ' nav-btn--share' : ''}`}
+            className={`nav-footer__cta${isShareSection ? ' nav-footer__cta--share' : ''}`}
             onClick={handlePrimary}
             disabled={!isShareSection && currentIndex === sections.length - 1}
             aria-label={isShareSection ? 'Share with your cult' : 'Next section'}
           >
             {isShareSection
               ? 'Share with Your Cult'
-              : currentSection === 'cemetery'
-                ? (flow === 'a' ? 'Enter the Necropolis →' : 'Visit the Global Dead →')
-                : currentSection === 'worldmap'
-                  ? 'Prepare the Rite →'
-                  : 'Continue →'}
+              : currentSection === 'personality'
+                ? 'Dig Deeper ↓'
+                : currentSection === 'numbers'
+                  ? 'Visit Your Tab Cemetery ↓'
+                  : currentSection === 'cemetery'
+                    ? (flow === 'c' ? 'Enter the Hex ↓' : flow === 'a' ? 'Read the Report ↓' : 'Visit the Global Dead ↓')
+                    : currentSection === 'grimreport'
+                      ? 'Prepare the Rite ↓'
+                      : currentSection === 'worldmap' || currentSection === 'hexmap'
+                        ? 'Prepare the Rite ↓'
+                        : 'Continue ↓'}
           </button>
         </footer>
       )}

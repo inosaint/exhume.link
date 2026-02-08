@@ -1,3 +1,64 @@
+# The Grim Report — Behavioral Analysis Section + Progress Rail Fix
+
+Date: 2026-02-08
+Agent/Model: Claude Opus 4.6 (claude-code)
+
+## Summary
+- Replaced the Necropolis map in Flow A with **The Grim Report** — a behavioral analysis page that surfaces insights from the user's tab data (spirals, consumption/creation ratio, stale tabs, unfinished business, domain drift).
+- Added `GrimReport` interface and `computeGrimReport()` to the analysis pipeline, extracting behavioral signals from data already being parsed.
+- Includes a template-generated **verdict** paragraph that synthesizes all findings into a closing narrative.
+- Renamed the Share section label to **"The Verdict"** in Flow A's config.
+- **Fixed the progress rail** — moved visible dot rendering from `::after` (which conflicted with tooltip at 768px breakpoint) to `.rail-dot__inner` (already in HTML). `::after` is now exclusively for tooltips at all breakpoints. Hit targets are properly sized (32px desktop, 44px tablet, 28px narrow).
+
+## Files Created
+- `src/sections/GrimReport.tsx` — The Grim Report section: insight cards (Spiral, Ratio, Rot, Unfinished Business, Drift) + verdict + CTA
+- `src/sections/grimreport.css` — Dark card layout, gold accents, consumption/creation bar, staggered fade-in, responsive
+
+## Files Updated
+- `src/data/tabsAnalysis.ts` — Added `GrimReport` interface, `computeGrimReport()`, updated `ExhumeSession` to include `grimReport`
+- `src/sections/config.ts` — Added `'grimreport'` to `SectionId`, replaced `worldmap` with `grimreport` in `SECTIONS_A`, renamed Share label to "The Verdict"
+- `src/App.tsx` — Imported `GrimReport`, added `grimreport` to `PHASE_TITLES` ("Bone Reading"), render case, footer nav condition, updated CTA text ("Read the Report →", "Deliver the Verdict →")
+- `src/App.css` — Rewrote progress rail: `.rail-dot__inner` is the visible dot, `.rail-dot` is the invisible hit target, `::after` is always the tooltip. Fixed connecting line alignment. Cleaned up mobile breakpoints.
+- `memory.md` — This entry
+
+## Flow A is now:
+Surface → Unearthing → The Dead → The Ledger → Cemetery → **The Grim Report** → **The Verdict** (Share)
+
+## Notes
+- `npm run build` passes clean.
+- `npm run lint` passes clean.
+- Flow B and Flow C are unchanged — they still use WorldMap and HexMap respectively.
+- NecropolisMap.tsx and necropolis.css remain in the codebase (used by Flow C's tab view).
+
+---
+
+# Hex Map Polish — Landscape, Colors, Wavy Labels, 2x Zoom
+
+Date: 2026-02-07
+Agent/Model: Claude Opus 4.6 (claude-code)
+
+## Summary
+- Changed hex map to landscape layout (1400×600 viewBox, was 1000×700)
+- Added distinct dark gothic color palette per category (burgundy for reading, teal for design, purple for social, etc.) — defined in `hexTileLayout.ts` so Flow A Necropolis colors are untouched
+- Added landscape-spread cluster center positions so categories form one connected organic mass horizontally
+- Default zoom now 2x centered (was 1:1) — caters to both horde and fledgling tab counts
+- Replaced flat text labels with wavy SVG `<textPath>` labels that undulate through cluster centroids
+- Labels have dark stroke outline (`paintOrder: stroke fill`) for readability on any hex color
+- Fixed section label: "Hex Map" → "Necropolis" in SECTIONS_C config
+- Kept hexbin mode toggle untouched for comparison
+
+## Files Updated
+- `src/lib/hexTileLayout.ts` — MAP_W/MAP_H, HEX_COLORS, HEX_CENTERS, getCategoryMeta override
+- `src/sections/HexMap.tsx` — Landscape dims, 2x initial zoom, wavy textPath labels, dark stroke
+- `src/sections/hexmap.css` — Aspect ratio 1400/600, label text drop-shadow
+- `src/sections/config.ts` — SECTIONS_C label fix
+
+## Notes
+- `npm run build` passes clean.
+- `necropolisRegions.ts` NOT modified — Flow A Necropolis Map unaffected.
+
+---
+
 # Placeholder Image Update Summary
 
 Date: 2026-02-05
@@ -441,3 +502,218 @@ Agent/Model: GPT-5.2 (Codex)
 
 ## Files Updated
 - `src/sections/sections.css`
+
+---
+
+# Hex Map — Flow C Prototype (d3-force + d3-hexbin)
+
+Date: 2026-02-06
+Agent/Model: Claude Opus 4.6 (claude-code)
+
+## Summary
+- Added Flow C (`?flow=c`) with a hex tile map where each tab is an individual hexagon, clustered by category.
+- Two layout modes togglable in the UI: **d3-force** (organic clustering via force simulation) and **d3-hexbin** (regular hex grid with nearest-center assignment).
+- Reuses category colors and cluster center positions from `necropolisRegions.ts`.
+- Basic interactions: hover tooltip (domain + category), click opens URL, D3 zoom (+/-/reset).
+- Legend below map shows category colors sorted by count.
+- This is a minimal prototype — polish items deferred to "Hex Map Backlog" section in `todo.md`.
+
+## Files Created
+- `src/lib/hexTileLayout.ts` — Hex geometry, force layout, hexbin layout
+- `src/sections/HexMap.tsx` — Main component with mode toggle, zoom, tooltip, legend
+- `src/sections/hexmap.css` — Styles for hex tiles, tooltip, controls, legend
+
+## Files Updated
+- `src/sections/config.ts` — Added Flow C variant and SECTIONS_C
+- `src/App.tsx` — Import HexMap, add flow=c routing, render hexmap section, update footer nav
+- `todo.md` — Added "Hex Map Backlog" section
+- `package.json` / `package-lock.json` — Added d3-force, d3-hexbin, @types/d3-force, @types/d3-hexbin
+
+## Notes
+- `npm run build` passes clean.
+- Access via `?flow=c` in the URL.
+- The hexbin layout uses a greedy nearest-center assignment which may not produce ideal clusters for very uneven category sizes. Force layout generally looks better.
+
+---
+
+# Tombstone Landing Page + Input Validation + Mobile Responsive Fixes
+
+Date: 2026-02-06
+Agent/Model: Claude Opus 4.6 (claude-code)
+
+## Summary
+- Redesigned the landing page for **both Flow A and Flow B** into a unified tombstone-shaped container with an arched top (`border-radius: 280px 280px 0 0`).
+- Removed the separate Flow B landing layout — both flows now share the same tombstone design (they still diverge at the map stage: Necropolis for A, WorldMap for B).
+- Tombstone contains: gold "EXHUME.LINK" title (Cinzel), four-line epitaph, bordered input panel with textarea + file upload + test dataset buttons.
+- CTA button and privacy note sit below the tombstone.
+- Added **URL validation**: CTA button only enables when textarea contains a valid URL or a file is attached.
+- Added **blood-drip error toast**: if analysis fails, user is returned to landing with a fixed-position error toast styled with CSS blood-drip animations.
+- Epitaph has a horizontal separator (border-bottom) between it and the input panel.
+- **Mobile responsive fixes**:
+  - Progress rail connecting line now uses `--rail-hit-size` for vertical alignment, fixing line floating above dots on mobile.
+  - Synced actual padding with `--rail-pad-y` variable at 768px breakpoint.
+  - Added 480px narrow-screen breakpoint: smaller rail dots (28px hit / 8px visual), hidden dot labels, tighter gaps.
+  - Added 480px tombstone breakpoint: smaller arch, `text-lg` title, `text-sm` epitaph, reduced CTA sizing.
+- Cleaned up all unused Flow B landing-specific CSS classes.
+
+## Files Updated
+- `src/sections/Landing.tsx` — Unified tombstone layout, removed `variant` prop, added URL regex validation
+- `src/sections/sections.css` — Tombstone styles, error toast, removed Flow B landing classes, added 480px breakpoint
+- `src/App.tsx` — Removed `variant={flow}` prop from Landing
+- `src/App.css` — Fixed rail line alignment, synced mobile padding, added 480px narrow-screen rules
+
+## Notes
+- `npm run build` passes clean.
+- Flow variant logic unchanged — still uses `resolveFlowVariant()` for A/B section selection at the map stage.
+
+---
+
+# Necropolis Tabs + Hex Map Horizontal Flow
+
+Date: 2026-02-07
+Agent/Model: GPT-5.2 (Codex)
+
+## Summary
+- Added a tab switch on the Necropolis page to toggle between the fantasy cartography map and the Hex Map.
+- Reworked the Hex Map into a panel with a fixed top bar + bottom legend, closer default zoom, and straight (non-wavy) region labels.
+- Widened the hex map layout for horizontal flow (larger map + hexes, updated centers, hexbin extent).
+
+## Files Updated
+- `src/sections/NecropolisMap.tsx`
+- `src/sections/necropolis.css`
+- `src/sections/HexMap.tsx`
+- `src/sections/hexmap.css`
+- `src/lib/hexTileLayout.ts`
+
+## Notes
+- `npm run lint` still fails due to existing `Math.random` usage in `src/sections/NecropolisMap.tsx` (react-hooks/purity).
+- `npm run build` passes.
+
+---
+
+# Hex Map Borders + Hexbin Default
+
+Date: 2026-02-07
+Agent/Model: GPT-5.2 (Codex)
+
+## Summary
+- Set Flow C hex map default layout to Hexbin.
+- Made hex tiles transparent with colored borders; hover now brightens stroke and glow.
+
+## Files Updated
+- `src/sections/HexMap.tsx`
+- `src/sections/hexmap.css`
+
+## Notes
+- `npm run lint` still fails due to existing `Math.random` usage in `src/sections/NecropolisMap.tsx` (react-hooks/purity).
+- `npm run build` passes.
+
+---
+
+# Force Layout Continent Squeeze (Flow C)
+
+Date: 2026-02-07
+Agent/Model: GPT-5.2 (Codex)
+
+## Summary
+- Switched Flow C default hex layout back to d3-force.
+- Pulled force-layout cluster centers closer together with a squeeze toward map center for a more continent-like mass.
+
+## Files Updated
+- `src/sections/HexMap.tsx`
+- `src/lib/hexTileLayout.ts`
+
+## Notes
+- `npm run lint` still fails due to existing `Math.random` usage in `src/sections/NecropolisMap.tsx` (react-hooks/purity).
+- `npm run build` passes.
+
+---
+
+# Force Cluster Tightening + Global Gravity
+
+Date: 2026-02-07
+Agent/Model: GPT-5.2 (Codex)
+
+## Summary
+- Tightened force-layout clustering by increasing center squeeze on X while leaving Y spread unchanged.
+- Added a light global gravity (stronger on X, weaker on Y) to keep the blob more contiguous without flattening vertically.
+
+## Files Updated
+- `src/lib/hexTileLayout.ts`
+
+## Notes
+- `npm run lint` still fails due to existing `Math.random` usage in `src/sections/NecropolisMap.tsx` (react-hooks/purity).
+- `npm run build` passes.
+
+---
+
+# Flow C Obsidian Background + Runes
+
+Date: 2026-02-07
+Agent/Model: GPT-5.2 (Codex)
+
+## Summary
+- Added a Flow C-only atmospheric background for the Hex Map section: obsidian stone texture, mist, glowing rune pattern, and vignette.
+
+## Files Updated
+- `src/sections/hexmap.css`
+
+## Notes
+- `npm run lint` still fails due to existing `Math.random` usage in `src/sections/NecropolisMap.tsx` (react-hooks/purity).
+- `npm run build` passes.
+
+---
+
+# Lint Fix: Deterministic Terrain Icon Scale
+
+Date: 2026-02-07
+Agent/Model: GPT-5.2 (Codex)
+
+## Summary
+- Replaced `Math.random` in NecropolisMap terrain icon scale with deterministic FBM-based noise for lint purity.
+
+## Files Updated
+- `src/sections/NecropolisMap.tsx`
+
+## Notes
+- `npm run lint` now passes.
+- `npm run build` passes.
+
+---
+
+# Flow C SVG Background (Arcane Stone)
+
+Date: 2026-02-07
+Agent/Model: GPT-5.2 (Codex)
+
+## Summary
+- Moved the atmospheric background to the Hex Map SVG itself (stone texture, mist, runes, vignette) and scoped it to Flow C via a `backgroundVariant` prop.
+- Restored the section-level background to neutral so only the map canvas changes in Flow C.
+
+## Files Updated
+- `src/sections/HexMap.tsx`
+- `src/sections/NecropolisMap.tsx`
+- `src/sections/hexmap.css`
+
+## Notes
+- `npm run lint` passes.
+- `npm run build` passes.
+
+---
+
+# Hex Map Background + Filled Tiles
+
+Date: 2026-02-07
+Agent/Model: GPT-5.2 (Codex)
+
+## Summary
+- Moved the Hex Map background layers to be viewport-locked (no visible edge on pan/zoom) and removed rune overlay.
+- Restored filled hex tiles with a subtle dark stroke and hover glow.
+
+## Files Updated
+- `src/sections/HexMap.tsx`
+- `src/sections/hexmap.css`
+
+## Notes
+- `npm run lint` passes.
+- `npm run build` passes.

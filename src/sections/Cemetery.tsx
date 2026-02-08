@@ -1,7 +1,13 @@
 import { useRef, useEffect, useState } from 'react'
 import { Gravestone, GravestoneRow } from '../components/Gravestone'
-import { CATEGORY_GROUPS, type CategoryGroup } from '../data/mockData'
+import { CATEGORY_GROUPS, type CategoryGroup, type CategoryId } from '../data/mockData'
+import { NECROPOLIS_REGIONS } from '../lib/necropolisRegions'
 import './sections.css'
+
+/** Map category IDs to their gothic region names */
+const REGION_NAMES: Record<CategoryId, string> = Object.fromEntries(
+  NECROPOLIS_REGIONS.map(r => [r.id, r.name])
+) as Record<CategoryId, string>
 
 function CategorySection({ group, index }: { group: CategoryGroup; index: number }) {
   const [isVisible, setIsVisible] = useState(false)
@@ -38,7 +44,7 @@ function CategorySection({ group, index }: { group: CategoryGroup; index: number
     >
       <div className="cemetery__category-header">
         <span className="cemetery__category-icon">{group.category.icon}</span>
-        <h3 className="cemetery__category-name">{group.category.label}</h3>
+        <h3 className="cemetery__category-name">{REGION_NAMES[group.category.id] ?? group.category.label}</h3>
         <span className="cemetery__category-count">{group.count} buried</span>
       </div>
 

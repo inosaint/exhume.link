@@ -96,6 +96,25 @@ Scoring **design** is done — 6 archetypes, 8 dimensions, 3 axes. Full spec in
 - [ ] Mobile testing on real device — CSS fixes are in, needs visual QA
 - [ ] DNS: point `exhume.link` A records to GitHub Pages IPs (185.199.108–111.153) and set custom domain in repo Settings → Pages
 
+## Hex Map Backlog (Flow C — `?flow=c`)
+
+Basic hex map prototype is live with two layout modes (force / hexbin). Toggle between them in the UI.
+Polish and advanced features below:
+
+- [ ] Wasteland gap-fill + drift behavior: split "other" hexes into gap-fillers (weak center pull) and drifters (outward push + fading opacity)
+- [ ] Parchment background filter (reuse `ParchmentDefs` from NecropolisMap)
+- [ ] Compass rose decoration (reuse `CompassRose` from NecropolisMap)
+- [ ] Legend hover highlighting: dim all non-hovered-category hexes to `opacity: 0.3`
+- [ ] Category labels: improve positioning (avoid overlap, offset from cluster centroid)
+- [ ] Opacity fading on outer wasteland hexes (distance-from-center gradient)
+- [ ] `prefers-reduced-motion`: disable hover scale transitions
+- [ ] Mobile: long-press tooltip, initial zoom level adjustment
+- [ ] Edge decorations and map border styling
+- [ ] Performance: test with 2000+ tabs, consider canvas fallback if SVG lags
+- [ ] Decide on final layout (force vs hexbin) and remove the other
+- [ ] Hex tile click feedback animation (brief flash)
+- [ ] Shared-domain bridges between clusters (optional visual connection)
+
 ## Backlog (not scheduled)
 
 - [ ] Open Graph / Twitter Card meta tags: dynamically set based on the rendered data so link previews show the card
