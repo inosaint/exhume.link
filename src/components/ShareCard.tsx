@@ -158,13 +158,13 @@ export function ShareCard({ profile, stats }: ShareCardProps) {
       ctx.fillStyle = COLORS.bgDeep
       ctx.fillRect(borderWidth, borderWidth, CARD_WIDTH - borderWidth * 2, CARD_HEIGHT - borderWidth * 2)
 
-      // Holographic gradient overlay effect
+      // Gothic holographic gradient overlay effect
       const holoGradient = ctx.createLinearGradient(0, 0, CARD_WIDTH, CARD_HEIGHT)
-      holoGradient.addColorStop(0, 'rgba(201, 169, 110, 0.15)')
-      holoGradient.addColorStop(0.25, 'rgba(150, 100, 200, 0.1)')
-      holoGradient.addColorStop(0.5, 'rgba(100, 200, 255, 0.1)')
-      holoGradient.addColorStop(0.75, 'rgba(255, 100, 150, 0.1)')
-      holoGradient.addColorStop(1, 'rgba(201, 169, 110, 0.15)')
+      holoGradient.addColorStop(0, 'rgba(201, 169, 110, 0.2)')      // Gold
+      holoGradient.addColorStop(0.25, 'rgba(80, 60, 100, 0.15)')     // Deep purple
+      holoGradient.addColorStop(0.5, 'rgba(40, 60, 80, 0.15)')       // Dark midnight blue
+      holoGradient.addColorStop(0.75, 'rgba(60, 80, 70, 0.12)')      // Dark teal/green
+      holoGradient.addColorStop(1, 'rgba(201, 169, 110, 0.2)')       // Gold
       ctx.fillStyle = holoGradient
       ctx.fillRect(borderWidth, borderWidth, CARD_WIDTH - borderWidth * 2, CARD_HEIGHT - borderWidth * 2)
 
