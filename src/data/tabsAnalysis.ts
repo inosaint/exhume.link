@@ -34,12 +34,35 @@ export interface ExhumeStats {
   mappedDomains: number
 }
 
+export interface GrimReport {
+  /** Domains with 5+ tabs — the rabbit holes */
+  spirals: { domain: string; count: number }[]
+  deepestSpiral: { domain: string; count: number } | null
+  /** Consumption (reading+news+video+social) vs Creation (tools+design+portfolios) */
+  consumptionCount: number
+  creationCount: number
+  ratio: string // e.g. "4:1"
+  isConsumer: boolean
+  /** Tabs likely stale (news, social, shopping — ephemeral by nature) */
+  staleCount: number
+  stalePct: number
+  /** Unfinished business */
+  unfinishedShopping: number
+  unfinishedJobs: number
+  /** Domains visited exactly once */
+  oneAndDoneCount: number
+  oneAndDonePct: number
+  /** Template-generated verdict paragraph */
+  verdict: string
+}
+
 export interface ExhumeSession {
   tabs: TabEntry[]
   categoryGroups: CategoryGroup[]
   locations: ClusteredLocation[]
   stats: ExhumeStats
   personality: PersonalityProfile
+  grimReport: GrimReport
 }
 
 const TRACKING_PARAMS = new Set([
@@ -758,6 +781,102 @@ function scorePersonality(input: {
   }
 }
 
+/* ── Grim Report computation ── */
+
+function computeGrimReport(input: {
+  domainCounts: Map<string, number>
+  categoryCounts: Record<CategoryId, number>
+  totalTabs: number
+  uniqueDomains: number
+  personality: PersonalityProfile
+}): GrimReport {
+  const { domainCounts, categoryCounts, totalTabs, uniqueDomains, personality } = input
+
+  // Spirals: domains with 5+ tabs
+  const spirals = Array.from(domainCounts.entries())
+    .filter(([, c]) => c >= 5)
+    .map(([domain, count]) => ({ domain, count }))
+    .sort((a, b) => b.count - a.count)
+
+  const deepestSpiral = spirals.length > 0 ? spirals[0] : null
+
+  // Consumption vs Creation
+  const consumptionCount =
+    (categoryCounts.reading ?? 0) +
+    (categoryCounts.news ?? 0) +
+    (categoryCounts.video ?? 0) +
+    (categoryCounts.social ?? 0)
+
+  const creationCount =
+    (categoryCounts.tools ?? 0) +
+    (categoryCounts.design ?? 0) +
+    (categoryCounts.portfolios ?? 0)
+
+  const isConsumer = consumptionCount >= creationCount
+  const high = Math.max(consumptionCount, creationCount, 1)
+  const low = Math.max(Math.min(consumptionCount, creationCount), 1)
+  const ratioNum = Math.round(high / low)
+  const ratio = ratioNum <= 1 ? '1:1' : `${ratioNum}:1`
+
+  // Stale tabs: news, social, shopping are ephemeral
+  const staleCount =
+    (categoryCounts.news ?? 0) +
+    (categoryCounts.social ?? 0) +
+    (categoryCounts.shopping ?? 0)
+  const stalePct = totalTabs > 0 ? Math.round((staleCount / totalTabs) * 100) : 0
+
+  // Unfinished business
+  const unfinishedShopping = categoryCounts.shopping ?? 0
+  const unfinishedJobs = categoryCounts.jobs ?? 0
+
+  // One-and-done domains
+  const oneAndDoneCount = Array.from(domainCounts.values()).filter(c => c === 1).length
+  const oneAndDonePct = uniqueDomains > 0 ? Math.round((oneAndDoneCount / uniqueDomains) * 100) : 0
+
+  // Build verdict
+  const verdictParts: string[] = []
+
+  verdictParts.push(`You opened ${totalTabs} graves.`)
+
+  if (deepestSpiral) {
+    verdictParts.push(`You spiraled ${deepestSpiral.count} tabs deep into ${deepestSpiral.domain}.`)
+  }
+
+  if (stalePct > 0) {
+    verdictParts.push(`${stalePct}% of your tabs are probably already dead.`)
+  }
+
+  if (unfinishedShopping > 0 && unfinishedJobs > 0) {
+    verdictParts.push(`You saved ${unfinishedShopping} things you'll never buy and browsed ${unfinishedJobs} jobs you'll never apply to.`)
+  } else if (unfinishedShopping > 0) {
+    verdictParts.push(`You saved ${unfinishedShopping} things you'll never buy.`)
+  } else if (unfinishedJobs > 0) {
+    verdictParts.push(`You browsed ${unfinishedJobs} jobs you'll never apply to.`)
+  }
+
+  if (oneAndDonePct > 50) {
+    verdictParts.push(`${oneAndDonePct}% of the domains you touched, you never returned to.`)
+  }
+
+  verdictParts.push(`You are ${personality.title} — and you have unfinished business.`)
+
+  return {
+    spirals,
+    deepestSpiral,
+    consumptionCount,
+    creationCount,
+    ratio,
+    isConsumer,
+    staleCount,
+    stalePct,
+    unfinishedShopping,
+    unfinishedJobs,
+    oneAndDoneCount,
+    oneAndDonePct,
+    verdict: verdictParts.join(' '),
+  }
+}
+
 export async function analyzeInputToSession(
   inputText: string,
   options?: {
@@ -882,11 +1001,20 @@ export async function analyzeInputToSession(
 
   const categoryGroups = buildCategoryGroups(tabs)
 
+  const grimReport = computeGrimReport({
+    domainCounts,
+    categoryCounts,
+    totalTabs: tabs.length,
+    uniqueDomains: uniqueDomains.size,
+    personality,
+  })
+
   return {
     tabs,
     categoryGroups,
     locations,
     stats,
     personality,
+    grimReport,
   }
 }

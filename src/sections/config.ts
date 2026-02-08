@@ -1,4 +1,4 @@
-export type FlowVariant = 'a' | 'b'
+export type FlowVariant = 'a' | 'b' | 'c'
 
 export type SectionId =
   | 'landing'
@@ -8,6 +8,8 @@ export type SectionId =
   | 'numbers'
   | 'cemetery'
   | 'worldmap'
+  | 'hexmap'
+  | 'grimreport'
   | 'share'
 
 export interface SectionDef {
@@ -18,11 +20,11 @@ export interface SectionDef {
 export const SECTIONS_A: SectionDef[] = [
   { id: 'landing', label: 'Surface' },
   { id: 'processing', label: 'Unearthing' },
-  { id: 'personality', label: 'The Dead' },
+  { id: 'personality', label: 'The Verdict' },
   { id: 'numbers', label: 'The Ledger' },
   { id: 'cemetery', label: 'Cemetery' },
-  { id: 'worldmap', label: 'Necropolis' },
-  { id: 'share', label: 'Share' },
+  { id: 'grimreport', label: 'Grim Report' },
+  { id: 'share', label: 'The Rite' },
 ]
 
 export const SECTIONS_B: SectionDef[] = [
@@ -32,5 +34,15 @@ export const SECTIONS_B: SectionDef[] = [
   { id: 'numbers', label: 'The Ledger' },
   { id: 'cemetery', label: 'Cemetery' },
   { id: 'worldmap', label: 'The Web' },
+  { id: 'share', label: 'Share' },
+]
+
+export const SECTIONS_C: SectionDef[] = [
+  { id: 'landing', label: 'Surface' },
+  { id: 'processing', label: 'Unearthing' },
+  { id: 'personality', label: 'The Dead' },
+  { id: 'numbers', label: 'The Ledger' },
+  { id: 'cemetery', label: 'Cemetery' },
+  { id: 'hexmap', label: 'Necropolis' },
   { id: 'share', label: 'Share' },
 ]

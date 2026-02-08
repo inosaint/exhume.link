@@ -11,6 +11,7 @@ import { zoom, zoomIdentity, type ZoomBehavior } from 'd3-zoom'
 import { seedNoise, noisyPolygon, smoothPath, fbm } from '../lib/noise'
 import { NECROPOLIS_REGIONS, type NecropolisRegion } from '../lib/necropolisRegions'
 import type { CategoryGroup } from '../data/mockData'
+import { HexMapPanel } from './HexMap'
 import './necropolis.css'
 
 const MAP_WIDTH = 1000
@@ -457,6 +458,7 @@ export function NecropolisMap({ groups }: NecropolisMapProps) {
   const svgRef = useRef<SVGSVGElement>(null)
   const gRef = useRef<SVGGElement>(null)
   const zoomBehaviorRef = useRef<ZoomBehavior<SVGSVGElement> | null>(null)
+  const [view, setView] = useState<'map' | 'hex'>('map')
   const [hoveredRegion, setHoveredRegion] = useState<string | null>(null)
 
   // Initialize noise with fixed seed for deterministic maps
@@ -521,7 +523,7 @@ export function NecropolisMap({ groups }: NecropolisMapProps) {
           type: region.terrainType,
           x: region.cx + Math.cos(angle) * dist,
           y: region.cy + Math.sin(angle) * dist,
-          scale: 0.7 + Math.random() * 0.3,
+          scale: 0.7 + ((fbm(region.noiseSeedX + i * 3.1, region.noiseSeedY - i * 2.7, 2) + 1) / 2) * 0.3,
         })
       }
     }
@@ -558,6 +560,7 @@ export function NecropolisMap({ groups }: NecropolisMapProps) {
 
   // D3 zoom setup
   useEffect(() => {
+    if (view !== 'map') return
     const svg = svgRef.current
     if (!svg) return
 
@@ -578,7 +581,7 @@ export function NecropolisMap({ groups }: NecropolisMapProps) {
       selection.on('.zoom', null)
       zoomBehaviorRef.current = null
     }
-  }, [])
+  }, [view])
 
   const handleZoomIn = () => {
     const svg = svgRef.current
@@ -608,225 +611,252 @@ export function NecropolisMap({ groups }: NecropolisMapProps) {
       <div className="necropolis__container">
         <h2 className="section__heading necropolis__title">The Necropolis</h2>
         <p className="necropolis__subtitle">
-          A cartography of your digital remains. Each region holds the tabs of its kind.
+          {view === 'map'
+            ? 'A cartography of your digital remains. Each region holds the tabs of its kind.'
+            : 'Each hex is a tab, clustered by district. Drag to drift across the necropolis.'}
         </p>
 
-        <div className="necropolis__viewport">
-          {/* Zoom controls */}
-          <div className="necropolis__controls">
-            <button className="necropolis__control" onClick={handleZoomIn} aria-label="Zoom in">+</button>
-            <button className="necropolis__control" onClick={handleZoomOut} aria-label="Zoom out">−</button>
-            <button className="necropolis__control necropolis__control--reset" onClick={handleReset} aria-label="Reset view">⟲</button>
-          </div>
-
-          <svg
-            ref={svgRef}
-            className="necropolis__svg"
-            viewBox={`0 0 ${MAP_WIDTH} ${MAP_HEIGHT}`}
-            preserveAspectRatio="xMidYMid meet"
+        <div className="necropolis__tabs" role="tablist" aria-label="Necropolis view">
+          <button
+            className={`necropolis__tab ${view === 'map' ? 'necropolis__tab--active' : ''}`}
+            role="tab"
+            aria-selected={view === 'map'}
+            onClick={() => setView('map')}
           >
-            <ParchmentDefs />
+            Cartography
+          </button>
+          <button
+            className={`necropolis__tab ${view === 'hex' ? 'necropolis__tab--active' : ''}`}
+            role="tab"
+            aria-selected={view === 'hex'}
+            onClick={() => setView('hex')}
+          >
+            Hex Map
+          </button>
+        </div>
 
-            <g ref={gRef}>
-              {/* Background — ocean/water */}
-              <rect
-                x={-50} y={-50}
-                width={MAP_WIDTH + 100} height={MAP_HEIGHT + 100}
-                fill={COLORS.water}
-                opacity={0.25}
-              />
+        {view === 'map' ? (
+          <>
+            <div className="necropolis__viewport">
+              {/* Zoom controls */}
+              <div className="necropolis__controls">
+                <button className="necropolis__control" onClick={handleZoomIn} aria-label="Zoom in">+</button>
+                <button className="necropolis__control" onClick={handleZoomOut} aria-label="Zoom out">−</button>
+                <button className="necropolis__control necropolis__control--reset" onClick={handleReset} aria-label="Reset view">⟲</button>
+              </div>
 
-              {/* Parchment background for the continent */}
-              {coastlinePath && (
-                <path
-                  className="necropolis__continent"
-                  d={coastlinePath}
-                  fill={COLORS.parchment}
-                  stroke={COLORS.ink}
-                  strokeWidth={2}
-                  opacity={0.95}
-                  filter="url(#parchment-noise)"
-                />
-              )}
+              <svg
+                ref={svgRef}
+                className="necropolis__svg"
+                viewBox={`0 0 ${MAP_WIDTH} ${MAP_HEIGHT}`}
+                preserveAspectRatio="xMidYMid meet"
+              >
+                <ParchmentDefs />
 
-              {/* Coastline hatching — repeated inner strokes for hand-drawn feel */}
-              {coastlinePath && (
-                <>
-                  <path
-                    d={coastlinePath}
-                    fill="none"
-                    stroke={COLORS.ink}
-                    strokeWidth={0.5}
-                    strokeDasharray="4 6"
-                    opacity={0.15}
-                    transform="scale(0.98) translate(10, 7)"
+                <g ref={gRef}>
+                  {/* Background — ocean/water */}
+                  <rect
+                    x={-50} y={-50}
+                    width={MAP_WIDTH + 100} height={MAP_HEIGHT + 100}
+                    fill={COLORS.water}
+                    opacity={0.25}
                   />
-                </>
-              )}
 
-              {/* Border mountain marks */}
-              {borderMarks.map((mark, i) => (
-                <polygon
-                  key={`border-${i}`}
-                  points="-3,2 0,-4 3,2"
-                  transform={`translate(${mark.x},${mark.y}) rotate(${mark.rotation}) scale(0.6)`}
-                  fill={COLORS.ink}
-                  opacity={0.12}
-                />
-              ))}
-
-              {/* Region polygons */}
-              {regionPolygons.map(({ region, count, path }) => {
-                const isEmpty = count === 0
-                const isHovered = hoveredRegion === region.id
-                return (
-                  <g
-                    key={region.id}
-                    className={`necropolis__region ${isEmpty ? 'necropolis__region--empty' : ''} ${isHovered ? 'necropolis__region--hover' : ''}`}
-                    onMouseEnter={() => setHoveredRegion(region.id)}
-                    onMouseLeave={() => setHoveredRegion(null)}
-                  >
+                  {/* Parchment background for the continent */}
+                  {coastlinePath && (
                     <path
-                      d={path}
-                      fill={isEmpty ? COLORS.regionEmpty : region.fillColor}
+                      className="necropolis__continent"
+                      d={coastlinePath}
+                      fill={COLORS.parchment}
                       stroke={COLORS.ink}
-                      strokeWidth={isEmpty ? 0.5 : 1.2}
-                      opacity={isEmpty ? 0.5 : 0.85}
-                      filter={isHovered && !isEmpty ? 'url(#region-glow)' : undefined}
+                      strokeWidth={2}
+                      opacity={0.95}
+                      filter="url(#parchment-noise)"
                     />
-                    {isEmpty && (
+                  )}
+
+                  {/* Coastline hatching — repeated inner strokes for hand-drawn feel */}
+                  {coastlinePath && (
+                    <>
                       <path
-                        d={path}
-                        fill="url(#fog-pattern)"
-                        stroke="none"
-                        opacity={0.5}
+                        d={coastlinePath}
+                        fill="none"
+                        stroke={COLORS.ink}
+                        strokeWidth={0.5}
+                        strokeDasharray="4 6"
+                        opacity={0.15}
+                        transform="scale(0.98) translate(10, 7)"
                       />
-                    )}
-                  </g>
-                )
-              })}
+                    </>
+                  )}
 
-              {/* Terrain scatter icons */}
-              {terrainIcons.map(icon => (
-                <TerrainIcon
-                  key={icon.key}
-                  type={icon.type}
-                  x={icon.x}
-                  y={icon.y}
-                  scale={icon.scale}
-                />
-              ))}
+                  {/* Border mountain marks */}
+                  {borderMarks.map((mark, i) => (
+                    <polygon
+                      key={`border-${i}`}
+                      points="-3,2 0,-4 3,2"
+                      transform={`translate(${mark.x},${mark.y}) rotate(${mark.rotation}) scale(0.6)`}
+                      fill={COLORS.ink}
+                      opacity={0.12}
+                    />
+                  ))}
 
-              {/* Region labels */}
-              {regionData.map(({ region, count }) => {
-                const isEmpty = count === 0
-                return (
-                  <g
-                    key={`label-${region.id}`}
-                    className={`necropolis__label ${isEmpty ? 'necropolis__label--empty' : ''}`}
-                    onMouseEnter={() => setHoveredRegion(region.id)}
-                    onMouseLeave={() => setHoveredRegion(null)}
-                  >
-                    <text
-                      x={region.cx}
-                      y={region.cy - region.baseRadius * 0.5 - 8}
-                      textAnchor="middle"
-                      className="necropolis__label-text"
-                      fill={isEmpty ? COLORS.textLight : COLORS.textDark}
-                      opacity={isEmpty ? 0.4 : 0.85}
-                    >
-                      {region.name}
-                    </text>
-                    {count > 0 && (
-                      <text
-                        x={region.cx}
-                        y={region.cy - region.baseRadius * 0.5 + 4}
-                        textAnchor="middle"
-                        className="necropolis__label-count"
-                        fill={COLORS.textLight}
-                        opacity={0.6}
+                  {/* Region polygons */}
+                  {regionPolygons.map(({ region, count, path }) => {
+                    const isEmpty = count === 0
+                    const isHovered = hoveredRegion === region.id
+                    return (
+                      <g
+                        key={region.id}
+                        className={`necropolis__region ${isEmpty ? 'necropolis__region--empty' : ''} ${isHovered ? 'necropolis__region--hover' : ''}`}
+                        onMouseEnter={() => setHoveredRegion(region.id)}
+                        onMouseLeave={() => setHoveredRegion(null)}
                       >
-                        {count} tab{count !== 1 ? 's' : ''}
-                      </text>
-                    )}
+                        <path
+                          d={path}
+                          fill={isEmpty ? COLORS.regionEmpty : region.fillColor}
+                          stroke={COLORS.ink}
+                          strokeWidth={isEmpty ? 0.5 : 1.2}
+                          opacity={isEmpty ? 0.5 : 0.85}
+                          filter={isHovered && !isEmpty ? 'url(#region-glow)' : undefined}
+                        />
+                        {isEmpty && (
+                          <path
+                            d={path}
+                            fill="url(#fog-pattern)"
+                            stroke="none"
+                            opacity={0.5}
+                          />
+                        )}
+                      </g>
+                    )
+                  })}
+
+                  {/* Terrain scatter icons */}
+                  {terrainIcons.map(icon => (
+                    <TerrainIcon
+                      key={icon.key}
+                      type={icon.type}
+                      x={icon.x}
+                      y={icon.y}
+                      scale={icon.scale}
+                    />
+                  ))}
+
+                  {/* Region labels */}
+                  {regionData.map(({ region, count }) => {
+                    const isEmpty = count === 0
+                    return (
+                      <g
+                        key={`label-${region.id}`}
+                        className={`necropolis__label ${isEmpty ? 'necropolis__label--empty' : ''}`}
+                        onMouseEnter={() => setHoveredRegion(region.id)}
+                        onMouseLeave={() => setHoveredRegion(null)}
+                      >
+                        <text
+                          x={region.cx}
+                          y={region.cy - region.baseRadius * 0.5 - 8}
+                          textAnchor="middle"
+                          className="necropolis__label-text"
+                          fill={isEmpty ? COLORS.textLight : COLORS.textDark}
+                          opacity={isEmpty ? 0.4 : 0.85}
+                        >
+                          {region.name}
+                        </text>
+                        {count > 0 && (
+                          <text
+                            x={region.cx}
+                            y={region.cy - region.baseRadius * 0.5 + 4}
+                            textAnchor="middle"
+                            className="necropolis__label-count"
+                            fill={COLORS.textLight}
+                            opacity={0.6}
+                          >
+                            {count} tab{count !== 1 ? 's' : ''}
+                          </text>
+                        )}
+                      </g>
+                    )
+                  })}
+
+                  {/* Edge decorations */}
+                  <EdgeDecorations />
+
+                  {/* Compass rose */}
+                  <CompassRose x={900} y={620} size={55} />
+
+                  {/* Map title cartouche */}
+                  <g className="necropolis__cartouche" transform="translate(500, 42)">
+                    <rect
+                      x={-130} y={-18}
+                      width={260} height={36}
+                      rx={4}
+                      fill={COLORS.parchment}
+                      stroke={COLORS.ink}
+                      strokeWidth={1.5}
+                      opacity={0.9}
+                    />
+                    <rect
+                      x={-126} y={-14}
+                      width={252} height={28}
+                      rx={2}
+                      fill="none"
+                      stroke={COLORS.ink}
+                      strokeWidth={0.5}
+                      opacity={0.3}
+                    />
+                    <text
+                      x={0} y={5}
+                      textAnchor="middle"
+                      fontFamily="'Cinzel', serif"
+                      fontSize={14}
+                      fontWeight={700}
+                      fill={COLORS.textDark}
+                      letterSpacing="0.2em"
+                    >
+                      THE NECROPOLIS
+                    </text>
                   </g>
-                )
-              })}
 
-              {/* Edge decorations */}
-              <EdgeDecorations />
-
-              {/* Compass rose */}
-              <CompassRose x={900} y={620} size={55} />
-
-              {/* Map title cartouche */}
-              <g className="necropolis__cartouche" transform="translate(500, 42)">
-                <rect
-                  x={-130} y={-18}
-                  width={260} height={36}
-                  rx={4}
-                  fill={COLORS.parchment}
-                  stroke={COLORS.ink}
-                  strokeWidth={1.5}
-                  opacity={0.9}
-                />
-                <rect
-                  x={-126} y={-14}
-                  width={252} height={28}
-                  rx={2}
-                  fill="none"
-                  stroke={COLORS.ink}
-                  strokeWidth={0.5}
-                  opacity={0.3}
-                />
-                <text
-                  x={0} y={5}
-                  textAnchor="middle"
-                  fontFamily="'Cinzel', serif"
-                  fontSize={14}
-                  fontWeight={700}
-                  fill={COLORS.textDark}
-                  letterSpacing="0.2em"
-                >
-                  THE NECROPOLIS
-                </text>
-              </g>
-
-              {/* Tooltip for hovered region */}
-              {hoveredData && hoveredData.count > 0 && (
-                <RegionTooltip
-                  region={hoveredData.region}
-                  count={hoveredData.count}
-                  tabs={hoveredData.tabs}
-                  svgX={hoveredData.region.cx}
-                  svgY={hoveredData.region.cy}
-                />
-              )}
-            </g>
-          </svg>
-        </div>
-
-        {/* Legend */}
-        <div className="necropolis__legend">
-          {regionData
-            .filter(d => d.count > 0)
-            .sort((a, b) => b.count - a.count)
-            .map(({ region, count }) => (
-            <div
-              key={region.id}
-              className={`necropolis__legend-item ${hoveredRegion === region.id ? 'necropolis__legend-item--active' : ''}`}
-              onMouseEnter={() => setHoveredRegion(region.id)}
-              onMouseLeave={() => setHoveredRegion(null)}
-            >
-              <span
-                className="necropolis__legend-swatch"
-                style={{ backgroundColor: region.fillColor }}
-              />
-              <span className="necropolis__legend-name">{region.name}</span>
-              <span className="necropolis__legend-count">{count}</span>
+                  {/* Tooltip for hovered region */}
+                  {hoveredData && hoveredData.count > 0 && (
+                    <RegionTooltip
+                      region={hoveredData.region}
+                      count={hoveredData.count}
+                      tabs={hoveredData.tabs}
+                      svgX={hoveredData.region.cx}
+                      svgY={hoveredData.region.cy}
+                    />
+                  )}
+                </g>
+              </svg>
             </div>
-          ))}
-        </div>
+
+            {/* Legend */}
+            <div className="necropolis__legend">
+              {regionData
+                .filter(d => d.count > 0)
+                .sort((a, b) => b.count - a.count)
+                .map(({ region, count }) => (
+                <div
+                  key={region.id}
+                  className={`necropolis__legend-item ${hoveredRegion === region.id ? 'necropolis__legend-item--active' : ''}`}
+                  onMouseEnter={() => setHoveredRegion(region.id)}
+                  onMouseLeave={() => setHoveredRegion(null)}
+                >
+                  <span
+                    className="necropolis__legend-swatch"
+                    style={{ backgroundColor: region.fillColor }}
+                  />
+                  <span className="necropolis__legend-name">{region.name}</span>
+                  <span className="necropolis__legend-count">{count}</span>
+                </div>
+              ))}
+            </div>
+          </>
+        ) : (
+          <HexMapPanel groups={groups} className="necropolis__hex-panel" backgroundVariant="plain" />
+        )}
       </div>
     </section>
   )
