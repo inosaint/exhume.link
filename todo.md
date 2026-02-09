@@ -16,7 +16,7 @@ Scoring **design** is done — 6 archetypes, 8 dimensions, 3 axes. Full spec in
 - [x] Implement category classifier: domain → content-type buckets (see docs/personality-scoring.md §Step 1)
 - [x] Implement 8-dimension scorer: content-type counts → dimension scores → 3-axis position → archetype + suffix
 - [x] Wire up: load `browserdata/all_tabs_clean.txt` as static import, run parser + scorer, log output
-- [x] Verify: scorer produces expected result against known dataset (Resurrectionist of the Horde) ✅
+- [x] Verify: scorer produces expected result against known dataset (Warlock of the Endless Horde) ✅
 
 ## Phase 1: Visual Shell & Navigation
 

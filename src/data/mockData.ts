@@ -222,7 +222,7 @@ export const SHARE_STATS = {
   uniqueDomains: 500,
   browsers: 2,
   topDomain: { name: 'Medium', count: 44 },
-  archetype: 'Resurrectionist of the Horde',
+  archetype: 'Warlock of the Endless Horde',
   volumeSuffix: '',
   topCategories: [
     { id: 'design' as CategoryId, label: 'Design & UX', count: 107 },
@@ -232,8 +232,8 @@ export const SHARE_STATS = {
 }
 
 export const PERSONALITY_PROFILE = {
-  title: 'Resurrectionist of the Horde',
+  title: 'Warlock of the Endless Horde',
   description:
-    'Every tab is a tool. Nothing open without reason. A workspace of design, portfolios, and purpose — scout activity high, depth earned.',
-  image: '/resurrectionist.png',
+    'Your tabs are instruments of work. Tools, references, and opportunities bound by intent. You open with purpose, act decisively, and close the pact when the task is done.',
+  image: '/warlock.png',
 }

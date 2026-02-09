@@ -9,11 +9,13 @@ import {
 
 export type ArchetypeId =
   | 'necromancer'
-  | 'resurrectionist'
-  | 'seance-master'
-  | 'plague-doctor'
+  | 'warlock'
+  | 'wraith'
+  | 'bone-cleric'
   | 'zombie'
   | 'lich'
+  | 'unburdened'
+  | 'mortab'
 
 export interface PersonalityProfile {
   archetype: ArchetypeId
@@ -103,38 +105,50 @@ const ARCHETYPES: Record<
   necromancer: {
     baseTitle: 'Necromancer',
     description:
-      'You exhume knowledge on purpose. Classics, essays, and long reads — kept like relics.',
+      'You exhume knowledge on purpose. Your tabs are grimoires — long reads, old essays, and sources that still matter. You finish what you open. Nothing here is accidental.',
     image: '/necromancer.png',
   },
-  resurrectionist: {
-    baseTitle: 'Resurrectionist',
+  warlock: {
+    baseTitle: 'Warlock',
     description:
-      'Every tab is a tool. Your browser is a workshop — deliberate, practical, and oddly disciplined.',
-    image: '/resurrectionist.png',
+      'Your tabs are instruments of work. Tools, references, and opportunities bound by intent. You open with purpose, act decisively, and close the pact when the task is done.',
+    image: '/warlock.png',
   },
-  'seance-master': {
-    baseTitle: 'Séance Master',
+  wraith: {
+    baseTitle: 'Wraith',
     description:
-      'You pulled one thread and opened everything it touched. The ritual is still unfinished.',
-    image: '/seance-master.png',
+      'You followed one idea too far. Rabbit holes, half-read books, endless related tabs — all circling something you haven\'t named yet. The knowledge lingers. You do too.',
+    image: '/wraith.png',
   },
-  'plague-doctor': {
-    baseTitle: 'Plague Doctor',
+  'bone-cleric': {
+    baseTitle: 'Bone Cleric',
     description:
-      'You survey the landscape: tools, news, portfolios, events. Broad, professional, and intentional.',
-    image: '/plague-doctor.png',
+      'You survey the dead and decide what rises. News, tools, markets, and signals pass through you. You evaluate, choose, and move on. Wide vision. Clean cuts.',
+    image: '/bone-cleric.png',
   },
   zombie: {
-    baseTitle: 'Wandering Zombie',
+    baseTitle: 'Zombie',
     description:
-      'You wander. Tabs arrive from feeds and searches, then linger for months without meaning.',
+      'You didn\'t mean to open these tabs. They spread anyway. Social links, homepages, forgotten searches — all open, none finished. You wander. The tabs multiply.',
     image: '/zombie.png',
   },
   lich: {
     baseTitle: 'Lich',
     description:
-      'You accumulate. Carts, tools, product pages — collected, not completed.',
+      'You accumulate power but never release it. Carts filled, tools bookmarked, decisions deferred. Everything is collected. Nothing is committed.',
     image: '/lich.png',
+  },
+  unburdened: {
+    baseTitle: 'The Unburdened',
+    description:
+      'Fewer than ten tabs. You travel light through the digital world — or you just got here. Either way, the graves are shallow.',
+    image: '/unburdened.png',
+  },
+  mortab: {
+    baseTitle: 'Mor\'tab the Unending',
+    description:
+      'You have crossed the threshold. A thousand tabs or more, all coexisting in impossible equilibrium. Not chaos — something older. You no longer manage tabs. They orbit you.',
+    image: '/mortab.png',
   },
 }
 
@@ -732,20 +746,17 @@ function axesToArchetype(axes: AxisScores, dims: DimensionScores): ArchetypeId {
   const isUnresolved = axes.resolvedUnresolved >= 0.5
 
   if (isDeep && !isAction && !isUnresolved) return 'necromancer'
-  if (isDeep && isAction && !isUnresolved) return 'resurrectionist'
-  if (isDeep && !isAction && isUnresolved) return 'seance-master'
-  if (!isDeep && isAction && !isUnresolved) return 'plague-doctor'
-  if (!isDeep && !isAction && isUnresolved) {
-    // Wandering Zombie: social pull should be notable
-    return 'zombie'
-  }
+  if (isDeep && isAction && !isUnresolved) return 'warlock'
+  if (isDeep && !isAction && isUnresolved) return 'wraith'
+  if (!isDeep && isAction && !isUnresolved) return 'bone-cleric'
+  if (!isDeep && !isAction && isUnresolved) return 'zombie'
   if (!isDeep && isAction && isUnresolved) return 'lich'
 
   // Edge cases (deep + action + unresolved, broad + consumption + resolved)
   // These don't occur naturally per spec — pick closest match
   if (isDeep && isAction && isUnresolved) {
-    // Lean toward séance master if reading heavy, lich otherwise
-    return dims.readingMass > dims.actionMass ? 'seance-master' : 'lich'
+    // Lean toward wraith if reading heavy, lich otherwise
+    return dims.readingMass > dims.actionMass ? 'wraith' : 'lich'
   }
   // Broad + consumption + resolved
   if (dims.socialPull > 0.1) return 'zombie'
@@ -763,6 +774,28 @@ function scorePersonality(input: {
 }): PersonalityProfile {
   const { totalTabs } = input
 
+  // Special override: <10 tabs → Unburdened (not enough signal to classify)
+  if (totalTabs < 10) {
+    const base = ARCHETYPES.unburdened
+    return {
+      archetype: 'unburdened',
+      title: base.baseTitle,
+      description: base.description,
+      image: base.image,
+    }
+  }
+
+  // Special override: ≥1000 tabs → Mor'tab the Unending (ascended state)
+  if (totalTabs >= 1000) {
+    const base = ARCHETYPES.mortab
+    return {
+      archetype: 'mortab',
+      title: base.baseTitle,
+      description: base.description,
+      image: base.image,
+    }
+  }
+
   const dims = scoreDimensions(input)
   const axes = mapToAxes(dims)
   const archetype = axesToArchetype(axes, dims)
@@ -776,14 +809,10 @@ function scorePersonality(input: {
           ? 'of the Dark Legion'
           : totalTabs >= 50
             ? 'of the Cult'
-            : totalTabs >= 10
-              ? 'of the Shadows'
-              : 'The Unburdened'
+            : 'of the Shadows'
 
   const base = ARCHETYPES[archetype]
-  const title = volumeSuffix === 'The Unburdened'
-    ? `${volumeSuffix} ${base.baseTitle}`
-    : `${base.baseTitle} ${volumeSuffix}`
+  const title = `${base.baseTitle} ${volumeSuffix}`
 
   return {
     archetype,

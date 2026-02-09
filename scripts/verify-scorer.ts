@@ -2,7 +2,7 @@
  * Quick scorer verification script.
  * Run with: npx tsx scripts/verify-scorer.ts
  *
- * Expected output: "The Resurrectionist of the Horde"
+ * Expected output: "Warlock of the Endless Horde"
  */
 import { readFileSync } from 'fs'
 import { fileURLToPath } from 'url'
@@ -49,7 +49,7 @@ async function main() {
     console.log(scoreDimensionsDebug)
   }
 
-  const expected = 'Resurrectionist of the Horde'
+  const expected = 'Warlock of the Endless Horde'
   if (session.personality.title === expected) {
     console.log(`✅ PASS — matches expected "${expected}"`)
   } else {
