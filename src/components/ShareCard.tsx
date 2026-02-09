@@ -1,13 +1,12 @@
 import { useRef, useCallback, useState, useEffect } from 'react'
-import { PersonalityCard } from './PersonalityCard'
 import type { ExhumeStats, PersonalityProfile } from '../data/tabsAnalysis'
 import './ShareCard.css'
 
-// Card dimensions for trading card (portrait orientation)
+// Card dimensions for trading card (portrait orientation, 5:7 ratio matching TradingCard3D)
 const CARD_WIDTH = 800
 const CARD_HEIGHT = 1120
 
-// Colors from design system
+// Colors from design system (matching CSS custom properties)
 const COLORS = {
   bgDeep: '#0a0a0e',
   bgSurface: '#12121a',
@@ -18,39 +17,6 @@ const COLORS = {
   textMuted: '#5a5a6a',
   accent: '#c9a96e',
   accentDim: '#7a6540',
-}
-
-function drawLetterSpacedText(
-  ctx: CanvasRenderingContext2D,
-  text: string,
-  x: number,
-  y: number,
-  spacing: number,
-  align: CanvasTextAlign = 'left'
-) {
-  if (!text) return
-
-  if (spacing <= 0) {
-    ctx.textAlign = align
-    ctx.fillText(text, x, y)
-    return
-  }
-
-  const chars = text.split('')
-  const totalWidth = chars.reduce((acc, ch, i) => {
-    const w = ctx.measureText(ch).width
-    return acc + w + (i < chars.length - 1 ? spacing : 0)
-  }, 0)
-
-  let cursorX = x
-  if (align === 'center') cursorX = x - totalWidth / 2
-  if (align === 'right') cursorX = x - totalWidth
-
-  for (let i = 0; i < chars.length; i++) {
-    const ch = chars[i]
-    ctx.fillText(ch, cursorX, y)
-    cursorX += ctx.measureText(ch).width + spacing
-  }
 }
 
 // Wait for document fonts to be ready (Cinzel/Inter loaded via CSS)
@@ -143,120 +109,110 @@ export function ShareCard({ profile, stats }: ShareCardProps) {
       const ctx = canvas.getContext('2d')
       if (!ctx) return
 
-      // ===== TRADING CARD DESIGN =====
+      // ===== CARD DESIGN (matches TradingCard3D layout) =====
 
+      // Matches TradingCard3D: 8px border at 400px → 16px at 800px (2x)
       const borderWidth = 16
-      const borderRadius = 24
-      const padding = 24
+      const borderRadius = 32 // 16px at 1x → 32px at 2x
+      const padding = 24      // space-3 (12px) at 1x → 24px at 2x
 
-      // Outer gold border with gradient
-      const borderGradient = ctx.createLinearGradient(0, 0, CARD_WIDTH, CARD_HEIGHT)
-      borderGradient.addColorStop(0, 'rgba(201, 169, 110, 1)')
-      borderGradient.addColorStop(0.5, 'rgba(220, 190, 130, 1)')
-      borderGradient.addColorStop(1, 'rgba(201, 169, 110, 1)')
-      ctx.fillStyle = borderGradient
+      // Solid accent border (matches TradingCard3D's `border: 8px solid var(--color-accent)`)
+      ctx.fillStyle = COLORS.accent
       drawRoundedRect(ctx, 0, 0, CARD_WIDTH, CARD_HEIGHT, borderRadius)
       ctx.fill()
 
-      // Inner card background
+      // Inner card background (matches var(--color-bg-deep))
       ctx.fillStyle = COLORS.bgDeep
       drawRoundedRect(ctx, borderWidth, borderWidth, CARD_WIDTH - borderWidth * 2, CARD_HEIGHT - borderWidth * 2, borderRadius - 4)
       ctx.fill()
 
-      // Subtle holographic shimmer overlay
-      const holoGradient = ctx.createRadialGradient(CARD_WIDTH / 2, CARD_HEIGHT / 3, 0, CARD_WIDTH / 2, CARD_HEIGHT / 3, CARD_WIDTH / 2)
-      holoGradient.addColorStop(0, 'rgba(80, 60, 100, 0.08)')
-      holoGradient.addColorStop(0.5, 'rgba(40, 60, 80, 0.06)')
-      holoGradient.addColorStop(1, 'rgba(60, 80, 70, 0.04)')
-      ctx.fillStyle = holoGradient
-      drawRoundedRect(ctx, borderWidth, borderWidth, CARD_WIDTH - borderWidth * 2, CARD_HEIGHT - borderWidth * 2, borderRadius - 4)
-      ctx.fill()
+      // Content area dimensions
+      const contentX = borderWidth + padding
+      const contentY = borderWidth + padding
+      const contentW = CARD_WIDTH - (borderWidth + padding) * 2
 
-      // Top info bar
-      const topBarY = borderWidth + padding
-      const topBarHeight = 40
-
-      // Rarity badge (left)
+      // ── Rarity badge (top-left, matches .trading-card-3d__rarity) ──
       let rarity = 'COMMON'
       if (stats.totalTabs > 1000) rarity = 'LEGENDARY'
       else if (stats.totalTabs > 500) rarity = 'EPIC'
       else if (stats.totalTabs > 100) rarity = 'RARE'
       else if (stats.totalTabs > 50) rarity = 'UNCOMMON'
 
-      ctx.fillStyle = 'rgba(18, 18, 26, 0.7)'
-      drawRoundedRect(ctx, borderWidth + padding, topBarY, 100, 32, 6)
+      ctx.font = 'bold 13px Inter, sans-serif'
+      const rarityWidth = ctx.measureText(rarity).width + 48 // padding
+      ctx.fillStyle = 'rgba(18, 18, 26, 0.8)'
+      drawRoundedRect(ctx, contentX, contentY, rarityWidth, 32, 6)
       ctx.fill()
 
       ctx.fillStyle = COLORS.accent
-      ctx.font = 'bold 13px Inter, sans-serif'
       ctx.textAlign = 'center'
-      ctx.fillText(rarity, borderWidth + padding + 50, topBarY + 21)
+      ctx.fillText(rarity, contentX + rarityWidth / 2, contentY + 22)
 
-      // Portrait section
-      const portraitBox = 400
-      const portraitX = (CARD_WIDTH - portraitBox) / 2
-      const portraitY = topBarY + topBarHeight + 20
+      // ── Portrait (full-width, matches .trading-card-3d__portrait) ──
+      const portraitY = contentY + 32 + 16 // badge height + gap
+      const portraitW = contentW
+      const portraitH = contentW // 1:1 aspect ratio
 
-      // Portrait background with subtle border
+      // Stone border around portrait (matches border: 2px solid var(--color-stone))
       ctx.fillStyle = COLORS.stone
-      drawRoundedRect(ctx, portraitX - 4, portraitY - 4, portraitBox + 8, portraitBox + 8, 12)
+      drawRoundedRect(ctx, contentX - 4, portraitY - 4, portraitW + 8, portraitH + 8, 18)
       ctx.fill()
 
+      // Portrait background
       ctx.fillStyle = COLORS.bgSurface
-      drawRoundedRect(ctx, portraitX, portraitY, portraitBox, portraitBox, 10)
+      drawRoundedRect(ctx, contentX, portraitY, portraitW, portraitH, 16)
       ctx.fill()
 
-      // Portrait image (preserve aspect ratio)
-      const scale = Math.min(portraitBox / portrait.width, portraitBox / portrait.height)
+      // Portrait image (cover, matching object-fit: cover)
+      const scale = Math.max(portraitW / portrait.width, portraitH / portrait.height)
       const drawW = portrait.width * scale
       const drawH = portrait.height * scale
       ctx.save()
-      drawRoundedRect(ctx, portraitX, portraitY, portraitBox, portraitBox, 10)
+      drawRoundedRect(ctx, contentX, portraitY, portraitW, portraitH, 16)
       ctx.clip()
       ctx.drawImage(
         portrait,
-        portraitX + (portraitBox - drawW) / 2,
-        portraitY + (portraitBox - drawH) / 2,
+        contentX + (portraitW - drawW) / 2,
+        portraitY + (portraitH - drawH) / 2,
         drawW,
         drawH
       )
       ctx.restore()
 
-      // Title section
-      const titleStartY = portraitY + portraitBox + 30
+      // ── Title (matches .trading-card-3d__title) ──
+      const titleStartY = portraitY + portraitH + 28
       const titleText = profile.title.toUpperCase()
       ctx.fillStyle = COLORS.accent
-      ctx.font = 'bold 32px Cinzel, serif'
+      ctx.font = 'bold 30px Cinzel, serif'
       ctx.textAlign = 'center'
-      const titleLines = wrapText(ctx, titleText, CARD_WIDTH - borderWidth * 2 - padding * 3)
+      const titleLines = wrapText(ctx, titleText, contentW)
       titleLines.slice(0, 2).forEach((line, index) => {
-        ctx.fillText(line, CARD_WIDTH / 2, titleStartY + index * 38)
+        ctx.fillText(line, CARD_WIDTH / 2, titleStartY + index * 36)
       })
 
-      // Description
-      const descStartY = titleStartY + (titleLines.length * 38) + 16
+      // ── Description (matches .trading-card-3d__description) ──
+      const descStartY = titleStartY + (titleLines.length * 36) + 12
       ctx.fillStyle = COLORS.textSecondary
-      ctx.font = '15px Inter, sans-serif'
-      const descLines = wrapText(ctx, profile.description, CARD_WIDTH - borderWidth * 2 - padding * 3)
+      ctx.font = '14px Inter, sans-serif'
+      const descLines = wrapText(ctx, profile.description, contentW)
       descLines.slice(0, 2).forEach((line, index) => {
-        ctx.fillText(line, CARD_WIDTH / 2, descStartY + index * 22)
+        ctx.fillText(line, CARD_WIDTH / 2, descStartY + index * 20)
       })
 
-      // Stats section
-      const statsBoxY = descStartY + (descLines.length * 22) + 30
-      const statsBoxHeight = CARD_HEIGHT - statsBoxY - borderWidth - padding
-      const statsInnerPadding = 24
+      // ── Stats section (matches .trading-card-3d__stats) ──
+      const statsBoxY = descStartY + (descLines.length * 20) + 20
+      const statsBoxBottom = CARD_HEIGHT - borderWidth - padding
+      const statsBoxHeight = statsBoxBottom - statsBoxY
+      const statsInnerPadding = 20
 
-      // Stats background
+      // Stats background (matches rgba(18, 18, 26, 0.6) + border-radius: 8px)
       ctx.fillStyle = 'rgba(18, 18, 26, 0.6)'
-      drawRoundedRect(ctx, borderWidth + padding, statsBoxY, CARD_WIDTH - borderWidth * 2 - padding * 2, statsBoxHeight, 10)
+      drawRoundedRect(ctx, contentX, statsBoxY, contentW, statsBoxHeight, 16)
       ctx.fill()
 
-      // Stats table
-      const statsTableY = statsBoxY + statsInnerPadding
-      const statsLeftX = borderWidth + padding + statsInnerPadding
-      const statsRightX = CARD_WIDTH - borderWidth - padding - statsInnerPadding
-      const statRowHeight = 48
+      // Stats rows
+      const statsLeftX = contentX + statsInnerPadding
+      const statsRightX = contentX + contentW - statsInnerPadding
 
       const statsData = [
         { label: 'Tabs Exhumed', value: stats.totalTabs.toString() },
@@ -266,46 +222,58 @@ export function ShareCard({ profile, stats }: ShareCardProps) {
         { label: 'Locations Mapped', value: stats.mappedLocations.toString() },
       ]
 
-      // Divider line under stats
+      // Calculate row height dynamically to fit stats + optional top domain
+      const domainSectionHeight = stats.topDomain ? 56 : 0
+      const availableStatsHeight = statsBoxHeight - statsInnerPadding * 2 - domainSectionHeight
+      const statRowHeight = Math.min(42, availableStatsHeight / statsData.length)
+
       ctx.strokeStyle = COLORS.stone
       ctx.lineWidth = 1
 
       statsData.forEach((stat, i) => {
-        const y = statsTableY + i * statRowHeight
+        const y = statsBoxY + statsInnerPadding + i * statRowHeight
 
         // Label (left)
         ctx.fillStyle = COLORS.textSecondary
-        ctx.font = '14px Inter, sans-serif'
+        ctx.font = '13px Inter, sans-serif'
         ctx.textAlign = 'left'
-        ctx.fillText(stat.label, statsLeftX, y + 18)
+        ctx.fillText(stat.label, statsLeftX, y + 16)
 
         // Value (right)
         ctx.fillStyle = COLORS.accent
-        ctx.font = 'bold 20px Cinzel, serif'
+        ctx.font = 'bold 18px Cinzel, serif'
         ctx.textAlign = 'right'
-        ctx.fillText(stat.value, statsRightX, y + 18)
+        ctx.fillText(stat.value, statsRightX, y + 16)
 
-        // Divider line
+        // Divider line (matches border-bottom: 1px solid var(--color-stone))
         if (i < statsData.length - 1) {
           ctx.beginPath()
-          ctx.moveTo(statsLeftX, y + statRowHeight - 6)
-          ctx.lineTo(statsRightX, y + statRowHeight - 6)
+          ctx.moveTo(statsLeftX, y + statRowHeight - 4)
+          ctx.lineTo(statsRightX, y + statRowHeight - 4)
           ctx.stroke()
         }
       })
 
-      // Top domain at bottom
+      // Top domain at bottom (matches .trading-card-3d__top-domain)
       if (stats.topDomain) {
-        const bottomY = statsBoxY + statsBoxHeight - statsInnerPadding - 10
+        const domainDividerY = statsBoxY + statsInnerPadding + statsData.length * statRowHeight
+        // Top border
+        ctx.strokeStyle = COLORS.stone
+        ctx.beginPath()
+        ctx.moveTo(statsLeftX, domainDividerY)
+        ctx.lineTo(statsRightX, domainDividerY)
+        ctx.stroke()
+
+        const domainLabelY = domainDividerY + 20
         ctx.fillStyle = COLORS.textMuted
         ctx.font = '11px Inter, sans-serif'
         ctx.textAlign = 'center'
-        ctx.fillText('TOP DOMAIN', CARD_WIDTH / 2, bottomY - 16)
+        ctx.fillText('TOP DOMAIN', CARD_WIDTH / 2, domainLabelY)
 
         ctx.fillStyle = COLORS.accent
         ctx.font = 'bold 14px Inter, sans-serif'
-        const domainText = stats.topDomain.domain.length > 35 ? stats.topDomain.domain.substring(0, 32) + '...' : stats.topDomain.domain
-        ctx.fillText(domainText, CARD_WIDTH / 2, bottomY)
+        const domainText = stats.topDomain.domain.length > 30 ? stats.topDomain.domain.substring(0, 27) + '...' : stats.topDomain.domain
+        ctx.fillText(domainText, CARD_WIDTH / 2, domainLabelY + 20)
       }
 
       setIsGenerated(true)
@@ -457,8 +425,6 @@ export function ShareCard({ profile, stats }: ShareCardProps) {
 
   return (
     <>
-      <PersonalityCard profile={profile} />
-
       {showShareModal && (
         <div className="share-card-modal" onClick={() => setShowShareModal(false)}>
           <div className="share-card-modal__content" onClick={e => e.stopPropagation()}>
@@ -552,7 +518,7 @@ export function ShareCard({ profile, stats }: ShareCardProps) {
                   Reddit
                 </button>
               </div>
-              {navigator.share && (
+              {'share' in navigator && (
                 <button
                   className="share-card-button share-card-button--native"
                   onClick={handleNativeShare}
@@ -563,7 +529,7 @@ export function ShareCard({ profile, stats }: ShareCardProps) {
             </div>
 
             <p className="share-card-modal__note">
-              Your trading card includes detailed stats from your digital archaeology.
+              Your archetype card includes detailed stats from your digital archaeology.
             </p>
           </div>
         </div>
