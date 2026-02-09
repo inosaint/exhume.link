@@ -61,12 +61,21 @@ function resolveFlowVariant(): FlowVariant {
 
 export default function App() {
   const [flow] = useState<FlowVariant>(() => resolveFlowVariant())
-  const sections = useMemo(() => (flow === 'c' ? SECTIONS_C : flow === 'b' ? SECTIONS_B : SECTIONS_A), [flow])
   const [currentSection, setCurrentSection] = useState<SectionId>('landing')
   const [analysisStatus, setAnalysisStatus] = useState<AnalysisStatus>('idle')
   const [analysisStepIndex, setAnalysisStepIndex] = useState(0)
   const [analysisError, setAnalysisError] = useState<string | null>(null)
   const [session, setSession] = useState<ExhumeSession | null>(null)
+
+  const isUnburdened = session?.personality.archetype === 'unburdened'
+  const sections = useMemo(() => {
+    const base = flow === 'c' ? SECTIONS_C : flow === 'b' ? SECTIONS_B : SECTIONS_A
+    if (!isUnburdened) return base
+    // Unburdened: skip analysis sections — verdict straight to share
+    return base.filter(s =>
+      s.id === 'landing' || s.id === 'processing' || s.id === 'personality' || s.id === 'share'
+    )
+  }, [flow, isUnburdened])
 
   const currentIndex = Math.max(0, sections.findIndex(s => s.id === currentSection))
   const isShareSection = currentSection === 'share'
@@ -246,7 +255,7 @@ export default function App() {
             {isShareSection
               ? 'Share with Your Cult'
               : currentSection === 'personality'
-                ? 'Dig Deeper ↓'
+                ? (isUnburdened ? 'Bind Your Archetype ↓' : 'Dig Deeper ↓')
                 : currentSection === 'numbers'
                   ? 'Visit Your Tab Cemetery ↓'
                   : currentSection === 'cemetery'
