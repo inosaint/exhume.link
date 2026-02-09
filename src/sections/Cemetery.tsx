@@ -9,9 +9,16 @@ const REGION_NAMES: Record<CategoryId, string> = Object.fromEntries(
   NECROPOLIS_REGIONS.map(r => [r.id, r.name])
 ) as Record<CategoryId, string>
 
+/** Map category IDs to their descriptions */
+const REGION_DESCRIPTIONS: Record<CategoryId, string> = Object.fromEntries(
+  NECROPOLIS_REGIONS.map(r => [r.id, r.description])
+) as Record<CategoryId, string>
+
 function CategorySection({ group, index }: { group: CategoryGroup; index: number }) {
   const [isVisible, setIsVisible] = useState(false)
+  const [showInfo, setShowInfo] = useState(false)
   const sectionRef = useRef<HTMLDivElement>(null)
+  const infoRef = useRef<HTMLButtonElement>(null)
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -36,6 +43,24 @@ function CategorySection({ group, index }: { group: CategoryGroup; index: number
     typeof window !== 'undefined' &&
     window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
+  // Close info tooltip when clicking outside
+  useEffect(() => {
+    if (!showInfo) return
+    function handleOutside(e: MouseEvent | TouchEvent) {
+      if (infoRef.current && !infoRef.current.contains(e.target as Node)) {
+        setShowInfo(false)
+      }
+    }
+    document.addEventListener('mousedown', handleOutside)
+    document.addEventListener('touchstart', handleOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleOutside)
+      document.removeEventListener('touchstart', handleOutside)
+    }
+  }, [showInfo])
+
+  const description = REGION_DESCRIPTIONS[group.category.id] ?? group.category.description
+
   return (
     <div
       ref={sectionRef}
@@ -43,8 +68,27 @@ function CategorySection({ group, index }: { group: CategoryGroup; index: number
       style={{ '--category-delay': `${index * 100}ms` } as React.CSSProperties}
     >
       <div className="cemetery__category-header">
-        <span className="cemetery__category-icon">{group.category.icon}</span>
-        <h3 className="cemetery__category-name">{REGION_NAMES[group.category.id] ?? group.category.label}</h3>
+        <div className="cemetery__category-title-row">
+          <span className="cemetery__category-icon">{group.category.icon}</span>
+          <h3 className="cemetery__category-name">{REGION_NAMES[group.category.id] ?? group.category.label}</h3>
+          <button
+            ref={infoRef}
+            className="cemetery__info-btn"
+            onMouseEnter={() => setShowInfo(true)}
+            onMouseLeave={() => setShowInfo(false)}
+            onClick={() => setShowInfo(prev => !prev)}
+            aria-label={`About ${REGION_NAMES[group.category.id] ?? group.category.label}`}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="16" x2="12" y2="12" />
+              <line x1="12" y1="8" x2="12.01" y2="8" />
+            </svg>
+            {showInfo && (
+              <span className="cemetery__info-tooltip">{description}</span>
+            )}
+          </button>
+        </div>
         <span className="cemetery__category-count">{group.count} buried</span>
       </div>
 

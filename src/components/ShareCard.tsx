@@ -255,14 +255,8 @@ export function ShareCard({ profile, stats }: ShareCardProps) {
       // Top domain at bottom (matches .trading-card-3d__top-domain)
       if (stats.topDomain) {
         const domainDividerY = statsBoxY + statsInnerPadding + statsData.length * statRowHeight
-        // Top border
-        ctx.strokeStyle = COLORS.stone
-        ctx.beginPath()
-        ctx.moveTo(statsLeftX, domainDividerY)
-        ctx.lineTo(statsRightX, domainDividerY)
-        ctx.stroke()
 
-        const domainLabelY = domainDividerY + 20
+        const domainLabelY = domainDividerY + 12
         ctx.fillStyle = COLORS.textMuted
         ctx.font = '11px Inter, sans-serif'
         ctx.textAlign = 'center'

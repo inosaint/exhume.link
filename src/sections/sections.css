@@ -504,6 +504,7 @@
   letter-spacing: 0.08em;
   text-transform: uppercase;
   line-height: 1.2;
+  margin-top: auto;
 }
 
 /* ── Personality card ── */
@@ -725,12 +726,19 @@
 
 .cemetery__category-header {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: var(--space-3);
+  gap: var(--space-1);
   margin-bottom: var(--space-5);
   padding-bottom: var(--space-3);
   border-bottom: 1px solid var(--color-stone);
+}
+
+.cemetery__category-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
 }
 
 .cemetery__category-icon {
@@ -749,6 +757,48 @@
   font-size: var(--text-sm);
   color: var(--color-text-muted);
   font-style: italic;
+}
+
+/* Info icon button */
+.cemetery__info-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  padding: 2px;
+  border-radius: 50%;
+  transition: color var(--duration-fast);
+}
+
+.cemetery__info-btn:hover {
+  color: var(--color-accent);
+}
+
+.cemetery__info-tooltip {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: 240px;
+  padding: var(--space-2) var(--space-3);
+  background: #0a0a0e;
+  border: 1px solid var(--color-stone-light);
+  border-radius: 6px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+  text-align: center;
+  text-transform: none;
+  letter-spacing: normal;
+  z-index: 20;
+  pointer-events: none;
+  animation: tooltipFadeIn 150ms var(--ease-out);
 }
 
 /* Desktop: Grid layout */
@@ -775,7 +825,12 @@
   }
 
   .cemetery__category-header {
+    gap: var(--space-1);
+  }
+
+  .cemetery__category-title-row {
     flex-wrap: wrap;
+    justify-content: center;
     gap: var(--space-2);
   }
 

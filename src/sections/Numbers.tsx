@@ -13,7 +13,7 @@ export function Numbers({ stats, grimReport }: NumbersProps) {
       <div className="section__inner">
         <h2 className="section__heading">Ledger of Your Sins</h2>
         <p className="section__placeholder">
-          Are you ready to ask forgiveness for your sins?
+          Are you ready to ask for forgiveness?
         </p>
 
         <div className="numbers__stats">

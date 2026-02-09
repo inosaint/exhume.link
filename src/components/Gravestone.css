@@ -42,6 +42,13 @@
   stroke: var(--color-accent);
 }
 
+/* Icon wrapper — positions favicon over the SVG */
+.gravestone__icon-wrap {
+  position: relative;
+  width: 80px;
+  height: 100px;
+}
+
 /* SVG */
 .gravestone__svg {
   width: 80px;
@@ -57,6 +64,28 @@
 
 .gravestone__cross {
   transition: stroke var(--duration-mid) var(--ease-out);
+}
+
+/* Favicon overlay — centered on the cross area of the gravestone */
+.gravestone__favicon {
+  position: absolute;
+  top: 22px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--duration-mid) var(--ease-out);
+}
+
+.gravestone__favicon--loaded {
+  opacity: 0.85;
+}
+
+.gravestone--hovered .gravestone__favicon--loaded {
+  opacity: 1;
 }
 
 /* Text below gravestone */

@@ -151,6 +151,20 @@ export function StatsGrid({ stats, grimReport }: { stats: ExhumeStats; grimRepor
     { label: 'Graves Dug', icon: ICONS.tab, value: stats.totalTabs, suffix: '', tooltip: 'Total number of browser tabs exhumed from your browsing history.' },
     { label: 'Bloodlines Buried', icon: ICONS.globe, value: stats.uniqueDomains, suffix: '', tooltip: 'Unique websites you visited — each domain is a distinct bloodline.' },
     { label: 'Restless Spirits', icon: ICONS.search, value: stats.unresolvedSearches, suffix: '', tooltip: 'Searches you started but never followed through on — questions left unanswered.' },
+  ]
+
+  // Insert Rot right after Restless Spirits so they stack nicely on mobile
+  if (grimReport && grimReport.stalePct > 0) {
+    defs.push({
+      label: 'The Rot',
+      icon: ICONS.skull,
+      value: grimReport.stalePct,
+      suffix: '%',
+      tooltip: 'Percentage of your tabs that are probably already dead — news, social, and shopping pages that decay by the hour.',
+    })
+  }
+
+  defs.push(
     {
       label: 'Dominant Realm',
       icon: ICONS.realm,
@@ -169,17 +183,7 @@ export function StatsGrid({ stats, grimReport }: { stats: ExhumeStats; grimRepor
       variant: 'domain',
       tooltip: 'The single website you returned to most — your favourite haunt.',
     },
-  ]
-
-  if (grimReport && grimReport.stalePct > 0) {
-    defs.push({
-      label: 'The Rot',
-      icon: ICONS.skull,
-      value: grimReport.stalePct,
-      suffix: '%',
-      tooltip: 'Percentage of your tabs that are probably already dead — news, social, and shopping pages that decay by the hour.',
-    })
-  }
+  )
 
   return (
     <div className="overview__stats">
