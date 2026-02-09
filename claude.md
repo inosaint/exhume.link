@@ -51,12 +51,13 @@ Copy should be dry, slightly unsettling, occasionally funny. Never campy.
 
 Full spec is in `docs/personality-scoring.md`. Read that file for the complete rubric.
 
-**Summary:** 6 archetypes (Necromancer, Resurrectionist, Séance Master, Plague Doctor,
-Wandering Zombie, Lich). Scored via 8 dimensions that collapse onto 3 axes
-(Depth↔Breadth, Consumption↔Action, Resolved↔Unresolved). Volume suffix applied
-last (≥500 tabs = "of the Horde", <50 = "the Fledgling").
+**Summary:** 6 scored archetypes (Necromancer, Warlock, Wraith, Bone Cleric,
+Zombie, Lich) + 2 special override cards (The Unburdened for <10 tabs,
+Mor'tab the Unending for ≥1000 tabs). Scored via 8 dimensions that collapse
+onto 3 axes (Depth↔Breadth, Consumption↔Action, Resolved↔Unresolved).
+Volume suffix applied last (≥500 tabs = "of the Endless Horde", 10–49 = "of the Shadows").
 
-Expected result for the sample dataset: **The Resurrectionist of the Horde**.
+Expected result for the sample dataset: **Warlock of the Endless Horde**.
 
 ---
 

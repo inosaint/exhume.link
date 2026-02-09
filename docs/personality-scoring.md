@@ -91,17 +91,21 @@ corner of this space they land in.
 
 ---
 
-## Step 4: The 6 Archetypes
+## Step 4: The 6 Archetypes + 2 Special Cards
 
 8 corners exist in a 3-axis space but only 6 represent real browsing patterns.
 The two that don't occur naturally: Deep + Action + Unresolved, and
 Broad + Consumption + Resolved (without Scout Activity, that's just "read the news
 and stopped" — not a persistent tab behavior).
 
+Two additional special cards override the scoring entirely based on tab count:
+**The Unburdened** (<10 tabs) and **Mor'tab the Unending** (≥1000 tabs).
+
 ### The Necromancer
 **Deep · Consumption · Resolved**
 
-*"You dig up old knowledge on purpose. Your tabs are archaeological sites, not bookmarks."*
+*"You exhume knowledge on purpose. Your tabs are grimoires — long reads, old essays,
+and sources that still matter. You finish what you open. Nothing here is accidental."*
 
 High reading mass. High evergreen retention — keeps classics from 2012 open because
 they still matter. Low open searches; when curious, finishes the thread.
@@ -112,10 +116,11 @@ Rabbit Hole Depth moderate.
 
 ---
 
-### The Resurrectionist
+### The Warlock
 **Deep · Action · Resolved**
 
-*"Every tab is a tool. Every tool is a weapon. Nothing is open without a reason."*
+*"Your tabs are instruments of work. Tools, references, and opportunities bound by
+intent. You open with purpose, act decisively, and close the pact when the task is done."*
 
 Tabs are a workspace. Design tools, portfolios open for reference, job boards
 being actively worked. High scout activity — knows what's out there because they
@@ -126,10 +131,11 @@ Depth high.
 
 ---
 
-### The Séance Master
+### The Wraith
 **Deep · Consumption · Unresolved**
 
-*"You pulled one thread. The whole tapestry unraveled. You still haven't finished."*
+*"You followed one idea too far. Rabbit holes, half-read books, endless related
+tabs — all circling something you haven't named yet. The knowledge lingers. You do too."*
 
 The rabbit holler. Falls into a topic — a book, an idea, a person — and opens
 everything related to it across multiple platforms. But never quite closes the loop.
@@ -140,10 +146,11 @@ Breadth moderate (focused breadth within rabbit holes).
 
 ---
 
-### The Plague Doctor
+### The Bone Cleric
 **Broad · Action · Resolved**
 
-*"You've read every outlet. You've evaluated every tool. You've decided nothing — but you know everything."*
+*"You survey the dead and decide what rises. News, tools, markets, and signals pass
+through you. You evaluate, choose, and move on. Wide vision. Clean cuts."*
 
 The generalist professional. Tabs span news, design, tools, portfolios, events,
 jobs — all relevant, all intentional, all spread wide. Not chasing rabbit holes;
@@ -154,10 +161,11 @@ Action Mass moderate, Social Pull low.
 
 ---
 
-### The Wandering Zombie
+### The Zombie
 **Broad · Consumption · Unresolved**
 
-*"You opened this tab three months ago. You still don't know why. You opened 400 more since then."*
+*"You didn't mean to open these tabs. They spread anyway. Social links, homepages,
+forgotten searches — all open, none finished. You wander. The tabs multiply."*
 
 High social pull — most tabs arrived via Twitter or Reddit links, not direct
 navigation. High breadth, low depth. Lots of homepage-only tabs that were never
@@ -171,7 +179,8 @@ Depth low, Rabbit Hole Depth low.
 ### The Lich
 **Broad · Action · Unresolved**
 
-*"You collect. You accumulate. The cart is always full. The checkout never happens."*
+*"You accumulate power but never release it. Carts filled, tools bookmarked,
+decisions deferred. Everything is collected. Nothing is committed."*
 
 Shopping tabs, tool homepages, product pages — all open, none acted on.
 High breadth but shallow: lots of first-visits, few return trips.
@@ -183,21 +192,46 @@ Unresolved Curiosity high, Depth low.
 
 ---
 
-## Step 5: Volume Suffix
+### The Unburdened *(Special Card)*
+**<10 Tabs · Default State**
 
-Tab count doesn't change the archetype but affects the title:
+*"Fewer than ten tabs. You travel light through the digital world — or you just
+got here. Either way, the graves are shallow."*
 
-| Total tabs | Suffix | Example |
+Not enough signal to classify. This card is assigned automatically when the user
+has fewer than 10 tabs, bypassing the scoring system entirely.
+
+---
+
+### Mor'tab the Unending *(Special Card)*
+**≥1000 Tabs · Ascended State**
+
+*"You have crossed the threshold. A thousand tabs or more, all coexisting in
+impossible equilibrium. Not chaos — something older. You no longer manage tabs.
+They orbit you."*
+
+Assigned automatically when the user has 1000 or more tabs, bypassing the
+scoring system entirely. An ascended state beyond the normal archetypes.
+
+---
+
+## Step 5: Volume Suffix + Special Overrides
+
+Tab count determines special card overrides and volume suffixes:
+
+| Total tabs | Result | Example |
 |---|---|---|
-| 0–9 | "The Unburdened" *(prefix)* | The Unburdened Necromancer |
-| 10–49 | "of the Shadows" | Resurrectionist of the Shadows |
-| 50–99 | "of the Cult" | Séance Master of the Cult |
-| 100–249 | "of the Dark Legion" | Plague Doctor of the Dark Legion |
-| 250–499 | "of the Horde" | Wandering Zombie of the Horde |
-| ≥ 500 | "of the Endless Horde" | Necromancer of the Endless Horde |
+| 0–9 | **The Unburdened** *(special card, bypasses scoring)* | The Unburdened |
+| 10–49 | "of the Shadows" | Warlock of the Shadows |
+| 50–99 | "of the Cult" | Wraith of the Cult |
+| 100–249 | "of the Dark Legion" | Bone Cleric of the Dark Legion |
+| 250–499 | "of the Horde" | Zombie of the Horde |
+| 500–999 | "of the Endless Horde" | Necromancer of the Endless Horde |
+| ≥ 1000 | **Mor'tab the Unending** *(special card, bypasses scoring)* | Mor'tab the Unending |
 
-Note: "The Unburdened" is a prefix (placed before the archetype name), while all
-other suffixes follow the archetype name.
+The two special cards (Unburdened and Mor'tab) override the entire scoring
+pipeline — no axes are computed, no archetype is assigned. They are standalone
+cards with their own art, title, and description.
 
 ---
 
@@ -212,7 +246,7 @@ The sample dataset (689 tabs, design-heavy, 40+ portfolio tabs, 24 news outlets,
 - Social Pull: low (25 social tabs out of 689)
 - Unresolved Curiosity: moderate (16 open searches)
 
-**Primary archetype: The Resurrectionist** (Deep · Action · Resolved)
-**Strong secondary: The Plague Doctor** (Broad · Action · Resolved)
+**Primary archetype: The Warlock** (Deep · Action · Resolved)
+**Strong secondary: The Bone Cleric** (Broad · Action · Resolved)
 **Volume suffix: "of the Endless Horde"** (689 ≥ 500)
-**Final title: Resurrectionist of the Endless Horde**
+**Final title: Warlock of the Endless Horde**
