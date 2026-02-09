@@ -1270,3 +1270,103 @@
     padding: var(--space-2) var(--space-4);
   }
 }
+
+/* ──────────────────────────────────────────────
+   Share Section Styles
+   ────────────────────────────────────────────── */
+
+.share-section {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-8) var(--space-4);
+}
+
+.share-section__content {
+  width: 100%;
+  max-width: 600px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.share-section__title {
+  font-family: var(--font-heading);
+  font-size: var(--text-2xl);
+  color: var(--color-accent);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-bottom: var(--space-2);
+}
+
+.share-section__subtitle {
+  font-size: var(--text-base);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-6);
+  font-style: italic;
+}
+
+.share-section__button {
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  font-weight: 600;
+  color: var(--color-bg-deep);
+  background: var(--color-accent);
+  border: none;
+  border-radius: 6px;
+  padding: var(--space-3) var(--space-6);
+  cursor: pointer;
+  transition:
+    background-color var(--duration-fast),
+    box-shadow var(--duration-fast),
+    transform var(--duration-fast);
+  margin-top: var(--space-6);
+}
+
+.share-section__button:hover {
+  background: #dbb97a;
+  box-shadow: 0 0 16px var(--color-accent-glow);
+  transform: translateY(-2px);
+}
+
+.share-section__button:active {
+  transform: translateY(0);
+}
+
+.share-section__hint {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  margin-top: var(--space-3);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .share-section {
+    padding: var(--space-6) var(--space-3);
+  }
+
+  .share-section__title {
+    font-size: var(--text-xl);
+  }
+
+  .share-section__subtitle {
+    font-size: var(--text-sm);
+  }
+
+  .share-section__button {
+    width: 100%;
+    max-width: 300px;
+    min-height: 48px;
+  }
+}
+
+/* Motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .share-section__button {
+    transition: none;
+  }
+}
