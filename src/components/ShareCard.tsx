@@ -145,87 +145,65 @@ export function ShareCard({ profile, stats }: ShareCardProps) {
 
       // ===== TRADING CARD DESIGN =====
 
-      // Background - deep dark
+      const borderWidth = 16
+      const borderRadius = 24
+      const padding = 24
+
+      // Outer gold border with gradient
+      const borderGradient = ctx.createLinearGradient(0, 0, CARD_WIDTH, CARD_HEIGHT)
+      borderGradient.addColorStop(0, 'rgba(201, 169, 110, 1)')
+      borderGradient.addColorStop(0.5, 'rgba(220, 190, 130, 1)')
+      borderGradient.addColorStop(1, 'rgba(201, 169, 110, 1)')
+      ctx.fillStyle = borderGradient
+      drawRoundedRect(ctx, 0, 0, CARD_WIDTH, CARD_HEIGHT, borderRadius)
+      ctx.fill()
+
+      // Inner card background
       ctx.fillStyle = COLORS.bgDeep
-      ctx.fillRect(0, 0, CARD_WIDTH, CARD_HEIGHT)
+      drawRoundedRect(ctx, borderWidth, borderWidth, CARD_WIDTH - borderWidth * 2, CARD_HEIGHT - borderWidth * 2, borderRadius - 4)
+      ctx.fill()
 
-      // Outer border (gold frame)
-      const borderWidth = 20
-      ctx.fillStyle = COLORS.accent
-      ctx.fillRect(0, 0, CARD_WIDTH, CARD_HEIGHT)
-
-      // Inner dark background
-      ctx.fillStyle = COLORS.bgDeep
-      ctx.fillRect(borderWidth, borderWidth, CARD_WIDTH - borderWidth * 2, CARD_HEIGHT - borderWidth * 2)
-
-      // Gothic holographic gradient overlay effect
-      const holoGradient = ctx.createLinearGradient(0, 0, CARD_WIDTH, CARD_HEIGHT)
-      holoGradient.addColorStop(0, 'rgba(201, 169, 110, 0.2)')      // Gold
-      holoGradient.addColorStop(0.25, 'rgba(80, 60, 100, 0.15)')     // Deep purple
-      holoGradient.addColorStop(0.5, 'rgba(40, 60, 80, 0.15)')       // Dark midnight blue
-      holoGradient.addColorStop(0.75, 'rgba(60, 80, 70, 0.12)')      // Dark teal/green
-      holoGradient.addColorStop(1, 'rgba(201, 169, 110, 0.2)')       // Gold
+      // Subtle holographic shimmer overlay
+      const holoGradient = ctx.createRadialGradient(CARD_WIDTH / 2, CARD_HEIGHT / 3, 0, CARD_WIDTH / 2, CARD_HEIGHT / 3, CARD_WIDTH / 2)
+      holoGradient.addColorStop(0, 'rgba(80, 60, 100, 0.08)')
+      holoGradient.addColorStop(0.5, 'rgba(40, 60, 80, 0.06)')
+      holoGradient.addColorStop(1, 'rgba(60, 80, 70, 0.04)')
       ctx.fillStyle = holoGradient
-      ctx.fillRect(borderWidth, borderWidth, CARD_WIDTH - borderWidth * 2, CARD_HEIGHT - borderWidth * 2)
-
-      // Corner decorations
-      const cornerSize = 40
-      const cornerOffset = borderWidth + 10
-      ctx.fillStyle = COLORS.accent
-      // Top-left corner
-      ctx.beginPath()
-      ctx.moveTo(cornerOffset, cornerOffset)
-      ctx.lineTo(cornerOffset + cornerSize, cornerOffset)
-      ctx.lineTo(cornerOffset, cornerOffset + cornerSize)
-      ctx.closePath()
-      ctx.fill()
-      // Top-right corner
-      ctx.beginPath()
-      ctx.moveTo(CARD_WIDTH - cornerOffset, cornerOffset)
-      ctx.lineTo(CARD_WIDTH - cornerOffset - cornerSize, cornerOffset)
-      ctx.lineTo(CARD_WIDTH - cornerOffset, cornerOffset + cornerSize)
-      ctx.closePath()
-      ctx.fill()
-      // Bottom-left corner
-      ctx.beginPath()
-      ctx.moveTo(cornerOffset, CARD_HEIGHT - cornerOffset)
-      ctx.lineTo(cornerOffset + cornerSize, CARD_HEIGHT - cornerOffset)
-      ctx.lineTo(cornerOffset, CARD_HEIGHT - cornerOffset - cornerSize)
-      ctx.closePath()
-      ctx.fill()
-      // Bottom-right corner
-      ctx.beginPath()
-      ctx.moveTo(CARD_WIDTH - cornerOffset, CARD_HEIGHT - cornerOffset)
-      ctx.lineTo(CARD_WIDTH - cornerOffset - cornerSize, CARD_HEIGHT - cornerOffset)
-      ctx.lineTo(CARD_WIDTH - cornerOffset, CARD_HEIGHT - cornerOffset - cornerSize)
-      ctx.closePath()
+      drawRoundedRect(ctx, borderWidth, borderWidth, CARD_WIDTH - borderWidth * 2, CARD_HEIGHT - borderWidth * 2, borderRadius - 4)
       ctx.fill()
 
-      // Rarity indicator (based on total tabs)
+      // Top info bar
+      const topBarY = borderWidth + padding
+      const topBarHeight = 40
+
+      // Rarity badge (left)
       let rarity = 'COMMON'
       if (stats.totalTabs > 1000) rarity = 'LEGENDARY'
       else if (stats.totalTabs > 500) rarity = 'EPIC'
       else if (stats.totalTabs > 100) rarity = 'RARE'
       else if (stats.totalTabs > 50) rarity = 'UNCOMMON'
 
-      ctx.fillStyle = COLORS.accent
-      ctx.font = 'bold 14px Inter, sans-serif'
-      ctx.textAlign = 'center'
-      ctx.fillText(rarity, CARD_WIDTH / 2, borderWidth + 25)
-
-      // Portrait frame and image
-      const portraitBox = 340
-      const portraitX = (CARD_WIDTH - portraitBox) / 2
-      const portraitY = 90
-
-      // Portrait border
-      ctx.fillStyle = COLORS.accent
-      drawRoundedRect(ctx, portraitX - 8, portraitY - 8, portraitBox + 16, portraitBox + 16, 8)
+      ctx.fillStyle = 'rgba(18, 18, 26, 0.7)'
+      drawRoundedRect(ctx, borderWidth + padding, topBarY, 100, 32, 6)
       ctx.fill()
 
-      // Portrait background
+      ctx.fillStyle = COLORS.accent
+      ctx.font = 'bold 13px Inter, sans-serif'
+      ctx.textAlign = 'center'
+      ctx.fillText(rarity, borderWidth + padding + 50, topBarY + 21)
+
+      // Portrait section
+      const portraitBox = 400
+      const portraitX = (CARD_WIDTH - portraitBox) / 2
+      const portraitY = topBarY + topBarHeight + 20
+
+      // Portrait background with subtle border
+      ctx.fillStyle = COLORS.stone
+      drawRoundedRect(ctx, portraitX - 4, portraitY - 4, portraitBox + 8, portraitBox + 8, 12)
+      ctx.fill()
+
       ctx.fillStyle = COLORS.bgSurface
-      drawRoundedRect(ctx, portraitX, portraitY, portraitBox, portraitBox, 6)
+      drawRoundedRect(ctx, portraitX, portraitY, portraitBox, portraitBox, 10)
       ctx.fill()
 
       // Portrait image (preserve aspect ratio)
@@ -233,7 +211,7 @@ export function ShareCard({ profile, stats }: ShareCardProps) {
       const drawW = portrait.width * scale
       const drawH = portrait.height * scale
       ctx.save()
-      drawRoundedRect(ctx, portraitX, portraitY, portraitBox, portraitBox, 6)
+      drawRoundedRect(ctx, portraitX, portraitY, portraitBox, portraitBox, 10)
       ctx.clip()
       ctx.drawImage(
         portrait,
@@ -244,75 +222,90 @@ export function ShareCard({ profile, stats }: ShareCardProps) {
       )
       ctx.restore()
 
-      // Title
+      // Title section
+      const titleStartY = portraitY + portraitBox + 30
       const titleText = profile.title.toUpperCase()
       ctx.fillStyle = COLORS.accent
-      ctx.font = 'bold 36px Cinzel, serif'
+      ctx.font = 'bold 32px Cinzel, serif'
       ctx.textAlign = 'center'
-      const titleLines = wrapText(ctx, titleText, CARD_WIDTH * 0.85)
-      const titleStartY = portraitY + portraitBox + 50
+      const titleLines = wrapText(ctx, titleText, CARD_WIDTH - borderWidth * 2 - padding * 3)
       titleLines.slice(0, 2).forEach((line, index) => {
-        ctx.fillText(line, CARD_WIDTH / 2, titleStartY + index * 42)
+        ctx.fillText(line, CARD_WIDTH / 2, titleStartY + index * 38)
       })
 
       // Description
+      const descStartY = titleStartY + (titleLines.length * 38) + 16
       ctx.fillStyle = COLORS.textSecondary
-      ctx.font = '16px Inter, sans-serif'
-      const descLines = wrapText(ctx, profile.description, CARD_WIDTH * 0.85)
-      const descStartY = titleStartY + (titleLines.length * 42) + 20
-      descLines.slice(0, 3).forEach((line, index) => {
-        ctx.fillText(line, CARD_WIDTH / 2, descStartY + index * 24)
+      ctx.font = '15px Inter, sans-serif'
+      const descLines = wrapText(ctx, profile.description, CARD_WIDTH - borderWidth * 2 - padding * 3)
+      descLines.slice(0, 2).forEach((line, index) => {
+        ctx.fillText(line, CARD_WIDTH / 2, descStartY + index * 22)
       })
 
-      // Stats section background
-      const statsBoxY = descStartY + 90
-      const statsBoxHeight = CARD_HEIGHT - statsBoxY - borderWidth - 20
-      ctx.fillStyle = 'rgba(18, 18, 26, 0.8)'
-      drawRoundedRect(ctx, borderWidth + 30, statsBoxY, CARD_WIDTH - borderWidth * 2 - 60, statsBoxHeight, 8)
+      // Stats section
+      const statsBoxY = descStartY + (descLines.length * 22) + 30
+      const statsBoxHeight = CARD_HEIGHT - statsBoxY - borderWidth - padding
+      const statsInnerPadding = 24
+
+      // Stats background
+      ctx.fillStyle = 'rgba(18, 18, 26, 0.6)'
+      drawRoundedRect(ctx, borderWidth + padding, statsBoxY, CARD_WIDTH - borderWidth * 2 - padding * 2, statsBoxHeight, 10)
       ctx.fill()
 
-      // Stats grid
+      // Stats table
+      const statsTableY = statsBoxY + statsInnerPadding
+      const statsLeftX = borderWidth + padding + statsInnerPadding
+      const statsRightX = CARD_WIDTH - borderWidth - padding - statsInnerPadding
+      const statRowHeight = 48
+
       const statsData = [
-        { value: stats.totalTabs.toString(), label: 'TABS EXHUMED' },
-        { value: stats.uniqueDomains.toString(), label: 'UNIQUE DOMAINS' },
-        { value: stats.repeatDomains.toString(), label: 'REPEAT DOMAINS' },
-        { value: stats.unresolvedSearches.toString(), label: 'UNFINISHED SEARCHES' },
-        { value: stats.mappedLocations.toString(), label: 'LOCATIONS MAPPED' },
-        { value: stats.topDomain?.domain ?? 'N/A', label: 'TOP DOMAIN', small: true },
+        { label: 'Tabs Exhumed', value: stats.totalTabs.toString() },
+        { label: 'Unique Domains', value: stats.uniqueDomains.toString() },
+        { label: 'Repeat Domains', value: stats.repeatDomains.toString() },
+        { label: 'Unfinished Searches', value: stats.unresolvedSearches.toString() },
+        { label: 'Locations Mapped', value: stats.mappedLocations.toString() },
       ]
 
-      const statsPadding = 60
-      const statsStartY = statsBoxY + 30
-      const statRowHeight = 60
+      // Divider line under stats
+      ctx.strokeStyle = COLORS.stone
+      ctx.lineWidth = 1
 
       statsData.forEach((stat, i) => {
-        const row = Math.floor(i / 2)
-        const col = i % 2
-        const x = borderWidth + statsPadding + col * (CARD_WIDTH - borderWidth * 2 - statsPadding * 2) / 2
-        const y = statsStartY + row * statRowHeight
+        const y = statsTableY + i * statRowHeight
 
+        // Label (left)
+        ctx.fillStyle = COLORS.textSecondary
+        ctx.font = '14px Inter, sans-serif'
+        ctx.textAlign = 'left'
+        ctx.fillText(stat.label, statsLeftX, y + 18)
+
+        // Value (right)
         ctx.fillStyle = COLORS.accent
-        ctx.font = stat.small ? 'bold 16px Cinzel, serif' : 'bold 22px Cinzel, serif'
-        ctx.textAlign = col === 0 ? 'left' : 'right'
-        ctx.fillText(stat.value, x, y)
+        ctx.font = 'bold 20px Cinzel, serif'
+        ctx.textAlign = 'right'
+        ctx.fillText(stat.value, statsRightX, y + 18)
 
-        ctx.fillStyle = COLORS.textMuted
-        ctx.font = '11px Inter, sans-serif'
-        drawLetterSpacedText(ctx, stat.label, x, y + 20, 1.5, col === 0 ? 'left' : 'right')
+        // Divider line
+        if (i < statsData.length - 1) {
+          ctx.beginPath()
+          ctx.moveTo(statsLeftX, y + statRowHeight - 6)
+          ctx.lineTo(statsRightX, y + statRowHeight - 6)
+          ctx.stroke()
+        }
       })
 
-      // Top categories at bottom
-      if (stats.topCategories.length > 0) {
-        const categoriesY = CARD_HEIGHT - borderWidth - 40
+      // Top domain at bottom
+      if (stats.topDomain) {
+        const bottomY = statsBoxY + statsBoxHeight - statsInnerPadding - 10
         ctx.fillStyle = COLORS.textMuted
         ctx.font = '11px Inter, sans-serif'
         ctx.textAlign = 'center'
-        ctx.fillText('TOP CATEGORIES:', CARD_WIDTH / 2, categoriesY - 20)
+        ctx.fillText('TOP DOMAIN', CARD_WIDTH / 2, bottomY - 16)
 
-        const categoryText = stats.topCategories.slice(0, 3).map(c => c.label).join(' • ')
-        ctx.fillStyle = COLORS.textSecondary
-        ctx.font = 'bold 13px Inter, sans-serif'
-        ctx.fillText(categoryText, CARD_WIDTH / 2, categoriesY)
+        ctx.fillStyle = COLORS.accent
+        ctx.font = 'bold 14px Inter, sans-serif'
+        const domainText = stats.topDomain.domain.length > 35 ? stats.topDomain.domain.substring(0, 32) + '...' : stats.topDomain.domain
+        ctx.fillText(domainText, CARD_WIDTH / 2, bottomY)
       }
 
       setIsGenerated(true)
@@ -481,6 +474,16 @@ export function ShareCard({ profile, stats }: ShareCardProps) {
             </div>
             <p className="share-card-modal__title">Choose your ritual.</p>
 
+            {/* Card Preview */}
+            <div className="share-card-preview">
+              <canvas
+                ref={canvasRef}
+                width={CARD_WIDTH}
+                height={CARD_HEIGHT}
+                className="share-card-canvas"
+              />
+            </div>
+
             <div className="share-card-section">
               <p className="share-card-section__title">Download & Copy</p>
               <div className="share-card-actions">
@@ -562,12 +565,6 @@ export function ShareCard({ profile, stats }: ShareCardProps) {
             <p className="share-card-modal__note">
               Your trading card includes detailed stats from your digital archaeology.
             </p>
-            <canvas
-              ref={canvasRef}
-              width={CARD_WIDTH}
-              height={CARD_HEIGHT}
-              className="share-card-canvas share-card-canvas--hidden"
-            />
           </div>
         </div>
       )}
