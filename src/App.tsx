@@ -250,7 +250,7 @@ export default function App() {
                 : currentSection === 'numbers'
                   ? 'Visit Your Tab Cemetery ↓'
                   : currentSection === 'cemetery'
-                    ? (flow === 'c' ? 'Enter the Hex ↓' : flow === 'a' ? 'Read the Report ↓' : 'Visit the Global Dead ↓')
+                    ? (flow === 'c' ? 'Enter the Hex ↓' : flow === 'a' ? 'Bind Your Archetype ↓' : 'Visit the Global Dead ↓')
                     : currentSection === 'grimreport'
                       ? 'Prepare the Rite ↓'
                       : currentSection === 'worldmap' || currentSection === 'hexmap'

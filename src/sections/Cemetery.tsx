@@ -153,9 +153,9 @@ export function Cemetery({ groups }: CemeteryProps) {
       <div ref={containerRef} className="cemetery__scroll-container">
         <div className="cemetery__inner">
           <h2 className="section__heading">The Cemetery</h2>
-          <p className="cemetery__subtitle">
+          {/* <p className="cemetery__subtitle">
             Each stone marks a tab. Click to resurrect.
-          </p>
+          </p> */}
 
           <div className="cemetery__categories">
             {activeCategories.map((group, i) => (
