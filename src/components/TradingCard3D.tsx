@@ -11,6 +11,8 @@ export function TradingCard3D({ profile, stats }: TradingCard3DProps) {
   const cardRef = useRef<HTMLDivElement>(null)
   const [rotateX, setRotateX] = useState(0)
   const [rotateY, setRotateY] = useState(0)
+  const [mouseX, setMouseX] = useState(50)
+  const [mouseY, setMouseY] = useState(50)
   const [isHovering, setIsHovering] = useState(false)
 
   useEffect(() => {
@@ -30,14 +32,22 @@ export function TradingCard3D({ profile, stats }: TradingCard3DProps) {
       const rotateXValue = ((y - centerY) / centerY) * -15
       const rotateYValue = ((x - centerX) / centerX) * 15
 
+      // Calculate mouse position as percentage for gradient positioning
+      const mouseXPercent = (x / rect.width) * 100
+      const mouseYPercent = (y / rect.height) * 100
+
       setRotateX(rotateXValue)
       setRotateY(rotateYValue)
+      setMouseX(mouseXPercent)
+      setMouseY(mouseYPercent)
     }
 
     const handleMouseLeave = () => {
       setIsHovering(false)
       setRotateX(0)
       setRotateY(0)
+      setMouseX(50)
+      setMouseY(50)
     }
 
     const handleMouseEnter = () => {
@@ -81,8 +91,32 @@ export function TradingCard3D({ profile, stats }: TradingCard3DProps) {
         }}
       >
         <div className="trading-card-3d__inner">
-          {/* Holographic overlay */}
-          <div className="trading-card-3d__holo" />
+          {/* Holographic overlay - moves with mouse */}
+          <div
+            className="trading-card-3d__holo"
+            style={{
+              backgroundPosition: `${mouseX}% ${mouseY}%`,
+              opacity: isHovering ? 1 : 0.5,
+            }}
+          />
+
+          {/* Sparkle/shine effect */}
+          <div
+            className="trading-card-3d__sparkle"
+            style={{
+              backgroundPosition: `${mouseX}% ${mouseY}%`,
+              opacity: isHovering ? 0.8 : 0,
+            }}
+          />
+
+          {/* Glare effect */}
+          <div
+            className="trading-card-3d__glare"
+            style={{
+              backgroundPosition: `${mouseX}% ${mouseY}%`,
+              opacity: isHovering ? 0.3 : 0,
+            }}
+          />
 
           {/* Rarity badge */}
           <div className="trading-card-3d__rarity">
