@@ -768,10 +768,22 @@ function scorePersonality(input: {
   const archetype = axesToArchetype(axes, dims)
 
   const volumeSuffix =
-    totalTabs >= 500 ? 'of the Horde' : totalTabs < 50 ? 'the Fledgling' : ''
+    totalTabs >= 500
+      ? 'of the Endless Horde'
+      : totalTabs >= 250
+        ? 'of the Horde'
+        : totalTabs >= 100
+          ? 'of the Dark Legion'
+          : totalTabs >= 50
+            ? 'of the Cult'
+            : totalTabs >= 10
+              ? 'of the Shadows'
+              : 'The Unburdened'
 
   const base = ARCHETYPES[archetype]
-  const title = volumeSuffix ? `${base.baseTitle} ${volumeSuffix}` : base.baseTitle
+  const title = volumeSuffix === 'The Unburdened'
+    ? `${volumeSuffix} ${base.baseTitle}`
+    : `${base.baseTitle} ${volumeSuffix}`
 
   return {
     archetype,
