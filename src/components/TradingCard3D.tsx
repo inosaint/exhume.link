@@ -73,11 +73,9 @@ export function TradingCard3D({ profile, stats }: TradingCard3DProps) {
   else if (stats.totalTabs > 50) rarity = 'UNCOMMON'
 
   const statsData = [
-    { label: 'Tabs Exhumed', value: stats.totalTabs.toString() },
-    { label: 'Unique Domains', value: stats.uniqueDomains.toString() },
-    { label: 'Repeat Domains', value: stats.repeatDomains.toString() },
-    { label: 'Unfinished Searches', value: stats.unresolvedSearches.toString() },
-    { label: 'Locations Mapped', value: stats.mappedLocations.toString() },
+    { label: 'Graves Dug', value: stats.totalTabs.toString() },
+    { label: 'Bloodlines Buried', value: stats.uniqueDomains.toString() },
+    { label: 'Restless Spirits', value: stats.unresolvedSearches.toString() },
   ]
 
   return (

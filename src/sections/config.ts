@@ -23,8 +23,8 @@ export const SECTIONS_A: SectionDef[] = [
   { id: 'personality', label: 'The Verdict' },
   { id: 'numbers', label: 'The Ledger' },
   { id: 'cemetery', label: 'Cemetery' },
-  { id: 'grimreport', label: 'Grim Report' },
-  { id: 'share', label: 'The Rite' },
+  // { id: 'grimreport', label: 'Grim Report' },
+  { id: 'share', label: 'Archetype Binding' },
 ]
 
 export const SECTIONS_B: SectionDef[] = [

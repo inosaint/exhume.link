@@ -189,9 +189,15 @@ Tab count doesn't change the archetype but affects the title:
 
 | Total tabs | Suffix | Example |
 |---|---|---|
-| ≥ 500 | "of the Horde" | The Necromancer of the Horde |
-| 50–499 | *(none)* | The Séance Master |
-| < 50 | "the Fledgling" | The Lich the Fledgling |
+| 0–9 | "The Unburdened" *(prefix)* | The Unburdened Necromancer |
+| 10–49 | "of the Shadows" | Resurrectionist of the Shadows |
+| 50–99 | "of the Cult" | Séance Master of the Cult |
+| 100–249 | "of the Dark Legion" | Plague Doctor of the Dark Legion |
+| 250–499 | "of the Horde" | Wandering Zombie of the Horde |
+| ≥ 500 | "of the Endless Horde" | Necromancer of the Endless Horde |
+
+Note: "The Unburdened" is a prefix (placed before the archetype name), while all
+other suffixes follow the archetype name.
 
 ---
 
@@ -208,5 +214,5 @@ The sample dataset (689 tabs, design-heavy, 40+ portfolio tabs, 24 news outlets,
 
 **Primary archetype: The Resurrectionist** (Deep · Action · Resolved)
 **Strong secondary: The Plague Doctor** (Broad · Action · Resolved)
-**Volume suffix: "of the Horde"** (689 ≥ 500)
-**Final title: The Resurrectionist of the Horde**
+**Volume suffix: "of the Endless Horde"** (689 ≥ 500)
+**Final title: Resurrectionist of the Endless Horde**

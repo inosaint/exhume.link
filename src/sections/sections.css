@@ -381,12 +381,13 @@
 
 .overview__stats {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: var(--space-3);
   margin-bottom: 0;
 }
 
 .stat-card {
+  position: relative;
   background: var(--color-bg-surface);
   border: 1px solid var(--color-stone);
   border-radius: 6px;
@@ -396,14 +397,43 @@
   align-items: center;
   gap: var(--space-1);
   justify-content: center;
-  grid-column: span 2;
+  grid-column: span 1;
   min-height: 140px;
+  cursor: default;
   transition: border-color var(--duration-mid) var(--ease-out);
   animation: fadeUp var(--duration-slow) var(--ease-out) both;
 }
 
 .stat-card:hover {
   border-color: var(--color-accent-dim);
+}
+
+.stat-card__tooltip {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: 260px;
+  padding: var(--space-2) var(--space-3);
+  background: #0a0a0e;
+  border: 1px solid var(--color-stone-light);
+  border-radius: 6px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+  text-align: center;
+  text-transform: none;
+  letter-spacing: normal;
+  z-index: 20;
+  pointer-events: none;
+  animation: tooltipFadeIn 150ms var(--ease-out);
+}
+
+@keyframes tooltipFadeIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(4px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
 }
 
 .stat-card__note {
@@ -443,8 +473,8 @@
   align-items: flex-start;
   text-align: left;
   padding: var(--space-4) var(--space-5);
-  grid-column: span 3;
-  justify-content: center;
+  grid-column: span 2;
+  justify-content: flex-start;
   gap: var(--space-2);
 }
 
@@ -474,6 +504,7 @@
   letter-spacing: 0.08em;
   text-transform: uppercase;
   line-height: 1.2;
+  margin-top: auto;
 }
 
 /* ── Personality card ── */
@@ -603,12 +634,14 @@
   .stat-card:nth-child(2) { animation-delay: 100ms; }
   .stat-card:nth-child(3) { animation-delay: 200ms; }
   .stat-card:nth-child(4) { animation-delay: 300ms; }
+  .stat-card:nth-child(5) { animation-delay: 400ms; }
+  .stat-card:nth-child(6) { animation-delay: 500ms; }
   .personality-card       { animation-delay: 100ms; }
 }
 
 @media (max-width: 720px) {
   .stat-card--domain {
-    grid-column: span 1;
+    grid-column: span 2;
     text-align: center;
     align-items: center;
   }
@@ -695,12 +728,19 @@
 
 .cemetery__category-header {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: var(--space-3);
+  gap: var(--space-1);
   margin-bottom: var(--space-5);
   padding-bottom: var(--space-3);
   border-bottom: 1px solid var(--color-stone);
+}
+
+.cemetery__category-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
 }
 
 .cemetery__category-icon {
@@ -719,6 +759,48 @@
   font-size: var(--text-sm);
   color: var(--color-text-muted);
   font-style: italic;
+}
+
+/* Info icon button */
+.cemetery__info-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  padding: 2px;
+  border-radius: 50%;
+  transition: color var(--duration-fast);
+}
+
+.cemetery__info-btn:hover {
+  color: var(--color-accent);
+}
+
+.cemetery__info-tooltip {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: 240px;
+  padding: var(--space-2) var(--space-3);
+  background: #0a0a0e;
+  border: 1px solid var(--color-stone-light);
+  border-radius: 6px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+  text-align: center;
+  text-transform: none;
+  letter-spacing: normal;
+  z-index: 20;
+  pointer-events: none;
+  animation: tooltipFadeIn 150ms var(--ease-out);
 }
 
 /* Desktop: Grid layout */
@@ -745,7 +827,12 @@
   }
 
   .cemetery__category-header {
+    gap: var(--space-1);
+  }
+
+  .cemetery__category-title-row {
     flex-wrap: wrap;
+    justify-content: center;
     gap: var(--space-2);
   }
 
@@ -1277,12 +1364,12 @@
 
 .share-section {
   width: 100%;
-  min-height: 100vh;
+  height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: var(--space-8) var(--space-4);
+  padding: var(--space-2) var(--space-4);
 }
 
 .share-section__content {
@@ -1306,7 +1393,7 @@
 .share-section__subtitle {
   font-size: var(--text-base);
   color: var(--color-text-secondary);
-  margin-bottom: var(--space-6);
+  margin-bottom: var(--space-3);
   font-style: italic;
 }
 
@@ -1346,15 +1433,17 @@
 /* Responsive */
 @media (max-width: 768px) {
   .share-section {
-    padding: var(--space-6) var(--space-3);
+    padding: var(--space-1) var(--space-3);
   }
 
   .share-section__title {
     font-size: var(--text-xl);
+    margin-bottom: var(--space-1);
   }
 
   .share-section__subtitle {
     font-size: var(--text-sm);
+    margin-bottom: var(--space-2);
   }
 
   .share-section__button {

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
-import type { ExhumeStats } from '../data/tabsAnalysis'
+import type { ExhumeStats, GrimReport } from '../data/tabsAnalysis'
 import { NECROPOLIS_REGIONS } from '../lib/necropolisRegions'
 
 /** Tiny inline SVG icons — 16×16, currentColor fill */
@@ -39,6 +39,17 @@ const ICONS = {
       <path d="M2 20h20L19 8l-5 6-2-8-2 8-5-6z" />
     </svg>
   ),
+  /** Skull → The Rot (stale tabs) */
+  skull: (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="10" r="8" />
+      <path d="M8 14v4" />
+      <path d="M12 14v4" />
+      <path d="M16 14v4" />
+      <circle cx="9" cy="10" r="1.5" fill="currentColor" />
+      <circle cx="15" cy="10" r="1.5" fill="currentColor" />
+    </svg>
+  ),
 } as const
 
 interface StatDef {
@@ -48,6 +59,7 @@ interface StatDef {
   suffix: string
   note?: string
   variant?: 'domain'
+  tooltip: string
 }
 
 function useCountUp(target: number, duration = 1200) {
@@ -79,11 +91,35 @@ function useCountUp(target: number, duration = 1200) {
   return reducedMotion ? target : count
 }
 
-function StatCard({ label, icon, value, suffix, note, variant }: StatDef) {
+function StatCard({ label, icon, value, suffix, note, variant, tooltip }: StatDef) {
   const display = useCountUp(value)
+  const [showTooltip, setShowTooltip] = useState(false)
+  const cardRef = useRef<HTMLDivElement>(null)
+
+  // Close tooltip when tapping outside on mobile
+  useEffect(() => {
+    if (!showTooltip) return
+    function handleOutside(e: MouseEvent | TouchEvent) {
+      if (cardRef.current && !cardRef.current.contains(e.target as Node)) {
+        setShowTooltip(false)
+      }
+    }
+    document.addEventListener('mousedown', handleOutside)
+    document.addEventListener('touchstart', handleOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleOutside)
+      document.removeEventListener('touchstart', handleOutside)
+    }
+  }, [showTooltip])
 
   return (
-    <div className={`stat-card${variant === 'domain' ? ' stat-card--domain' : ''}`}>
+    <div
+      ref={cardRef}
+      className={`stat-card${variant === 'domain' ? ' stat-card--domain' : ''}`}
+      onMouseEnter={() => setShowTooltip(true)}
+      onMouseLeave={() => setShowTooltip(false)}
+      onClick={() => setShowTooltip(prev => !prev)}
+    >
       {variant === 'domain' ? (
         <>
           <span className="stat-card__kicker">{icon} {label}</span>
@@ -97,11 +133,14 @@ function StatCard({ label, icon, value, suffix, note, variant }: StatDef) {
           <span className="stat-card__label">{icon} {label}</span>
         </>
       )}
+      {showTooltip && (
+        <div className="stat-card__tooltip">{tooltip}</div>
+      )}
     </div>
   )
 }
 
-export function StatsGrid({ stats }: { stats: ExhumeStats }) {
+export function StatsGrid({ stats, grimReport }: { stats: ExhumeStats; grimReport?: GrimReport }) {
   const topDomain = stats.topDomain
   const topCategory = stats.topCategories?.[0]
   const realmName = topCategory
@@ -109,9 +148,23 @@ export function StatsGrid({ stats }: { stats: ExhumeStats }) {
     : '—'
 
   const defs: StatDef[] = [
-    { label: 'Graves Dug', icon: ICONS.tab, value: stats.totalTabs, suffix: '' },
-    { label: 'Bloodlines Buried', icon: ICONS.globe, value: stats.uniqueDomains, suffix: '' },
-    { label: 'Restless Spirits', icon: ICONS.search, value: stats.unresolvedSearches, suffix: '' },
+    { label: 'Graves Dug', icon: ICONS.tab, value: stats.totalTabs, suffix: '', tooltip: 'Total number of browser tabs exhumed from your browsing history.' },
+    { label: 'Bloodlines Buried', icon: ICONS.globe, value: stats.uniqueDomains, suffix: '', tooltip: 'Unique websites you visited — each domain is a distinct bloodline.' },
+    { label: 'Restless Spirits', icon: ICONS.search, value: stats.unresolvedSearches, suffix: '', tooltip: 'Searches you started but never followed through on — questions left unanswered.' },
+  ]
+
+  // Insert Rot right after Restless Spirits so they stack nicely on mobile
+  if (grimReport && grimReport.stalePct > 0) {
+    defs.push({
+      label: 'The Rot',
+      icon: ICONS.skull,
+      value: grimReport.stalePct,
+      suffix: '%',
+      tooltip: 'Percentage of your tabs that are probably already dead — news, social, and shopping pages that decay by the hour.',
+    })
+  }
+
+  defs.push(
     {
       label: 'Dominant Realm',
       icon: ICONS.realm,
@@ -119,6 +172,7 @@ export function StatsGrid({ stats }: { stats: ExhumeStats }) {
       suffix: ' graves',
       note: realmName,
       variant: 'domain',
+      tooltip: 'The category of websites you visited most — your ruling domain in the digital afterlife.',
     },
     {
       label: 'Your Popular Haunts',
@@ -127,8 +181,9 @@ export function StatsGrid({ stats }: { stats: ExhumeStats }) {
       suffix: ' graves dug',
       note: topDomain?.domain ?? '—',
       variant: 'domain',
+      tooltip: 'The single website you returned to most — your favourite haunt.',
     },
-  ]
+  )
 
   return (
     <div className="overview__stats">
