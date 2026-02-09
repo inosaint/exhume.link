@@ -13,9 +13,6 @@ export function Share({ profile, stats }: ShareProps) {
     <div className="share-section">
       <div className="share-section__content">
         <h2 className="share-section__title">Your Archetype</h2>
-        <p className="share-section__subtitle">
-          Move your cursor over the card to see it in 3D
-        </p>
 
         <TradingCard3D profile={profile} stats={stats} />
       </div>

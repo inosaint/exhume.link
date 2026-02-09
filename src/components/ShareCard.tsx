@@ -215,11 +215,9 @@ export function ShareCard({ profile, stats }: ShareCardProps) {
       const statsRightX = contentX + contentW - statsInnerPadding
 
       const statsData = [
-        { label: 'Tabs Exhumed', value: stats.totalTabs.toString() },
-        { label: 'Unique Domains', value: stats.uniqueDomains.toString() },
-        { label: 'Repeat Domains', value: stats.repeatDomains.toString() },
-        { label: 'Unfinished Searches', value: stats.unresolvedSearches.toString() },
-        { label: 'Locations Mapped', value: stats.mappedLocations.toString() },
+        { label: 'Graves Dug', value: stats.totalTabs.toString() },
+        { label: 'Bloodlines Buried', value: stats.uniqueDomains.toString() },
+        { label: 'Restless Spirits', value: stats.unresolvedSearches.toString() },
       ]
 
       // Calculate row height dynamically to fit stats + optional top domain

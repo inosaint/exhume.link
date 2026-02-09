@@ -41,7 +41,7 @@ const PHASE_TITLES: Partial<Record<SectionId, string>> = {
   worldmap: 'Territory Alignment',
   hexmap: 'Territory Alignment',
   grimreport: 'Bone Reading',
-  share: 'The Rite',
+  share: 'Archetype Binding',
 }
 
 function resolveFlowVariant(): FlowVariant {
@@ -198,7 +198,7 @@ export default function App() {
             )}
 
             {currentSection === 'numbers' && session && (
-              <Numbers stats={session.stats} />
+              <Numbers stats={session.stats} grimReport={session.grimReport} />
             )}
 
             {currentSection === 'cemetery' && session && (
