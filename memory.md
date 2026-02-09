@@ -1,3 +1,85 @@
+# Share Card Redesign, Flow A Refinements, Volume Suffix Tiers
+
+Date: 2026-02-09
+Agent/Model: Claude Opus 4.6 (claude-code)
+
+## Summary
+Major overhaul of the Share page, share modal, and Numbers/Cemetery refinements for Flow A.
+
+### Share Page & Modal
+- Changed page title from "Trading Card" to "Your Archetype"
+- Removed duplicate PersonalityCard section below the TradingCard3D preview
+- Removed "Download & Share" button and hint text (footer "Share with Your Cult" is the sole CTA)
+- Made card fit viewport on all devices using `min()` with `svh`-derived width constraint
+- Fixed scroll issue by changing `.share-section` from `min-height: 100vh` to `height: 100%`
+- Removed subtitle text from share page
+- Renamed phase label from "The Rite" to "Archetype Binding" in config + App
+- **Replaced canvas-rendered share card** with `html-to-image` capture of the actual TradingCard3D DOM element
+- Redesigned share modal: removed card preview, replaced rectangular buttons with 3×3 square tile grid
+- Added Bluesky and Instagram share options, removed LinkedIn
+- Styled native "Share via..." as a tile matching social options
+
+### TradingCard3D
+- Removed Repeat Domains and Locations Mapped stats
+- Renamed stat labels to Ledger terms: Graves Dug, Bloodlines Buried, Restless Spirits
+- Removed top domain separator line (both CSS and canvas)
+
+### Numbers Page (Ledger)
+- Added hover/tap tooltips to stat cards with black bg, border, shadow
+- Added "The Rot" stat from GrimReport (stale tab percentage)
+- Moved Rot stat next to Restless Spirits
+- Changed subtitle to "Are you ready to ask for forgiveness?"
+- Aligned "Popular Haunts" text to top, bottom-aligned count text
+- Changed stats grid from 6-column to 4-column to fit 4 cards in first row
+
+### Cemetery Page
+- Added favicons to gravestones via Google Favicon API with fallback to cross
+- Added info icon tooltips to category titles with region descriptions
+- Stacked burial count below title in center-aligned layout
+- Commented out subtitle "Each stone marks a tab. Click to resurrect."
+
+### Flow A Navigation
+- Commented out grimreport from SECTIONS_A (cemetery → share directly)
+- Updated cemetery footer CTA to "Bind Your Archetype ↓"
+
+### Volume Suffix Tiers (finalized)
+Updated `scorePersonality()` with 6 tiers:
+- 0–9: The Unburdened (prefix), 10–49: of the Shadows, 50–99: of the Cult
+- 100–249: of the Dark Legion, 250–499: of the Horde, ≥500: of the Endless Horde
+Updated `docs/personality-scoring.md` to match.
+
+## Files Created
+- *(none)*
+
+## Files Updated
+- `src/sections/Share.tsx` — Title, removed subtitle/buttons
+- `src/components/ShareCard.tsx` — Replaced canvas with html-to-image, new tile UI
+- `src/components/ShareCard.css` — Square tile grid layout
+- `src/components/TradingCard3D.tsx` — Reduced stats, renamed labels
+- `src/components/TradingCard3D.css` — Viewport-height-aware sizing, removed separator
+- `src/sections/sections.css` — 4-column stats grid, tooltips, cemetery tooltips, share section height fix
+- `src/sections/Numbers.tsx` — Added grimReport prop, subtitle text
+- `src/components/StatsGrid.tsx` — Tooltips, Rot stat, skull icon
+- `src/App.tsx` — Passes grimReport to Numbers, phase label, footer CTA text
+- `src/sections/config.ts` — Commented out grimreport, renamed share label
+- `src/sections/Cemetery.tsx` — Commented out subtitle, added info tooltips
+- `src/components/Gravestone.tsx` — Favicon loading via Google API
+- `src/components/Gravestone.css` — Favicon overlay styles
+- `src/data/tabsAnalysis.ts` — 6-tier volume suffix logic
+- `docs/personality-scoring.md` — Updated volume suffix table
+- `package.json` / `package-lock.json` — Added html-to-image
+
+## Flow A is now:
+Surface → Unearthing → The Verdict → The Ledger → Cemetery → **Archetype Binding** (Share)
+*(Grim Report commented out — skipped for now)*
+
+## Notes
+- `npm run build` passes clean.
+- html-to-image captures the TradingCard3D DOM element at 2× pixel ratio for retina-quality downloads.
+- Instagram share downloads the card image (no web share intent available).
+
+---
+
 # The Grim Report — Behavioral Analysis Section + Progress Rail Fix
 
 Date: 2026-02-08
