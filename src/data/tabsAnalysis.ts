@@ -884,6 +884,13 @@ function computeGrimReport(input: {
       verdictParts.push(`${oneAndDonePct}% of your tabs were laid to rest the same day.`)
     }
     verdictParts.push(`You are ${personality.title} — and nothing is holding you here.`)
+  } else if (personality.archetype === 'mortab') {
+    // Mor'tab the Unending (≥1000 tabs) — ascended, reverential verdict
+    verdictParts.push('Time failed somewhere past tab 600.')
+    verdictParts.push('Nothing you opened was ever closed. It was fuel.')
+    verdictParts.push('Fuel for your insatiable hunger.')
+    verdictParts.push(`Now you've ascended to your now true form,`)
+    verdictParts.push(`We bow in your presence, O great ${personality.title}.`)
   } else {
     verdictParts.push(`You opened ${totalTabs} graves.`)
 
