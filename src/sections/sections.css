@@ -460,7 +460,7 @@
   margin-top: var(--space-1);
   display: inline-flex;
   align-items: center;
-  gap: 0.25em;
+  gap: 0.35em;
 }
 
 .stat-card__label svg,
@@ -646,6 +646,12 @@
     grid-column: span 2;
     text-align: center;
     align-items: center;
+  }
+}
+
+@media (min-width: 769px) {
+  .stat-card__label {
+    gap: 0.25em;
   }
 }
 
