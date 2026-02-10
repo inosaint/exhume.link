@@ -53,9 +53,10 @@
     inset 0 1px 1px rgba(255, 255, 255, 0.2);
 }
 
-/* ── Rarity-based border colors ── */
+/* ── Rarity-based border colors (COMMENTED OUT - keeping gold for now) ── */
+/*
 .trading-card-3d[data-rarity="common"] .trading-card-3d__inner {
-  border-color: #7D6B5D; /* Grave Dust - desaturated brown */
+  border-color: #7D6B5D;
   box-shadow:
     0 25px 70px rgba(0, 0, 0, 0.7),
     0 8px 20px rgba(125, 107, 93, 0.25),
@@ -73,7 +74,7 @@
 }
 
 .trading-card-3d[data-rarity="uncommon"] .trading-card-3d__inner {
-  border-color: #43A089; /* Verdigris - oxidized copper */
+  border-color: #43A089;
   box-shadow:
     0 25px 70px rgba(0, 0, 0, 0.7),
     0 8px 20px rgba(67, 160, 137, 0.3),
@@ -91,7 +92,7 @@
 }
 
 .trading-card-3d[data-rarity="rare"] .trading-card-3d__inner {
-  border-color: #1e3a5f; /* Deep Cobalt - death & night */
+  border-color: #1e3a5f;
   box-shadow:
     0 25px 70px rgba(0, 0, 0, 0.7),
     0 8px 20px rgba(30, 58, 95, 0.35),
@@ -109,7 +110,7 @@
 }
 
 .trading-card-3d[data-rarity="epic"] .trading-card-3d__inner {
-  border-color: #32FF7E; /* Malignant Lime - magical radiation */
+  border-color: #32FF7E;
   box-shadow:
     0 25px 70px rgba(0, 0, 0, 0.7),
     0 8px 20px rgba(50, 255, 126, 0.5),
@@ -127,7 +128,7 @@
 }
 
 .trading-card-3d[data-rarity="legendary"] .trading-card-3d__inner {
-  border-color: #8b5cf6; /* Void Purple - necromantic power */
+  border-color: #8b5cf6;
   box-shadow:
     0 25px 70px rgba(0, 0, 0, 0.7),
     0 8px 20px rgba(139, 92, 246, 0.4),
@@ -145,6 +146,7 @@
     inset 0 1px 1px rgba(255, 255, 255, 0.2),
     inset 0 0 30px rgba(245, 211, 255, 0.25);
 }
+*/
 
 /* ── Holographic overlay effect — moves with mouse ── */
 .trading-card-3d__holo {
@@ -251,7 +253,8 @@
   text-transform: uppercase;
 }
 
-/* ── Rarity badge colors ── */
+/* ── Rarity badge colors (COMMENTED OUT - keeping gold for now) ── */
+/*
 .trading-card-3d[data-rarity="common"] .trading-card-3d__rarity {
   border-color: #7D6B5D;
 }
@@ -291,6 +294,7 @@
 .trading-card-3d[data-rarity="legendary"] .trading-card-3d__rarity span {
   color: #8b5cf6;
 }
+*/
 
 /* ── Title ── */
 .trading-card-3d__title {
@@ -354,7 +358,8 @@
   color: var(--color-accent);
 }
 
-/* ── Rarity-specific title and domain colors ── */
+/* ── Rarity-specific title and domain colors (COMMENTED OUT - keeping gold for now) ── */
+/*
 .trading-card-3d[data-rarity="common"] .trading-card-3d__title,
 .trading-card-3d[data-rarity="common"] .trading-card-3d__haunt-value {
   color: #7D6B5D;
@@ -379,6 +384,7 @@
 .trading-card-3d[data-rarity="legendary"] .trading-card-3d__haunt-value {
   color: #8b5cf6;
 }
+*/
 
 /* ── Responsive ── */
 @media (max-width: 768px) {
