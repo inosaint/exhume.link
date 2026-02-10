@@ -460,7 +460,7 @@
   margin-top: var(--space-1);
   display: inline-flex;
   align-items: center;
-  gap: 0.35em;
+  gap: 0.25em;
 }
 
 .stat-card__label svg,
