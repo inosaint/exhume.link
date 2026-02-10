@@ -600,6 +600,11 @@
   opacity: 1;
 }
 
+.verdict-reveal__highlight {
+  color: var(--color-accent);
+  font-weight: 600;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .verdict-reveal__text {
     opacity: 1;

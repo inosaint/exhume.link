@@ -228,7 +228,7 @@ export default function App() {
             )}
 
             {currentSection === 'personality' && session && (
-              <Personality report={session.grimReport} />
+              <Personality report={session.grimReport} personality={session.personality} />
             )}
 
             {currentSection === 'numbers' && session && (
