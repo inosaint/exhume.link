@@ -249,8 +249,9 @@
   font-size: var(--text-xs);
   font-weight: 700;
   color: var(--color-accent);
-  letter-spacing: 0.11em;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
+  line-height: 1;
 }
 
 /* ── Rarity badge colors (COMMENTED OUT - keeping gold for now) ── */
