@@ -20,7 +20,7 @@ export function Landing({ isBusy, error, sampleText, onBegin }: LandingProps) {
   const isSubmitDisabled = isBusy || !canSubmit
 
   return (
-    <section className="section section--landing">
+    <section className="section section--landing" style={{ paddingTop: '2rem' }}>
       <div className="section__inner">
         <form
           className="surface__form"
@@ -99,9 +99,7 @@ export function Landing({ isBusy, error, sampleText, onBegin }: LandingProps) {
           </button>
 
           <p className="surface__note">
-            Analysis runs locally in your browser. No links are uploaded.
-            <br />
-            We collect anonymous analytics to improve the experience.{' '}
+            Analysis runs locally in your browser. No links are uploaded.{' '}
             <button
               type="button"
               className="surface__note-link"
