@@ -72,12 +72,6 @@ export function TradingCard3D({ profile, stats }: TradingCard3DProps) {
   else if (stats.totalTabs > 100) rarity = 'RARE'
   else if (stats.totalTabs > 50) rarity = 'UNCOMMON'
 
-  const statsData = [
-    { label: 'Graves Dug', value: stats.totalTabs.toString() },
-    { label: 'Bloodlines Buried', value: stats.uniqueDomains.toString() },
-    { label: 'Restless Spirits', value: stats.unresolvedSearches.toString() },
-  ]
-
   return (
     <div className="trading-card-3d-container">
       <div
@@ -116,14 +110,14 @@ export function TradingCard3D({ profile, stats }: TradingCard3DProps) {
             }}
           />
 
-          {/* Rarity badge */}
-          <div className="trading-card-3d__rarity">
-            <span>{rarity}</span>
-          </div>
-
           {/* Portrait */}
           <div className="trading-card-3d__portrait">
             <img src={profile.image} alt={profile.title} />
+          </div>
+
+          {/* Rarity badge - top right over portrait */}
+          <div className="trading-card-3d__rarity">
+            <span>{rarity}</span>
           </div>
 
           {/* Title */}
@@ -132,25 +126,17 @@ export function TradingCard3D({ profile, stats }: TradingCard3DProps) {
           {/* Description */}
           <p className="trading-card-3d__description">{profile.description}</p>
 
-          {/* Stats */}
-          <div className="trading-card-3d__stats">
-            {statsData.map((stat, i) => (
-              <div key={i} className="trading-card-3d__stat">
-                <span className="trading-card-3d__stat-label">{stat.label}</span>
-                <span className="trading-card-3d__stat-value">{stat.value}</span>
-              </div>
-            ))}
-            {stats.topDomain && (
-              <div className="trading-card-3d__top-domain">
-                <span className="trading-card-3d__top-domain-label">TOP DOMAIN</span>
-                <span className="trading-card-3d__top-domain-value">
-                  {stats.topDomain.domain.length > 25
-                    ? stats.topDomain.domain.substring(0, 22) + '...'
-                    : stats.topDomain.domain}
-                </span>
-              </div>
-            )}
-          </div>
+          {/* Popular haunt */}
+          {stats.topDomain && (
+            <div className="trading-card-3d__haunt">
+              <span className="trading-card-3d__haunt-label">Popular haunt</span>
+              <span className="trading-card-3d__haunt-value">
+                {stats.topDomain.domain.length > 25
+                  ? stats.topDomain.domain.substring(0, 22) + '...'
+                  : stats.topDomain.domain}
+              </span>
+            </div>
+          )}
         </div>
       </div>
     </div>

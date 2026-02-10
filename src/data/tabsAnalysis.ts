@@ -877,29 +877,45 @@ function computeGrimReport(input: {
   // Build verdict
   const verdictParts: string[] = []
 
-  verdictParts.push(`You opened ${totalTabs} graves.`)
+  if (personality.archetype === 'unburdened') {
+    // Unburdened (<10 tabs) — lighter, cleaner verdict
+    verdictParts.push(`You opened ${totalTabs} ${totalTabs === 1 ? 'grave' : 'graves'}.`)
+    if (oneAndDonePct > 0) {
+      verdictParts.push(`${oneAndDonePct}% of your tabs were laid to rest the same day.`)
+    }
+    verdictParts.push(`You are ${personality.title} — and nothing is holding you here.`)
+  } else if (personality.archetype === 'mortab') {
+    // Mor'tab the Unending (≥1000 tabs) — ascended, reverential verdict
+    verdictParts.push('Time failed somewhere past tab 600.')
+    verdictParts.push('Nothing you opened was ever closed. It was fuel.')
+    verdictParts.push('Fuel for your insatiable hunger.')
+    verdictParts.push(`Now you've ascended to your now true form,`)
+    verdictParts.push(`We bow in your presence, O great ${personality.title}.`)
+  } else {
+    verdictParts.push(`You opened ${totalTabs} graves.`)
 
-  if (deepestSpiral) {
-    verdictParts.push(`You spiraled ${deepestSpiral.count} tabs deep into ${deepestSpiral.domain}.`)
+    if (deepestSpiral) {
+      verdictParts.push(`You spiraled ${deepestSpiral.count} tabs deep into ${deepestSpiral.domain}.`)
+    }
+
+    if (stalePct > 0) {
+      verdictParts.push(`${stalePct}% of your tabs are probably already dead.`)
+    }
+
+    if (unfinishedShopping > 0 && unfinishedJobs > 0) {
+      verdictParts.push(`You saved ${unfinishedShopping} things you'll never buy and browsed ${unfinishedJobs} jobs you'll never apply to.`)
+    } else if (unfinishedShopping > 0) {
+      verdictParts.push(`You saved ${unfinishedShopping} things you'll never buy.`)
+    } else if (unfinishedJobs > 0) {
+      verdictParts.push(`You browsed ${unfinishedJobs} jobs you'll never apply to.`)
+    }
+
+    if (oneAndDonePct > 50) {
+      verdictParts.push(`${oneAndDonePct}% of the domains you touched, you never returned to.`)
+    }
+
+    verdictParts.push(`You are ${personality.title} — and you have unfinished business.`)
   }
-
-  if (stalePct > 0) {
-    verdictParts.push(`${stalePct}% of your tabs are probably already dead.`)
-  }
-
-  if (unfinishedShopping > 0 && unfinishedJobs > 0) {
-    verdictParts.push(`You saved ${unfinishedShopping} things you'll never buy and browsed ${unfinishedJobs} jobs you'll never apply to.`)
-  } else if (unfinishedShopping > 0) {
-    verdictParts.push(`You saved ${unfinishedShopping} things you'll never buy.`)
-  } else if (unfinishedJobs > 0) {
-    verdictParts.push(`You browsed ${unfinishedJobs} jobs you'll never apply to.`)
-  }
-
-  if (oneAndDonePct > 50) {
-    verdictParts.push(`${oneAndDonePct}% of the domains you touched, you never returned to.`)
-  }
-
-  verdictParts.push(`You are ${personality.title} — and you have unfinished business.`)
 
   return {
     spirals,
