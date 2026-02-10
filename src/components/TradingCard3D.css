@@ -55,10 +55,10 @@
 
 /* ── Rarity-based border colors ── */
 .trading-card-3d[data-rarity="common"] .trading-card-3d__inner {
-  border-color: #8b6f47; /* Rich brown - earth & graves */
+  border-color: #7D6B5D; /* Grave Dust - desaturated brown */
   box-shadow:
     0 25px 70px rgba(0, 0, 0, 0.7),
-    0 8px 20px rgba(139, 111, 71, 0.25),
+    0 8px 20px rgba(125, 107, 93, 0.25),
     0 2px 5px rgba(0, 0, 0, 0.4),
     inset 0 1px 1px rgba(255, 255, 255, 0.1);
 }
@@ -67,17 +67,31 @@
   transform: translateZ(20px);
   box-shadow:
     0 40px 100px rgba(0, 0, 0, 0.9),
-    0 15px 35px rgba(139, 111, 71, 0.5),
+    0 15px 35px rgba(125, 107, 93, 0.5),
     0 5px 10px rgba(0, 0, 0, 0.6),
     inset 0 1px 1px rgba(255, 255, 255, 0.2);
 }
 
 .trading-card-3d[data-rarity="uncommon"] .trading-card-3d__inner {
-  border-color: var(--color-accent); /* Gold */
+  border-color: #43A089; /* Verdigris - oxidized copper */
+  box-shadow:
+    0 25px 70px rgba(0, 0, 0, 0.7),
+    0 8px 20px rgba(67, 160, 137, 0.3),
+    0 2px 5px rgba(0, 0, 0, 0.4),
+    inset 0 1px 1px rgba(255, 255, 255, 0.1);
+}
+
+.trading-card-3d[data-rarity="uncommon"]:hover .trading-card-3d__inner {
+  transform: translateZ(20px);
+  box-shadow:
+    0 40px 100px rgba(0, 0, 0, 0.9),
+    0 15px 35px rgba(67, 160, 137, 0.55),
+    0 5px 10px rgba(0, 0, 0, 0.6),
+    inset 0 1px 1px rgba(255, 255, 255, 0.2);
 }
 
 .trading-card-3d[data-rarity="rare"] .trading-card-3d__inner {
-  border-color: #1e3a5f; /* Dark midnight blue - death & night */
+  border-color: #1e3a5f; /* Deep Cobalt - death & night */
   box-shadow:
     0 25px 70px rgba(0, 0, 0, 0.7),
     0 8px 20px rgba(30, 58, 95, 0.35),
@@ -95,10 +109,10 @@
 }
 
 .trading-card-3d[data-rarity="epic"] .trading-card-3d__inner {
-  border-color: #20c020; /* Fluorescent green - ancient artifacts */
+  border-color: #32FF7E; /* Malignant Lime - magical radiation */
   box-shadow:
     0 25px 70px rgba(0, 0, 0, 0.7),
-    0 8px 20px rgba(32, 192, 32, 0.45),
+    0 8px 20px rgba(50, 255, 126, 0.5),
     0 2px 5px rgba(0, 0, 0, 0.4),
     inset 0 1px 1px rgba(255, 255, 255, 0.1);
 }
@@ -107,27 +121,29 @@
   transform: translateZ(20px);
   box-shadow:
     0 40px 100px rgba(0, 0, 0, 0.9),
-    0 15px 35px rgba(32, 192, 32, 0.7),
+    0 15px 35px rgba(50, 255, 126, 0.75),
     0 5px 10px rgba(0, 0, 0, 0.6),
     inset 0 1px 1px rgba(255, 255, 255, 0.2);
 }
 
 .trading-card-3d[data-rarity="legendary"] .trading-card-3d__inner {
-  border-color: #8b5cf6; /* Deep purple - necromantic power */
+  border-color: #8b5cf6; /* Void Purple - necromantic power */
   box-shadow:
     0 25px 70px rgba(0, 0, 0, 0.7),
-    0 8px 20px rgba(139, 92, 246, 0.35),
+    0 8px 20px rgba(139, 92, 246, 0.4),
     0 2px 5px rgba(0, 0, 0, 0.4),
-    inset 0 1px 1px rgba(255, 255, 255, 0.1);
+    inset 0 1px 1px rgba(255, 255, 255, 0.1),
+    inset 0 0 20px rgba(245, 211, 255, 0.15);
 }
 
 .trading-card-3d[data-rarity="legendary"]:hover .trading-card-3d__inner {
   transform: translateZ(20px);
   box-shadow:
     0 40px 100px rgba(0, 0, 0, 0.9),
-    0 15px 35px rgba(139, 92, 246, 0.6),
+    0 15px 35px rgba(139, 92, 246, 0.7),
     0 5px 10px rgba(0, 0, 0, 0.6),
-    inset 0 1px 1px rgba(255, 255, 255, 0.2);
+    inset 0 1px 1px rgba(255, 255, 255, 0.2),
+    inset 0 0 30px rgba(245, 211, 255, 0.25);
 }
 
 /* ── Holographic overlay effect — moves with mouse ── */
@@ -237,11 +253,19 @@
 
 /* ── Rarity badge colors ── */
 .trading-card-3d[data-rarity="common"] .trading-card-3d__rarity {
-  border-color: #8b6f47;
+  border-color: #7D6B5D;
 }
 
 .trading-card-3d[data-rarity="common"] .trading-card-3d__rarity span {
-  color: #8b6f47;
+  color: #7D6B5D;
+}
+
+.trading-card-3d[data-rarity="uncommon"] .trading-card-3d__rarity {
+  border-color: #43A089;
+}
+
+.trading-card-3d[data-rarity="uncommon"] .trading-card-3d__rarity span {
+  color: #43A089;
 }
 
 .trading-card-3d[data-rarity="rare"] .trading-card-3d__rarity {
@@ -253,11 +277,11 @@
 }
 
 .trading-card-3d[data-rarity="epic"] .trading-card-3d__rarity {
-  border-color: #20c020;
+  border-color: #32FF7E;
 }
 
 .trading-card-3d[data-rarity="epic"] .trading-card-3d__rarity span {
-  color: #20c020;
+  color: #32FF7E;
 }
 
 .trading-card-3d[data-rarity="legendary"] .trading-card-3d__rarity {
@@ -328,6 +352,32 @@
   font-size: var(--text-sm);
   font-weight: 700;
   color: var(--color-accent);
+}
+
+/* ── Rarity-specific title and domain colors ── */
+.trading-card-3d[data-rarity="common"] .trading-card-3d__title,
+.trading-card-3d[data-rarity="common"] .trading-card-3d__haunt-value {
+  color: #7D6B5D;
+}
+
+.trading-card-3d[data-rarity="uncommon"] .trading-card-3d__title,
+.trading-card-3d[data-rarity="uncommon"] .trading-card-3d__haunt-value {
+  color: #43A089;
+}
+
+.trading-card-3d[data-rarity="rare"] .trading-card-3d__title,
+.trading-card-3d[data-rarity="rare"] .trading-card-3d__haunt-value {
+  color: #5a8cc8;
+}
+
+.trading-card-3d[data-rarity="epic"] .trading-card-3d__title,
+.trading-card-3d[data-rarity="epic"] .trading-card-3d__haunt-value {
+  color: #32FF7E;
+}
+
+.trading-card-3d[data-rarity="legendary"] .trading-card-3d__title,
+.trading-card-3d[data-rarity="legendary"] .trading-card-3d__haunt-value {
+  color: #8b5cf6;
 }
 
 /* ── Responsive ── */
