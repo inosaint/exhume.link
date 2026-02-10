@@ -67,6 +67,7 @@ export default function App() {
   const [analysisStepIndex, setAnalysisStepIndex] = useState(0)
   const [analysisError, setAnalysisError] = useState<string | null>(null)
   const [session, setSession] = useState<ExhumeSession | null>(null)
+  const [footerVisible, setFooterVisible] = useState(false)
 
   const isUnburdened = session?.personality.archetype === 'unburdened'
   const sections = useMemo(() => {
@@ -93,14 +94,36 @@ export default function App() {
   useEffect(() => {
     if (session) {
       posthog.capture('archetype_generated', {
-        archetype: session.personality.archetype,
-        archetype_title: session.personality.title,
+        archetype: session.personality.title,
+        archetype_id: session.personality.archetype,
         total_tabs: session.stats.totalTabs,
         unique_domains: session.stats.uniqueDomains,
         flow_variant: flow,
       })
     }
   }, [session, flow])
+
+  // Delay footer appearance when entering personality to prevent layout jump
+  useEffect(() => {
+    const shouldShowFooter =
+      currentSection === 'personality' ||
+      currentSection === 'numbers' ||
+      currentSection === 'cemetery' ||
+      currentSection === 'worldmap' ||
+      currentSection === 'hexmap' ||
+      currentSection === 'grimreport' ||
+      currentSection === 'share'
+
+    if (!shouldShowFooter) {
+      setFooterVisible(false)
+      return
+    }
+
+    // Add delay for personality section to sync with text fade-in
+    const delay = currentSection === 'personality' ? 400 : 0
+    const timer = setTimeout(() => setFooterVisible(true), delay)
+    return () => clearTimeout(timer)
+  }, [currentSection])
 
   const currentIndex = Math.max(0, sections.findIndex(s => s.id === currentSection))
   const isShareSection = currentSection === 'share'
@@ -159,15 +182,6 @@ export default function App() {
       setCurrentSection('landing')
     }
   }, [analysisStatus])
-
-  const showFooter =
-    currentSection === 'personality' ||
-    currentSection === 'numbers' ||
-    currentSection === 'cemetery' ||
-    currentSection === 'worldmap' ||
-    currentSection === 'hexmap' ||
-    currentSection === 'grimreport' ||
-    currentSection === 'share'
 
   return (
     <div className={`app app--${currentSection}`}>
@@ -228,7 +242,7 @@ export default function App() {
             )}
 
             {currentSection === 'personality' && session && (
-              <Personality report={session.grimReport} />
+              <Personality report={session.grimReport} personality={session.personality} />
             )}
 
             {currentSection === 'numbers' && session && (
@@ -269,7 +283,7 @@ export default function App() {
       </main>
 
       {/* ── Nav footer (single centered button) ── */}
-      {showFooter && (
+      {footerVisible && (
         <footer className="nav-footer">
           <button
             className={`nav-footer__cta${isShareSection ? ' nav-footer__cta--share' : ''}`}

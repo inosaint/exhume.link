@@ -77,6 +77,7 @@ export function TradingCard3D({ profile, stats }: TradingCard3DProps) {
       <div
         ref={cardRef}
         className="trading-card-3d"
+        data-rarity={rarity.toLowerCase()}
         style={{
           transform: `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`,
           transition: isHovering ? 'none' : 'transform 0.5s ease-out',
