@@ -13,6 +13,7 @@ interface LandingProps {
 export function Landing({ isBusy, error, sampleText, onBegin }: LandingProps) {
   const [text, setText] = useState('')
   const [file, setFile] = useState<File | null>(null)
+  const [showPrivacy, setShowPrivacy] = useState(false)
 
   const hasUrl = useMemo(() => URL_PATTERN.test(text), [text])
   const canSubmit = hasUrl || !!file
@@ -99,8 +100,65 @@ export function Landing({ isBusy, error, sampleText, onBegin }: LandingProps) {
 
           <p className="surface__note">
             Analysis runs locally in your browser. No links are uploaded.
+            <br />
+            We collect anonymous analytics to improve the experience.{' '}
+            <button
+              type="button"
+              className="surface__note-link"
+              onClick={() => setShowPrivacy(true)}
+            >
+              Privacy policy
+            </button>
           </p>
         </form>
+
+        {showPrivacy && (
+          <div className="privacy-modal" onClick={() => setShowPrivacy(false)}>
+            <div className="privacy-modal__content" onClick={(e) => e.stopPropagation()}>
+              <h2 className="privacy-modal__title">Privacy & Data Collection</h2>
+
+              <div className="privacy-modal__body">
+                <section>
+                  <h3>What We Collect</h3>
+                  <p>We collect anonymous analytics to improve the tool:</p>
+                  <ul>
+                    <li><strong>Usage analytics:</strong> Which sections you visit, navigation patterns</li>
+                    <li><strong>Archetype results:</strong> The personality type generated</li>
+                    <li><strong>Statistics:</strong> Tab counts and domain counts (no specific URLs)</li>
+                    <li><strong>Device info:</strong> Mobile or desktop</li>
+                    <li><strong>Location:</strong> Country of origin</li>
+                  </ul>
+                </section>
+
+                <section>
+                  <h3>What We Don't Collect</h3>
+                  <ul>
+                    <li><strong>Your URLs:</strong> Never recorded or sent to servers</li>
+                    <li><strong>Personal information:</strong> No emails, names, or identifiers</li>
+                    <li><strong>File contents:</strong> Processed locally, never uploaded</li>
+                  </ul>
+                </section>
+
+                <section>
+                  <h3>How It Works</h3>
+                  <p>
+                    All tab analysis happens <strong>in your browser</strong>. Your URLs and data
+                    are processed locally and never uploaded. Only anonymous analytics events
+                    (like "viewed personality section" or "archetype: collector") are sent to PostHog.
+                  </p>
+                </section>
+              </div>
+
+              <button
+                className="privacy-modal__close"
+                onClick={() => setShowPrivacy(false)}
+                type="button"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        )}
 
         {error && (
           <div className="error-toast" role="alert">

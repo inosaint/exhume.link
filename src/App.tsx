@@ -1,4 +1,4 @@
-import { useMemo, useState, useCallback } from 'react'
+import { useMemo, useState, useCallback, useEffect } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Agentation } from 'agentation'
 import { type FlowVariant, type SectionId, SECTIONS_A, SECTIONS_B, SECTIONS_C } from './sections/config'
@@ -14,6 +14,7 @@ import { NecropolisMap } from './sections/NecropolisMap'
 import { HexMap } from './sections/HexMap'
 import { GrimReport } from './sections/GrimReport'
 import { Share } from './sections/Share'
+import { posthog } from './lib/posthog'
 import './App.css'
 
 const prefersReducedMotion =
@@ -76,6 +77,30 @@ export default function App() {
       s.id === 'landing' || s.id === 'processing' || s.id === 'personality' || s.id === 'share'
     )
   }, [flow, isUnburdened])
+
+  // Track section changes for funnel analysis
+  useEffect(() => {
+    if (currentSection !== 'processing') {
+      posthog.capture('$pageview', {
+        section: currentSection,
+        phase_title: PHASE_TITLES[currentSection],
+        flow_variant: flow,
+      })
+    }
+  }, [currentSection, flow])
+
+  // Track archetype generation when session is created
+  useEffect(() => {
+    if (session) {
+      posthog.capture('archetype_generated', {
+        archetype: session.personality.archetype,
+        archetype_title: session.personality.title,
+        total_tabs: session.stats.totalTabs,
+        unique_domains: session.stats.uniqueDomains,
+        flow_variant: flow,
+      })
+    }
+  }, [session, flow])
 
   const currentIndex = Math.max(0, sections.findIndex(s => s.id === currentSection))
   const isShareSection = currentSection === 'share'
