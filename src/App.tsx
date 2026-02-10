@@ -1,7 +1,7 @@
 import { useMemo, useState, useCallback, useEffect } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Agentation } from 'agentation'
-import { type FlowVariant, type SectionId, SECTIONS_A, SECTIONS_B, SECTIONS_C } from './sections/config'
+import { type SectionId, SECTIONS } from './sections/config'
 import { analyzeInputToSession, extractUrlsFromText, type ExhumeSession } from './data/tabsAnalysis'
 import SAMPLE_TABS from '../browserdata/all_tabs_clean.txt?raw'
 import { Landing } from './sections/Landing'
@@ -9,9 +9,6 @@ import { Processing } from './sections/Processing'
 import { Personality } from './sections/Personality'
 import { Numbers } from './sections/Numbers'
 import { Cemetery } from './sections/Cemetery'
-import { WorldMap } from './sections/WorldMap'
-import { NecropolisMap } from './sections/NecropolisMap'
-import { HexMap } from './sections/HexMap'
 import { GrimReport } from './sections/GrimReport'
 import { Share } from './sections/Share'
 import { posthog } from './lib/posthog'
@@ -39,29 +36,11 @@ const PHASE_TITLES: Partial<Record<SectionId, string>> = {
   personality: 'The Verdict',
   numbers: 'Ledger Reading',
   cemetery: 'Cemetery Assembly',
-  worldmap: 'Territory Alignment',
-  hexmap: 'Territory Alignment',
   grimreport: 'Bone Reading',
   share: 'Archetype Binding',
 }
 
-function resolveFlowVariant(): FlowVariant {
-  if (typeof window === 'undefined') return 'a'
-
-  const params = new URLSearchParams(window.location.search)
-  const fromUrl = params.get('flow')
-  if (fromUrl === 'a' || fromUrl === 'b' || fromUrl === 'c') {
-    window.localStorage.setItem('exhume.flow', fromUrl)
-    return fromUrl
-  }
-
-  // Default to flow A for now (still overridable via `?flow=b` or `?flow=c`).
-  window.localStorage.setItem('exhume.flow', 'a')
-  return 'a'
-}
-
 export default function App() {
-  const [flow] = useState<FlowVariant>(() => resolveFlowVariant())
   const [currentSection, setCurrentSection] = useState<SectionId>('landing')
   const [analysisStatus, setAnalysisStatus] = useState<AnalysisStatus>('idle')
   const [analysisStepIndex, setAnalysisStepIndex] = useState(0)
@@ -71,13 +50,12 @@ export default function App() {
 
   const isUnburdened = session?.personality.archetype === 'unburdened'
   const sections = useMemo(() => {
-    const base = flow === 'c' ? SECTIONS_C : flow === 'b' ? SECTIONS_B : SECTIONS_A
-    if (!isUnburdened) return base
+    if (!isUnburdened) return SECTIONS
     // Unburdened: skip analysis sections — verdict straight to share
-    return base.filter(s =>
+    return SECTIONS.filter(s =>
       s.id === 'landing' || s.id === 'processing' || s.id === 'personality' || s.id === 'share'
     )
-  }, [flow, isUnburdened])
+  }, [isUnburdened])
 
   // Track section changes for funnel analysis
   useEffect(() => {
@@ -85,10 +63,9 @@ export default function App() {
       posthog.capture('$pageview', {
         section: currentSection,
         phase_title: PHASE_TITLES[currentSection],
-        flow_variant: flow,
       })
     }
-  }, [currentSection, flow])
+  }, [currentSection])
 
   // Track archetype generation when session is created
   useEffect(() => {
@@ -98,10 +75,9 @@ export default function App() {
         archetype_id: session.personality.archetype,
         total_tabs: session.stats.totalTabs,
         unique_domains: session.stats.uniqueDomains,
-        flow_variant: flow,
       })
     }
-  }, [session, flow])
+  }, [session])
 
   // Delay footer appearance when entering personality to prevent layout jump
   useEffect(() => {
@@ -109,8 +85,6 @@ export default function App() {
       currentSection === 'personality' ||
       currentSection === 'numbers' ||
       currentSection === 'cemetery' ||
-      currentSection === 'worldmap' ||
-      currentSection === 'hexmap' ||
       currentSection === 'grimreport' ||
       currentSection === 'share'
 
@@ -253,24 +227,6 @@ export default function App() {
               <Cemetery groups={session.categoryGroups} />
             )}
 
-            {currentSection === 'worldmap' && session && (
-              flow === 'b' ? (
-                <WorldMap
-                  locations={session.locations}
-                  tabs={session.tabs}
-                  title="The Web"
-                  subtitle="A spiderweb of the domains we could map. The rest remain unmarked."
-                  mode="web"
-                />
-              ) : (
-                <NecropolisMap groups={session.categoryGroups} />
-              )
-            )}
-
-            {currentSection === 'hexmap' && session && (
-              <HexMap groups={session.categoryGroups} />
-            )}
-
             {currentSection === 'grimreport' && session && (
               <GrimReport report={session.grimReport} />
             )}
@@ -298,12 +254,10 @@ export default function App() {
                 : currentSection === 'numbers'
                   ? 'Visit Your Tab Cemetery ↓'
                   : currentSection === 'cemetery'
-                    ? (flow === 'c' ? 'Enter the Hex ↓' : flow === 'a' ? 'Bind Your Archetype ↓' : 'Visit the Global Dead ↓')
+                    ? 'Bind Your Archetype ↓'
                     : currentSection === 'grimreport'
                       ? 'Prepare the Rite ↓'
-                      : currentSection === 'worldmap' || currentSection === 'hexmap'
-                        ? 'Prepare the Rite ↓'
-                        : 'Continue ↓'}
+                      : 'Continue ↓'}
           </button>
         </footer>
       )}
