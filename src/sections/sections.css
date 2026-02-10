@@ -651,7 +651,7 @@
 
 @media (min-width: 769px) {
   .stat-card__label {
-    gap: 0.25em;
+    letter-spacing: 0;
   }
 }
 
