@@ -148,7 +148,7 @@ const ARCHETYPES: Record<
     baseTitle: 'Mor\'tab the Unending',
     description:
       'You have crossed the threshold. A thousand tabs or more, all coexisting in impossible equilibrium. Not chaos — something older. You no longer manage tabs. They orbit you.',
-    image: '/mortab.png',
+    image: '/mortabtheunending.png',
   },
 }
 
