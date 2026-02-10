@@ -55,10 +55,10 @@
 
 /* ── Rarity-based border colors ── */
 .trading-card-3d[data-rarity="common"] .trading-card-3d__inner {
-  border-color: #a8a8b0; /* Silver */
+  border-color: #8b6f47; /* Rich brown - earth & graves */
   box-shadow:
     0 25px 70px rgba(0, 0, 0, 0.7),
-    0 8px 20px rgba(168, 168, 176, 0.25),
+    0 8px 20px rgba(139, 111, 71, 0.25),
     0 2px 5px rgba(0, 0, 0, 0.4),
     inset 0 1px 1px rgba(255, 255, 255, 0.1);
 }
@@ -67,7 +67,7 @@
   transform: translateZ(20px);
   box-shadow:
     0 40px 100px rgba(0, 0, 0, 0.9),
-    0 15px 35px rgba(168, 168, 176, 0.5),
+    0 15px 35px rgba(139, 111, 71, 0.5),
     0 5px 10px rgba(0, 0, 0, 0.6),
     inset 0 1px 1px rgba(255, 255, 255, 0.2);
 }
@@ -237,11 +237,11 @@
 
 /* ── Rarity badge colors ── */
 .trading-card-3d[data-rarity="common"] .trading-card-3d__rarity {
-  border-color: #a8a8b0;
+  border-color: #8b6f47;
 }
 
 .trading-card-3d[data-rarity="common"] .trading-card-3d__rarity span {
-  color: #a8a8b0;
+  color: #8b6f47;
 }
 
 .trading-card-3d[data-rarity="rare"] .trading-card-3d__rarity {
