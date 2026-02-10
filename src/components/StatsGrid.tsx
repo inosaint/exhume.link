@@ -148,9 +148,9 @@ export function StatsGrid({ stats, grimReport }: { stats: ExhumeStats; grimRepor
     : '—'
 
   const defs: StatDef[] = [
-    { label: 'Graves Dug', icon: ICONS.tab, value: stats.totalTabs, suffix: '', tooltip: 'Total number of browser tabs exhumed from your browsing history.' },
-    { label: 'Bloodlines Buried', icon: ICONS.globe, value: stats.uniqueDomains, suffix: '', tooltip: 'Unique websites you visited — each domain is a distinct bloodline.' },
-    { label: 'Restless Spirits', icon: ICONS.search, value: stats.unresolvedSearches, suffix: '', tooltip: 'Searches you started but never followed through on — questions left unanswered.' },
+    { label: 'Graves Dug', icon: ICONS.tab, value: stats.totalTabs ?? 0, suffix: '', tooltip: 'Total number of browser tabs exhumed from your browsing history.' },
+    { label: 'Bloodlines Buried', icon: ICONS.globe, value: stats.uniqueDomains ?? 0, suffix: '', tooltip: 'Unique websites you visited — each domain is a distinct bloodline.' },
+    { label: 'Restless Spirits', icon: ICONS.search, value: stats.unresolvedSearches ?? 0, suffix: '', tooltip: 'Searches you started but never followed through on — questions left unanswered.' },
   ]
 
   // Insert Rot right after Restless Spirits so they stack nicely on mobile
@@ -164,22 +164,25 @@ export function StatsGrid({ stats, grimReport }: { stats: ExhumeStats; grimRepor
     })
   }
 
+  const dominantRealmCount = topCategory?.count ?? 0
+  const popularHauntsCount = topDomain?.count ?? 0
+
   defs.push(
     {
       label: 'Dominant Realm',
       icon: ICONS.realm,
-      value: topCategory?.count ?? 0,
-      suffix: ' graves',
-      note: realmName,
+      value: dominantRealmCount,
+      suffix: dominantRealmCount === 0 ? '' : ' graves',
+      note: dominantRealmCount === 0 ? '—' : realmName,
       variant: 'domain',
       tooltip: 'The category of websites you visited most — your ruling domain in the digital afterlife.',
     },
     {
       label: 'Your Popular Haunts',
       icon: ICONS.crown,
-      value: topDomain?.count ?? 0,
-      suffix: ' graves dug',
-      note: topDomain?.domain ?? '—',
+      value: popularHauntsCount,
+      suffix: popularHauntsCount === 0 ? '' : ' graves dug',
+      note: popularHauntsCount === 0 ? '—' : (topDomain?.domain ?? '—'),
       variant: 'domain',
       tooltip: 'The single website you returned to most — your favourite haunt.',
     },
