@@ -142,7 +142,7 @@ const ARCHETYPES: Record<
     baseTitle: 'The Unburdened',
     description:
       'Fewer than ten tabs. You travel light through the digital world — or you just got here. Either way, the graves are shallow.',
-    image: '/unburdened.png',
+    image: '/theunburdened.png',
   },
   mortab: {
     baseTitle: 'Mor\'tab the Unending',
