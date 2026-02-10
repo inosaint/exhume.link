@@ -77,24 +77,6 @@
 }
 
 .trading-card-3d[data-rarity="rare"] .trading-card-3d__inner {
-  border-color: #8b5cf6; /* Deep purple - necromantic magic */
-  box-shadow:
-    0 25px 70px rgba(0, 0, 0, 0.7),
-    0 8px 20px rgba(139, 92, 246, 0.35),
-    0 2px 5px rgba(0, 0, 0, 0.4),
-    inset 0 1px 1px rgba(255, 255, 255, 0.1);
-}
-
-.trading-card-3d[data-rarity="rare"]:hover .trading-card-3d__inner {
-  transform: translateZ(20px);
-  box-shadow:
-    0 40px 100px rgba(0, 0, 0, 0.9),
-    0 15px 35px rgba(139, 92, 246, 0.6),
-    0 5px 10px rgba(0, 0, 0, 0.6),
-    inset 0 1px 1px rgba(255, 255, 255, 0.2);
-}
-
-.trading-card-3d[data-rarity="epic"] .trading-card-3d__inner {
   border-color: #1e3a5f; /* Dark midnight blue - death & night */
   box-shadow:
     0 25px 70px rgba(0, 0, 0, 0.7),
@@ -103,7 +85,7 @@
     inset 0 1px 1px rgba(255, 255, 255, 0.1);
 }
 
-.trading-card-3d[data-rarity="epic"]:hover .trading-card-3d__inner {
+.trading-card-3d[data-rarity="rare"]:hover .trading-card-3d__inner {
   transform: translateZ(20px);
   box-shadow:
     0 40px 100px rgba(0, 0, 0, 0.9),
@@ -112,11 +94,29 @@
     inset 0 1px 1px rgba(255, 255, 255, 0.2);
 }
 
-.trading-card-3d[data-rarity="legendary"] .trading-card-3d__inner {
-  border-color: #20c020; /* Darker fluorescent green - decay & ancient artifacts */
+.trading-card-3d[data-rarity="epic"] .trading-card-3d__inner {
+  border-color: #20c020; /* Fluorescent green - ancient artifacts */
   box-shadow:
     0 25px 70px rgba(0, 0, 0, 0.7),
     0 8px 20px rgba(32, 192, 32, 0.45),
+    0 2px 5px rgba(0, 0, 0, 0.4),
+    inset 0 1px 1px rgba(255, 255, 255, 0.1);
+}
+
+.trading-card-3d[data-rarity="epic"]:hover .trading-card-3d__inner {
+  transform: translateZ(20px);
+  box-shadow:
+    0 40px 100px rgba(0, 0, 0, 0.9),
+    0 15px 35px rgba(32, 192, 32, 0.7),
+    0 5px 10px rgba(0, 0, 0, 0.6),
+    inset 0 1px 1px rgba(255, 255, 255, 0.2);
+}
+
+.trading-card-3d[data-rarity="legendary"] .trading-card-3d__inner {
+  border-color: #8b5cf6; /* Deep purple - necromantic power */
+  box-shadow:
+    0 25px 70px rgba(0, 0, 0, 0.7),
+    0 8px 20px rgba(139, 92, 246, 0.35),
     0 2px 5px rgba(0, 0, 0, 0.4),
     inset 0 1px 1px rgba(255, 255, 255, 0.1);
 }
@@ -125,7 +125,7 @@
   transform: translateZ(20px);
   box-shadow:
     0 40px 100px rgba(0, 0, 0, 0.9),
-    0 15px 35px rgba(32, 192, 32, 0.7),
+    0 15px 35px rgba(139, 92, 246, 0.6),
     0 5px 10px rgba(0, 0, 0, 0.6),
     inset 0 1px 1px rgba(255, 255, 255, 0.2);
 }
@@ -245,27 +245,27 @@
 }
 
 .trading-card-3d[data-rarity="rare"] .trading-card-3d__rarity {
-  border-color: #8b5cf6;
-}
-
-.trading-card-3d[data-rarity="rare"] .trading-card-3d__rarity span {
-  color: #8b5cf6;
-}
-
-.trading-card-3d[data-rarity="epic"] .trading-card-3d__rarity {
   border-color: #1e3a5f;
 }
 
-.trading-card-3d[data-rarity="epic"] .trading-card-3d__rarity span {
+.trading-card-3d[data-rarity="rare"] .trading-card-3d__rarity span {
   color: #5a8cc8;
 }
 
-.trading-card-3d[data-rarity="legendary"] .trading-card-3d__rarity {
+.trading-card-3d[data-rarity="epic"] .trading-card-3d__rarity {
   border-color: #20c020;
 }
 
-.trading-card-3d[data-rarity="legendary"] .trading-card-3d__rarity span {
+.trading-card-3d[data-rarity="epic"] .trading-card-3d__rarity span {
   color: #20c020;
+}
+
+.trading-card-3d[data-rarity="legendary"] .trading-card-3d__rarity {
+  border-color: #8b5cf6;
+}
+
+.trading-card-3d[data-rarity="legendary"] .trading-card-3d__rarity span {
+  color: #8b5cf6;
 }
 
 /* ── Title ── */
