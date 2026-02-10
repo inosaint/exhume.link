@@ -48,6 +48,71 @@
     inset 0 1px 1px rgba(255, 255, 255, 0.15);
 }
 
+/* ── Rarity-based border colors ── */
+.trading-card-3d[data-rarity="common"] .trading-card-3d__inner {
+  border-color: #a8a8b0; /* Silver */
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.6),
+    0 5px 15px rgba(168, 168, 176, 0.2),
+    inset 0 1px 1px rgba(255, 255, 255, 0.1);
+}
+
+.trading-card-3d[data-rarity="common"]:hover .trading-card-3d__inner {
+  box-shadow:
+    0 30px 80px rgba(0, 0, 0, 0.8),
+    0 10px 25px rgba(168, 168, 176, 0.4),
+    inset 0 1px 1px rgba(255, 255, 255, 0.15);
+}
+
+.trading-card-3d[data-rarity="uncommon"] .trading-card-3d__inner {
+  border-color: var(--color-accent); /* Gold */
+}
+
+.trading-card-3d[data-rarity="rare"] .trading-card-3d__inner {
+  border-color: #8b5cf6; /* Deep purple - necromantic magic */
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.6),
+    0 5px 15px rgba(139, 92, 246, 0.3),
+    inset 0 1px 1px rgba(255, 255, 255, 0.1);
+}
+
+.trading-card-3d[data-rarity="rare"]:hover .trading-card-3d__inner {
+  box-shadow:
+    0 30px 80px rgba(0, 0, 0, 0.8),
+    0 10px 25px rgba(139, 92, 246, 0.5),
+    inset 0 1px 1px rgba(255, 255, 255, 0.15);
+}
+
+.trading-card-3d[data-rarity="epic"] .trading-card-3d__inner {
+  border-color: #1e3a5f; /* Dark midnight blue - death & night */
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.6),
+    0 5px 15px rgba(30, 58, 95, 0.3),
+    inset 0 1px 1px rgba(255, 255, 255, 0.1);
+}
+
+.trading-card-3d[data-rarity="epic"]:hover .trading-card-3d__inner {
+  box-shadow:
+    0 30px 80px rgba(0, 0, 0, 0.8),
+    0 10px 25px rgba(30, 58, 95, 0.5),
+    inset 0 1px 1px rgba(255, 255, 255, 0.15);
+}
+
+.trading-card-3d[data-rarity="legendary"] .trading-card-3d__inner {
+  border-color: #39ff14; /* Fluorescent green - decay & ancient artifacts */
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.6),
+    0 5px 15px rgba(57, 255, 20, 0.3),
+    inset 0 1px 1px rgba(255, 255, 255, 0.1);
+}
+
+.trading-card-3d[data-rarity="legendary"]:hover .trading-card-3d__inner {
+  box-shadow:
+    0 30px 80px rgba(0, 0, 0, 0.8),
+    0 10px 25px rgba(57, 255, 20, 0.5),
+    inset 0 1px 1px rgba(255, 255, 255, 0.15);
+}
+
 /* ── Holographic overlay effect — moves with mouse ── */
 .trading-card-3d__holo {
   position: absolute;
@@ -148,6 +213,39 @@
   color: var(--color-accent);
   letter-spacing: 0.11em;
   text-transform: uppercase;
+}
+
+/* ── Rarity badge colors ── */
+.trading-card-3d[data-rarity="common"] .trading-card-3d__rarity {
+  border-color: #a8a8b0;
+}
+
+.trading-card-3d[data-rarity="common"] .trading-card-3d__rarity span {
+  color: #a8a8b0;
+}
+
+.trading-card-3d[data-rarity="rare"] .trading-card-3d__rarity {
+  border-color: #8b5cf6;
+}
+
+.trading-card-3d[data-rarity="rare"] .trading-card-3d__rarity span {
+  color: #8b5cf6;
+}
+
+.trading-card-3d[data-rarity="epic"] .trading-card-3d__rarity {
+  border-color: #1e3a5f;
+}
+
+.trading-card-3d[data-rarity="epic"] .trading-card-3d__rarity span {
+  color: #5a8cc8;
+}
+
+.trading-card-3d[data-rarity="legendary"] .trading-card-3d__rarity {
+  border-color: #39ff14;
+}
+
+.trading-card-3d[data-rarity="legendary"] .trading-card-3d__rarity span {
+  color: #39ff14;
 }
 
 /* ── Title ── */
