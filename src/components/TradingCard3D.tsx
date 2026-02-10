@@ -19,12 +19,10 @@ export function TradingCard3D({ profile, stats }: TradingCard3DProps) {
     const card = cardRef.current
     if (!card) return
 
-    const handleMouseMove = (e: MouseEvent) => {
-      if (!isHovering) return
-
+    const updateRotation = (clientX: number, clientY: number) => {
       const rect = card.getBoundingClientRect()
-      const x = e.clientX - rect.left
-      const y = e.clientY - rect.top
+      const x = clientX - rect.left
+      const y = clientY - rect.top
 
       const centerX = rect.width / 2
       const centerY = rect.height / 2
@@ -32,7 +30,7 @@ export function TradingCard3D({ profile, stats }: TradingCard3DProps) {
       const rotateXValue = ((y - centerY) / centerY) * -15
       const rotateYValue = ((x - centerX) / centerX) * 15
 
-      // Calculate mouse position as percentage for gradient positioning
+      // Calculate position as percentage for gradient positioning
       const mouseXPercent = (x / rect.width) * 100
       const mouseYPercent = (y / rect.height) * 100
 
@@ -42,7 +40,7 @@ export function TradingCard3D({ profile, stats }: TradingCard3DProps) {
       setMouseY(mouseYPercent)
     }
 
-    const handleMouseLeave = () => {
+    const resetRotation = () => {
       setIsHovering(false)
       setRotateX(0)
       setRotateY(0)
@@ -50,18 +48,47 @@ export function TradingCard3D({ profile, stats }: TradingCard3DProps) {
       setMouseY(50)
     }
 
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isHovering) return
+      updateRotation(e.clientX, e.clientY)
+    }
+
     const handleMouseEnter = () => {
       setIsHovering(true)
     }
 
+    // Touch support for mobile
+    const handleTouchStart = (e: TouchEvent) => {
+      setIsHovering(true)
+      const touch = e.touches[0]
+      updateRotation(touch.clientX, touch.clientY)
+    }
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (!isHovering) return
+      e.preventDefault()
+      const touch = e.touches[0]
+      updateRotation(touch.clientX, touch.clientY)
+    }
+
+    const handleTouchEnd = () => {
+      resetRotation()
+    }
+
     card.addEventListener('mousemove', handleMouseMove)
-    card.addEventListener('mouseleave', handleMouseLeave)
+    card.addEventListener('mouseleave', resetRotation)
     card.addEventListener('mouseenter', handleMouseEnter)
+    card.addEventListener('touchstart', handleTouchStart, { passive: true })
+    card.addEventListener('touchmove', handleTouchMove, { passive: false })
+    card.addEventListener('touchend', handleTouchEnd)
 
     return () => {
       card.removeEventListener('mousemove', handleMouseMove)
-      card.removeEventListener('mouseleave', handleMouseLeave)
+      card.removeEventListener('mouseleave', resetRotation)
       card.removeEventListener('mouseenter', handleMouseEnter)
+      card.removeEventListener('touchstart', handleTouchStart)
+      card.removeEventListener('touchmove', handleTouchMove)
+      card.removeEventListener('touchend', handleTouchEnd)
     }
   }, [isHovering])
 

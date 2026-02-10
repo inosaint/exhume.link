@@ -21,6 +21,7 @@
   position: relative;
   cursor: pointer;
   transform-style: preserve-3d;
+  touch-action: manipulation;
 }
 
 .trading-card-3d__inner {

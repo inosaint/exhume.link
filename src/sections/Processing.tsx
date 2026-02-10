@@ -91,6 +91,20 @@ export function Processing({
     rafRef.current = requestAnimationFrame(tick)
   }, [])
 
+  // Timed fallback when audio analysis isn't available
+  const timedFallbackRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const timedFallback = useCallback((totalLines: number) => {
+    let current = visibleRef.current
+    timedFallbackRef.current = setInterval(() => {
+      current++
+      visibleRef.current = current
+      setVisibleCount(current)
+      if (current >= totalLines && timedFallbackRef.current) {
+        clearInterval(timedFallbackRef.current)
+      }
+    }, 1800)
+  }, [])
+
   // Start audio + analyser on mount, hard stop on unmount
   useEffect(() => {
     if (reducedMotion) {
@@ -114,21 +128,33 @@ export function Processing({
     analyserRef.current = analyser
 
     audio.play()
-      .then(() => detectDigs(lines.length))
+      .then(() => {
+        // Chrome autoplay policy: audio.play() can resolve but AudioContext
+        // stays suspended without a user gesture. In that case the analyser
+        // returns silence and digs are never detected — fall back to timed.
+        if (ctx.state === 'suspended') {
+          ctx.resume().catch(() => {})
+          // Give it a moment — if still suspended, fall back
+          setTimeout(() => {
+            if (ctxRef.current?.state === 'suspended') {
+              timedFallback(lines.length)
+            } else {
+              detectDigs(lines.length)
+            }
+          }, 200)
+        } else {
+          detectDigs(lines.length)
+        }
+      })
       .catch(() => {
         // Autoplay blocked — fall back to timed reveals
-        let current = 0
-        const fallback = setInterval(() => {
-          current++
-          visibleRef.current = current
-          setVisibleCount(current)
-          if (current >= lines.length) clearInterval(fallback)
-        }, 1800)
+        timedFallback(lines.length)
       })
 
     return () => {
       // Hard stop on unmount
       cancelAnimationFrame(rafRef.current)
+      if (timedFallbackRef.current) clearInterval(timedFallbackRef.current)
       audio.pause()
       audio.currentTime = 0
       audioRef.current = null
@@ -136,7 +162,7 @@ export function Processing({
       ctx.close().catch(() => {})
       ctxRef.current = null
     }
-  }, [lines.length, reducedMotion, detectDigs])
+  }, [lines.length, reducedMotion, detectDigs, timedFallback])
 
   // Auto-advance once analysis is done AND at least 3 lines are visible
   useEffect(() => {
