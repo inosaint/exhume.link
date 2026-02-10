@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type ReactElement } from 'react'
 import type { GrimReport, PersonalityProfile } from '../data/tabsAnalysis'
 import './sections.css'
 
@@ -11,8 +11,8 @@ interface PersonalityProps {
  * Parse verdict text and highlight the archetype title and numbers in gold.
  * Returns an array of text and span elements for rendering.
  */
-function highlightVerdict(verdict: string, title: string): (string | JSX.Element)[] {
-  const parts: (string | JSX.Element)[] = []
+function highlightVerdict(verdict: string, title: string): (string | ReactElement)[] {
+  const parts: (string | ReactElement)[] = []
   let lastIndex = 0
   let keyCounter = 0
 

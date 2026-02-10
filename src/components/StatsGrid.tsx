@@ -154,7 +154,7 @@ export function StatsGrid({ stats, grimReport }: { stats: ExhumeStats; grimRepor
   ]
 
   // Insert Rot right after Restless Spirits so they stack nicely on mobile
-  if (grimReport && grimReport.stalePct > 0) {
+  if (grimReport && grimReport.stalePct != null) {
     defs.push({
       label: 'The Rot',
       icon: ICONS.skull,
