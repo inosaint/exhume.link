@@ -119,8 +119,8 @@ export default function App() {
       return
     }
 
-    // Add delay for personality section to appear after text is fully visible
-    const delay = currentSection === 'personality' ? 3000 : 0
+    // Add delay for personality section to sync with text fade-in
+    const delay = currentSection === 'personality' ? 400 : 0
     const timer = setTimeout(() => setFooterVisible(true), delay)
     return () => clearTimeout(timer)
   }, [currentSection])
