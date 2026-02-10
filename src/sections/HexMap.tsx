@@ -16,6 +16,9 @@ type LayoutMode = 'force' | 'hexbin'
 /** Default zoom scale — closer, map-like intimacy */
 const DEFAULT_ZOOM = 3.2
 
+/** Skip expensive SVG filters on mobile for performance */
+const IS_MOBILE = typeof window !== 'undefined' && window.innerWidth <= 768
+
 interface HexMapProps {
   groups: CategoryGroup[]
 }
@@ -228,22 +231,27 @@ export function HexMapPanel({ groups, className, backgroundVariant = 'plain' }: 
                   <stop offset="100%" stopColor="#000000" stopOpacity="0.9" />
                 </radialGradient>
 
-                <filter id="hexmap-stone-noise" x="-20%" y="-20%" width="140%" height="140%">
-                  <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="3" seed="7" result="noise" />
-                  <feColorMatrix in="noise" type="saturate" values="0" result="mono" />
-                  <feBlend in="SourceGraphic" in2="mono" mode="soft-light" />
-                </filter>
+                {/* Skip expensive filters on mobile for performance */}
+                {!IS_MOBILE && (
+                  <>
+                    <filter id="hexmap-stone-noise" x="-20%" y="-20%" width="140%" height="140%">
+                      <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="3" seed="7" result="noise" />
+                      <feColorMatrix in="noise" type="saturate" values="0" result="mono" />
+                      <feBlend in="SourceGraphic" in2="mono" mode="soft-light" />
+                    </filter>
 
-                <filter id="hexmap-mist" x="-20%" y="-20%" width="140%" height="140%">
-                  <feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="3" seed="13" result="noise" />
-                  <feDisplacementMap in="SourceGraphic" in2="noise" scale="20" />
-                  <feGaussianBlur stdDeviation="12" />
-                  <feColorMatrix type="matrix" values="
-                    1 0 0 0 0
-                    1 0 0 0 0
-                    1 0 0 0 0
-                    0 0 0 0.15 0" />
-                </filter>
+                    <filter id="hexmap-mist" x="-20%" y="-20%" width="140%" height="140%">
+                      <feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="3" seed="13" result="noise" />
+                      <feDisplacementMap in="SourceGraphic" in2="noise" scale="20" />
+                      <feGaussianBlur stdDeviation="12" />
+                      <feColorMatrix type="matrix" values="
+                        1 0 0 0 0
+                        1 0 0 0 0
+                        1 0 0 0 0
+                        0 0 0 0.15 0" />
+                    </filter>
+                  </>
+                )}
               </defs>
             )}
 
@@ -257,26 +265,30 @@ export function HexMapPanel({ groups, className, backgroundVariant = 'plain' }: 
             {backgroundVariant === 'arcane' ? (
               <>
                 <rect x={-200} y={-200} width={MAP_W + 400} height={MAP_H + 400} fill="url(#hexmap-stone)" />
-                <rect
-                  x={-200} y={-200}
-                  width={MAP_W + 400} height={MAP_H + 400}
-                  fill="#1a1410"
-                  opacity={0.35}
-                  filter="url(#hexmap-stone-noise)"
-                />
+                {!IS_MOBILE && (
+                  <rect
+                    x={-200} y={-200}
+                    width={MAP_W + 400} height={MAP_H + 400}
+                    fill="#1a1410"
+                    opacity={0.35}
+                    filter="url(#hexmap-stone-noise)"
+                  />
+                )}
                 <rect
                   x={-200} y={-200}
                   width={MAP_W + 400} height={MAP_H + 400}
                   fill="url(#hexmap-lift)"
                   opacity={0.35}
                 />
-                <rect
-                  x={-200} y={-200}
-                  width={MAP_W + 400} height={MAP_H + 400}
-                  fill="#d8d0bf"
-                  opacity={0.06}
-                  filter="url(#hexmap-mist)"
-                />
+                {!IS_MOBILE && (
+                  <rect
+                    x={-200} y={-200}
+                    width={MAP_W + 400} height={MAP_H + 400}
+                    fill="#d8d0bf"
+                    opacity={0.06}
+                    filter="url(#hexmap-mist)"
+                  />
+                )}
                 <rect x={-200} y={-200} width={MAP_W + 400} height={MAP_H + 400} fill="url(#hexmap-vignette)" />
               </>
             ) : (

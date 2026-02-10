@@ -18,6 +18,7 @@
   min-height: 0;
   width: 100%;
   overflow: hidden;
+  overscroll-behavior: contain;
 }
 
 /* Framer-motion slide wrapper — fills the viewport.
@@ -34,6 +35,8 @@
   max-width: var(--max-width);
   margin: 0 auto;
   overflow: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* ── Progress rail (top, horizontal) ── */
@@ -155,6 +158,8 @@
   width: 100%;
   margin: 0 auto;
   background: linear-gradient(180deg, rgba(10, 10, 14, 0) 0%, rgba(10, 10, 14, 0.9) 45%, rgba(10, 10, 14, 1) 100%);
+  position: relative;
+  z-index: 10;
 }
 
 /* Footer CTA — outlined, fills on hover */

@@ -334,6 +334,17 @@
   }
 }
 
+@media (max-width: 768px) {
+  .hexmap__svg {
+    touch-action: pan-y pinch-zoom;
+  }
+
+  .hexmap__control {
+    width: 44px;
+    height: 44px;
+  }
+}
+
 /* ── Label text readability ── */
 .hexmap__label-text {
   font-family: 'Cinzel', serif;

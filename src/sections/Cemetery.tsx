@@ -115,14 +115,14 @@ export function Cemetery({ groups }: CemeteryProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const [scrollY, setScrollY] = useState(0)
 
-  // Parallax effect within the cemetery section
+  // Parallax effect within the cemetery section (disabled on mobile for perf)
   useEffect(() => {
     const container = containerRef.current
     if (!container) return
 
-    // Check for reduced motion preference
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    if (reducedMotion) return
+    const isMobile = window.innerWidth <= 768
+    if (reducedMotion || isMobile) return
 
     const handleScroll = () => {
       setScrollY(container.scrollTop)

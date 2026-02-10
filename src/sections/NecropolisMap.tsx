@@ -17,6 +17,9 @@ import './necropolis.css'
 const MAP_WIDTH = 1000
 const MAP_HEIGHT = 700
 
+/** Skip expensive SVG filters on mobile for performance */
+const IS_MOBILE = typeof window !== 'undefined' && window.innerWidth <= 768
+
 /* ── Parchment palette ── */
 const COLORS = {
   parchment: '#f4e8c1',
@@ -671,7 +674,7 @@ export function NecropolisMap({ groups }: NecropolisMapProps) {
                       stroke={COLORS.ink}
                       strokeWidth={2}
                       opacity={0.95}
-                      filter="url(#parchment-noise)"
+                      filter={IS_MOBILE ? undefined : 'url(#parchment-noise)'}
                     />
                   )}
 
@@ -718,7 +721,7 @@ export function NecropolisMap({ groups }: NecropolisMapProps) {
                           stroke={COLORS.ink}
                           strokeWidth={isEmpty ? 0.5 : 1.2}
                           opacity={isEmpty ? 0.5 : 0.85}
-                          filter={isHovered && !isEmpty ? 'url(#region-glow)' : undefined}
+                          filter={isHovered && !isEmpty && !IS_MOBILE ? 'url(#region-glow)' : undefined}
                         />
                         {isEmpty && (
                           <path
