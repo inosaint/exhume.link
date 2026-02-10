@@ -5,7 +5,7 @@ export const initPostHog = () => {
   const host = import.meta.env.VITE_PUBLIC_POSTHOG_HOST
 
   if (!apiKey) {
-    console.warn('PostHog API key not found')
+    console.warn('PostHog API key not found. Analytics will not be tracked.')
     return
   }
 
@@ -16,6 +16,12 @@ export const initPostHog = () => {
     capture_pageleave: true,
     autocapture: false, // Disable autocapture to have more control
   })
+
+  // Expose PostHog globally in development for debugging
+  if (import.meta.env.DEV) {
+    ;(window as any).posthog = posthog
+    console.log('PostHog initialized successfully. Access via window.posthog in console.')
+  }
 }
 
 export { posthog }
