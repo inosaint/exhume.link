@@ -593,7 +593,7 @@
   max-width: 560px;
   text-wrap: balance;
   opacity: 0;
-  transition: opacity 1.2s var(--ease-out);
+  transition: opacity 2.5s var(--ease-out);
 }
 
 .verdict-reveal__text--visible {
