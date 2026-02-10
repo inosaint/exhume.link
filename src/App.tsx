@@ -93,8 +93,8 @@ export default function App() {
   useEffect(() => {
     if (session) {
       posthog.capture('archetype_generated', {
-        archetype: session.personality.archetype,
-        archetype_title: session.personality.title,
+        archetype: session.personality.title,
+        archetype_id: session.personality.archetype,
         total_tabs: session.stats.totalTabs,
         unique_domains: session.stats.uniqueDomains,
         flow_variant: flow,
