@@ -593,19 +593,16 @@
   max-width: 560px;
   text-wrap: balance;
   opacity: 0;
-  transform: translateY(8px);
-  transition: opacity 1.2s var(--ease-out), transform 1.2s var(--ease-out);
+  transition: opacity 1.2s var(--ease-out);
 }
 
 .verdict-reveal__text--visible {
   opacity: 1;
-  transform: translateY(0);
 }
 
 @media (prefers-reduced-motion: reduce) {
   .verdict-reveal__text {
     opacity: 1;
-    transform: none;
     transition: none;
   }
 }
