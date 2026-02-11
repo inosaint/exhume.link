@@ -60,6 +60,32 @@ export function ShareCard({ profile, stats }: ShareCardProps) {
     link.click()
   }, [cardDataUrl])
 
+  // Direct download handler - must come after handleDownload is defined
+  useEffect(() => {
+    async function handleDownloadRequest() {
+      // Capture the card if we haven't already
+      if (!cardDataUrl && !isCapturing && !captureAttempted.current) {
+        captureAttempted.current = true
+        await captureCard()
+      }
+      // Download after a brief delay to ensure capture is complete
+      setTimeout(() => {
+        if (cardDataUrl) {
+          handleDownload()
+        } else {
+          // If still not ready, capture and download
+          captureCard().then(() => {
+            setTimeout(() => {
+              if (cardDataUrl) handleDownload()
+            }, 500)
+          })
+        }
+      }, 100)
+    }
+    window.addEventListener('download-card-request', handleDownloadRequest)
+    return () => window.removeEventListener('download-card-request', handleDownloadRequest)
+  }, [cardDataUrl, isCapturing, captureCard, handleDownload])
+
   const handleCopyImage = useCallback(async () => {
     if (!cardBlob) return
     try {

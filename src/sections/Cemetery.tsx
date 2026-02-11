@@ -19,23 +19,67 @@ function CategorySection({ group, index }: { group: CategoryGroup; index: number
   const [showInfo, setShowInfo] = useState(false)
   const sectionRef = useRef<HTMLDivElement>(null)
   const infoRef = useRef<HTMLButtonElement>(null)
+  const hasSetVisibleRef = useRef(false)
 
   useEffect(() => {
+    console.log(`[CEMETERY] Setting up IntersectionObserver for category ${index}:`, group.category.label)
+
+    const makeVisible = () => {
+      if (!hasSetVisibleRef.current) {
+        hasSetVisibleRef.current = true
+        setIsVisible(true)
+      }
+    }
+
     const observer = new IntersectionObserver(
       ([entry]) => {
+        console.log(`[CEMETERY] Category ${index} intersection:`, {
+          isIntersecting: entry.isIntersecting,
+          intersectionRatio: entry.intersectionRatio,
+          boundingClientRect: entry.boundingClientRect,
+          categoryLabel: group.category.label
+        })
         if (entry.isIntersecting) {
-          setIsVisible(true)
+          console.log(`[CEMETERY] ✅ Category ${index} (${group.category.label}) is now visible!`)
+          makeVisible()
           observer.disconnect()
         }
       },
-      { threshold: 0.1 }
+      {
+        threshold: 0.1,
+        // Add rootMargin to trigger earlier - helps with Chrome rendering
+        rootMargin: '50px'
+      }
     )
 
     if (sectionRef.current) {
+      console.log(`[CEMETERY] Observing category ${index}:`, group.category.label, 'element:', sectionRef.current)
       observer.observe(sectionRef.current)
+
+      // Chrome bug workaround: manually check if already visible on mount
+      setTimeout(() => {
+        if (sectionRef.current && !hasSetVisibleRef.current) {
+          const rect = sectionRef.current.getBoundingClientRect()
+          const isInViewport = rect.top < window.innerHeight && rect.bottom > 0
+          console.log(`[CEMETERY] Manual visibility check for category ${index}:`, {
+            isInViewport,
+            rect,
+            windowHeight: window.innerHeight
+          })
+          if (isInViewport) {
+            console.log(`[CEMETERY] 🔧 Manually setting visible for category ${index} (Chrome workaround)`)
+            makeVisible()
+          }
+        }
+      }, 100)
+    } else {
+      console.warn(`[CEMETERY] No ref available for category ${index}:`, group.category.label)
     }
 
-    return () => observer.disconnect()
+    return () => {
+      console.log(`[CEMETERY] Cleanup observer for category ${index}:`, group.category.label)
+      observer.disconnect()
+    }
   }, [])
 
   // Check for reduced motion preference

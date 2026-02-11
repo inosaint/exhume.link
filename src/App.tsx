@@ -117,7 +117,7 @@ export default function App() {
 
   const handlePrimary = useCallback(() => {
     if (isShareSection) {
-      window.dispatchEvent(new CustomEvent('share-card-request'))
+      window.dispatchEvent(new CustomEvent('download-card-request'))
       return
     }
     next()
@@ -245,10 +245,10 @@ export default function App() {
             className={`nav-footer__cta${isShareSection ? ' nav-footer__cta--share' : ''}`}
             onClick={handlePrimary}
             disabled={!isShareSection && currentIndex === sections.length - 1}
-            aria-label={isShareSection ? 'Share with your cult' : 'Next section'}
+            aria-label={isShareSection ? 'Download card' : 'Next section'}
           >
             {isShareSection
-              ? 'Share with Your Cult'
+              ? 'Download Card'
               : currentSection === 'personality'
                 ? (isUnburdened ? 'Bind Your Archetype ↓' : 'Dig Deeper ↓')
                 : currentSection === 'numbers'
