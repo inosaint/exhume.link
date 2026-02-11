@@ -19,8 +19,9 @@ const DIG_AUDIO_SRC = '/freesound_community-digging-with-shovel-63069.mp3'
 /**
  * Volume threshold to detect a "dig" impact.
  * The analyser returns RMS energy 0–1; shovel impacts spike well above ambient.
+ * Lowered from 0.12 to 0.02 based on actual audio levels (typical spikes: 0.025)
  */
-const DIG_THRESHOLD = 0.12
+const DIG_THRESHOLD = 0.02
 
 /** Minimum ms between two detected digs (debounce) */
 const DIG_COOLDOWN = 800
