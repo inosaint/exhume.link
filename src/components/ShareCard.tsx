@@ -45,7 +45,22 @@ export function ShareCard({ profile, stats }: ShareCardProps) {
     return () => window.removeEventListener('share-card-request', handleShareRequest)
   }, [])
 
-  // Direct download handler
+  useEffect(() => {
+    if (showShareModal && !cardDataUrl && !isCapturing && !captureAttempted.current) {
+      captureAttempted.current = true
+      captureCard()
+    }
+  }, [showShareModal, cardDataUrl, isCapturing, captureCard])
+
+  const handleDownload = useCallback(() => {
+    if (!cardDataUrl) return
+    const link = document.createElement('a')
+    link.download = 'exhume-archetype.png'
+    link.href = cardDataUrl
+    link.click()
+  }, [cardDataUrl])
+
+  // Direct download handler - must come after handleDownload is defined
   useEffect(() => {
     async function handleDownloadRequest() {
       // Capture the card if we haven't already
@@ -61,8 +76,7 @@ export function ShareCard({ profile, stats }: ShareCardProps) {
           // If still not ready, capture and download
           captureCard().then(() => {
             setTimeout(() => {
-              const dataUrl = document.querySelector('.trading-card-3d__inner')
-              if (dataUrl) handleDownload()
+              if (cardDataUrl) handleDownload()
             }, 500)
           })
         }
@@ -71,21 +85,6 @@ export function ShareCard({ profile, stats }: ShareCardProps) {
     window.addEventListener('download-card-request', handleDownloadRequest)
     return () => window.removeEventListener('download-card-request', handleDownloadRequest)
   }, [cardDataUrl, isCapturing, captureCard, handleDownload])
-
-  useEffect(() => {
-    if (showShareModal && !cardDataUrl && !isCapturing && !captureAttempted.current) {
-      captureAttempted.current = true
-      captureCard()
-    }
-  }, [showShareModal, cardDataUrl, isCapturing, captureCard])
-
-  const handleDownload = useCallback(() => {
-    if (!cardDataUrl) return
-    const link = document.createElement('a')
-    link.download = 'exhume-archetype.png'
-    link.href = cardDataUrl
-    link.click()
-  }, [cardDataUrl])
 
   const handleCopyImage = useCallback(async () => {
     if (!cardBlob) return
