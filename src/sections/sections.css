@@ -97,6 +97,13 @@
   align-items: center;
 }
 
+/* Safari mobile fix: ensure landing content is scrollable */
+@media (max-width: 768px) {
+  .section--landing {
+    align-items: flex-start;
+  }
+}
+
 .section--landing .surface__form {
   gap: var(--space-3);
 }
@@ -1068,6 +1075,9 @@
   z-index: 1000;
   padding: var(--space-4);
   animation: fadeIn 0.2s ease;
+  /* Force Safari to properly render modal */
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
 }
 
 @keyframes fadeIn {
@@ -1090,6 +1100,10 @@
   animation: slideUp 0.3s ease;
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
+  /* Force Safari to properly render scrollable content */
+  -webkit-overflow-scrolling: touch;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
 }
 
 @keyframes slideUp {
