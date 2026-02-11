@@ -57,13 +57,21 @@ export function Processing({
   // Detect digs via Web Audio API analyser
   const detectDigs = useCallback((totalLines: number) => {
     const analyser = analyserRef.current
-    if (!analyser) return
+    if (!analyser) {
+      console.log('[UNEARTH] detectDigs called but analyser is null')
+      return
+    }
 
+    console.log('[UNEARTH] Starting dig detection loop, totalLines:', totalLines)
     const data = new Uint8Array(analyser.fftSize)
+    let tickCount = 0
 
     function tick() {
       const a = analyserRef.current
-      if (!a) return
+      if (!a) {
+        console.log('[UNEARTH] analyser lost in tick loop')
+        return
+      }
       a.getByteTimeDomainData(data)
 
       // Compute RMS energy
@@ -74,6 +82,12 @@ export function Processing({
       }
       const rms = Math.sqrt(sum / data.length)
 
+      // Log every 30 ticks (~500ms) for debugging
+      tickCount++
+      if (tickCount % 30 === 0) {
+        console.log(`[UNEARTH] RMS: ${rms.toFixed(4)}, threshold: ${DIG_THRESHOLD}, visible: ${visibleRef.current}/${totalLines}, audioCtx state: ${ctxRef.current?.state}`)
+      }
+
       const now = performance.now()
       if (
         rms > DIG_THRESHOLD &&
@@ -83,6 +97,7 @@ export function Processing({
         lastDigRef.current = now
         visibleRef.current++
         setVisibleCount(visibleRef.current)
+        console.log(`[UNEARTH] 🎵 DIG DETECTED! RMS: ${rms.toFixed(4)}, revealing line ${visibleRef.current}/${totalLines}`)
       }
 
       rafRef.current = requestAnimationFrame(tick)
@@ -94,20 +109,25 @@ export function Processing({
   // Timed fallback when audio analysis isn't available
   const timedFallbackRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const timedFallback = useCallback((totalLines: number) => {
+    console.log('[UNEARTH] ⏱️  Using TIMED FALLBACK mode, starting at line', visibleRef.current)
     let current = visibleRef.current
     timedFallbackRef.current = setInterval(() => {
       current++
       visibleRef.current = current
       setVisibleCount(current)
+      console.log(`[UNEARTH] ⏱️  Timed reveal: line ${current}/${totalLines}`)
       if (current >= totalLines && timedFallbackRef.current) {
         clearInterval(timedFallbackRef.current)
+        console.log('[UNEARTH] ⏱️  Timed fallback complete')
       }
     }, 1800)
   }, [])
 
   // Start audio + analyser on mount, hard stop on unmount
   useEffect(() => {
+    console.log('[UNEARTH] 🚀 Processing component mounted, lines:', lines.length)
     if (reducedMotion) {
+      console.log('[UNEARTH] Reduced motion detected, showing all lines immediately')
       setVisibleCount(lines.length)
       return
     }
@@ -116,6 +136,7 @@ export function Processing({
     audio.loop = true
     audio.volume = 0.4
     audioRef.current = audio
+    console.log('[UNEARTH] Audio element created, src:', DIG_AUDIO_SRC)
 
     // Set up Web Audio analyser
     const ctx = new AudioContext()
@@ -126,33 +147,46 @@ export function Processing({
     analyser.connect(ctx.destination)
     ctxRef.current = ctx
     analyserRef.current = analyser
+    console.log('[UNEARTH] AudioContext created, initial state:', ctx.state)
 
+    console.log('[UNEARTH] Starting audio playback...')
     audio.play()
       .then(() => {
+        console.log('[UNEARTH] ✅ audio.play() resolved, AudioContext state:', ctx.state)
         // Chrome autoplay policy: audio.play() can resolve but AudioContext
         // stays suspended without a user gesture. In that case the analyser
         // returns silence and digs are never detected — fall back to timed.
         if (ctx.state === 'suspended') {
-          ctx.resume().catch(() => {})
+          console.log('[UNEARTH] ⚠️  AudioContext is SUSPENDED, attempting resume...')
+          ctx.resume()
+            .then(() => console.log('[UNEARTH] ctx.resume() resolved, new state:', ctx.state))
+            .catch((err) => console.error('[UNEARTH] ctx.resume() failed:', err))
           // Give it a moment — if still suspended, fall back
           setTimeout(() => {
-            if (ctxRef.current?.state === 'suspended') {
+            const currentState = ctxRef.current?.state
+            console.log('[UNEARTH] After 200ms wait, AudioContext state:', currentState)
+            if (currentState === 'suspended') {
+              console.log('[UNEARTH] ❌ Still suspended after resume attempt, using timed fallback')
               timedFallback(lines.length)
             } else {
+              console.log('[UNEARTH] ✅ AudioContext running, using dig detection')
               detectDigs(lines.length)
             }
           }, 200)
         } else {
+          console.log('[UNEARTH] ✅ AudioContext already running, using dig detection')
           detectDigs(lines.length)
         }
       })
-      .catch(() => {
+      .catch((err) => {
         // Autoplay blocked — fall back to timed reveals
+        console.log('[UNEARTH] ❌ audio.play() rejected:', err, '- using timed fallback')
         timedFallback(lines.length)
       })
 
     return () => {
       // Hard stop on unmount
+      console.log('[UNEARTH] 🛑 Cleanup: stopping audio and closing AudioContext')
       cancelAnimationFrame(rafRef.current)
       if (timedFallbackRef.current) clearInterval(timedFallbackRef.current)
       audio.pause()
@@ -167,10 +201,20 @@ export function Processing({
   // Auto-advance once analysis is done AND at least 3 lines are visible
   useEffect(() => {
     if (reducedMotion) return
-    if (!isReadyToAdvance) return
-    if (visibleCount < MIN_LINES_BEFORE_ADVANCE) return
+    if (!isReadyToAdvance) {
+      console.log('[UNEARTH] Not ready to advance yet')
+      return
+    }
+    if (visibleCount < MIN_LINES_BEFORE_ADVANCE) {
+      console.log(`[UNEARTH] Waiting for minimum lines: ${visibleCount}/${MIN_LINES_BEFORE_ADVANCE}`)
+      return
+    }
 
-    const timer = setTimeout(() => onNextRef.current(), ADVANCE_PAUSE)
+    console.log(`[UNEARTH] ✅ Auto-advance triggered! visibleCount: ${visibleCount}, advancing in ${ADVANCE_PAUSE}ms`)
+    const timer = setTimeout(() => {
+      console.log('[UNEARTH] 🚀 Advancing to next section')
+      onNextRef.current()
+    }, ADVANCE_PAUSE)
     return () => clearTimeout(timer)
   }, [reducedMotion, isReadyToAdvance, visibleCount])
 
