@@ -45,6 +45,33 @@ export function ShareCard({ profile, stats }: ShareCardProps) {
     return () => window.removeEventListener('share-card-request', handleShareRequest)
   }, [])
 
+  // Direct download handler
+  useEffect(() => {
+    async function handleDownloadRequest() {
+      // Capture the card if we haven't already
+      if (!cardDataUrl && !isCapturing && !captureAttempted.current) {
+        captureAttempted.current = true
+        await captureCard()
+      }
+      // Download after a brief delay to ensure capture is complete
+      setTimeout(() => {
+        if (cardDataUrl) {
+          handleDownload()
+        } else {
+          // If still not ready, capture and download
+          captureCard().then(() => {
+            setTimeout(() => {
+              const dataUrl = document.querySelector('.trading-card-3d__inner')
+              if (dataUrl) handleDownload()
+            }, 500)
+          })
+        }
+      }, 100)
+    }
+    window.addEventListener('download-card-request', handleDownloadRequest)
+    return () => window.removeEventListener('download-card-request', handleDownloadRequest)
+  }, [cardDataUrl, isCapturing, captureCard, handleDownload])
+
   useEffect(() => {
     if (showShareModal && !cardDataUrl && !isCapturing && !captureAttempted.current) {
       captureAttempted.current = true
