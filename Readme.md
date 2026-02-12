@@ -8,7 +8,7 @@ The first step to analyzing your open tabs with exhume.link is getting a list of
 
 Safari on iOS and iPadOS has a convenient built-in feature to copy links from all your open tabs at once.
 
-![A context menu in Safari on iOS, showing the "Copy Links" option.](safari-iOS.jpeg)
+![A context menu in Safari on iOS, showing the "Copy Links" option.](public/safari-iOS.jpeg)
 
 
 **Instructions:**
@@ -21,7 +21,7 @@ Safari on iOS and iPadOS has a convenient built-in feature to copy links from al
 
 Safari on your Mac also has a native feature for this, accessible through the sidebar.
 
-![Right-clicking a Tab Group in the Safari sidebar reveals the "Copy Links" option.](safari-macOS.png)
+![Right-clicking a Tab Group in the Safari sidebar reveals the "Copy Links" option.](public/safari-macOS.png)
 
 **Instructions:**
 1.  Open Safari on your Mac.
