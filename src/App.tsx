@@ -95,7 +95,14 @@ export default function App() {
 
     // Add delay for personality section to sync with text fade-in
     const delay = currentSection === 'personality' ? 400 : 0
-    const timer = setTimeout(() => setFooterVisible(true), delay)
+    const timer = setTimeout(() => {
+      setFooterVisible(true)
+      // Force Safari to recalculate layout by triggering a reflow
+      // This fixes a Safari rendering bug where the footer doesn't appear until viewport resize
+      requestAnimationFrame(() => {
+        document.body.offsetHeight // Read forces synchronous layout
+      })
+    }, delay)
     return () => clearTimeout(timer)
   }, [currentSection])
 

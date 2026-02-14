@@ -19,6 +19,9 @@
   width: 100%;
   overflow: hidden;
   overscroll-behavior: contain;
+  /* Force Safari to properly calculate layout */
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
 }
 
 /* Framer-motion slide wrapper — fills the viewport.
@@ -37,6 +40,11 @@
   overflow: auto;
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
+  /* Force Safari to properly calculate and render content height */
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 /* ── Progress rail (top, horizontal) ── */
@@ -160,6 +168,12 @@
   background: linear-gradient(180deg, rgba(10, 10, 14, 0) 0%, rgba(10, 10, 14, 0.9) 45%, rgba(10, 10, 14, 1) 100%);
   position: relative;
   z-index: 10;
+  /* Force Safari to properly render this element */
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  will-change: transform;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 /* Footer CTA — outlined, fills on hover */
@@ -222,6 +236,7 @@
 @media (max-width: 768px) {
   .section-slide {
     padding: var(--space-6) var(--space-4);
+    padding-bottom: calc(var(--space-6) + 80px); /* Add space for fixed footer */
     align-items: flex-start;
     -webkit-overflow-scrolling: touch;
   }
@@ -243,8 +258,28 @@
   }
 
   .nav-footer {
+    /* Fix footer to bottom on mobile to avoid Safari grid layout bugs */
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
     padding: var(--space-3) var(--space-4);
     padding-bottom: max(var(--space-3), env(safe-area-inset-bottom, 0px));
+    /* Ensure background covers content behind it */
+    background: linear-gradient(180deg, rgba(10, 10, 14, 0) 0%, rgba(10, 10, 14, 1) 20%, rgba(10, 10, 14, 1) 100%);
+    /* Smooth appearance */
+    animation: slideUpFooter 0.3s ease-out both;
+  }
+
+  @keyframes slideUpFooter {
+    from {
+      opacity: 0;
+      transform: translateY(100%) translateZ(0);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) translateZ(0);
+    }
   }
 }
 
