@@ -1,6 +1,5 @@
 import { useMemo, useState, useCallback, useEffect } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Agentation } from 'agentation'
 import { type SectionId, SECTIONS } from './sections/config'
 import { analyzeInputToSession, extractUrlsFromText, type ExhumeSession } from './data/tabsAnalysis'
 import SAMPLE_TABS from '../browserdata/all_tabs_clean.txt?raw'
@@ -267,10 +266,6 @@ export default function App() {
                       : 'Continue ↓'}
           </button>
         </footer>
-      )}
-
-      {import.meta.env.DEV && (
-        <Agentation endpoint="http://localhost:4747" />
       )}
     </div>
   )
