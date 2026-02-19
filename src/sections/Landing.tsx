@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import './sections.css'
 
@@ -17,6 +17,30 @@ export function Landing({ isBusy, error, sampleText, onBegin }: LandingProps) {
   const [showPrivacy, setShowPrivacy] = useState(false)
   const [showHowTo, setShowHowTo] = useState(false)
 
+  // DEBUG: Safari click investigation
+  useEffect(() => {
+    const logEvent = (e: Event) => {
+      const t = e.target as HTMLElement
+      const tag = t.tagName.toLowerCase()
+      const cls = t.className?.toString?.().slice(0, 60) || ''
+      const txt = t.textContent?.slice(0, 30) || ''
+      console.log(`[SAFARI-DBG] ${e.type} | <${tag}> .${cls} "${txt}"`)
+    }
+    // Capture phase — fires before any React handler
+    document.addEventListener('touchstart', logEvent, true)
+    document.addEventListener('touchend', logEvent, true)
+    document.addEventListener('click', logEvent, true)
+    // Also log if something is calling preventDefault or stopPropagation
+    document.addEventListener('touchend', (e) => {
+      console.log(`[SAFARI-DBG] touchend bubble | defaultPrevented=${e.defaultPrevented}`)
+    }, false)
+    console.log('[SAFARI-DBG] Event listeners attached')
+    return () => {
+      document.removeEventListener('touchstart', logEvent, true)
+      document.removeEventListener('touchend', logEvent, true)
+      document.removeEventListener('click', logEvent, true)
+    }
+  }, [])
 
   const hasUrl = useMemo(() => URL_PATTERN.test(text), [text])
   const canSubmit = hasUrl || !!file
@@ -87,7 +111,13 @@ export function Landing({ isBusy, error, sampleText, onBegin }: LandingProps) {
                 <button
                   type="button"
                   className="surface__sample"
-                  onClick={() => setShowHowTo(true)}
+                  onClick={() => {
+                    console.log('[SAFARI-DBG] "How to export tabs" onClick fired')
+                    setShowHowTo(true)
+                  }}
+                  onTouchEnd={(e) => {
+                    console.log('[SAFARI-DBG] "How to export tabs" onTouchEnd fired, defaultPrevented=', e.defaultPrevented)
+                  }}
                 >
                   How to export tabs
                 </button>
@@ -101,7 +131,13 @@ export function Landing({ isBusy, error, sampleText, onBegin }: LandingProps) {
             </div>
           </div>
 
-          <button className="landing__cta" type="submit" disabled={isSubmitDisabled}>
+          <button
+            className="landing__cta"
+            type="submit"
+            disabled={isSubmitDisabled}
+            onClick={() => console.log('[SAFARI-DBG] CTA onClick, disabled=', isSubmitDisabled)}
+            onTouchEnd={(e) => console.log('[SAFARI-DBG] CTA onTouchEnd, defaultPrevented=', e.defaultPrevented)}
+          >
             {isBusy ? 'Unearthing…' : 'Begin the Exhumation'}
           </button>
 
@@ -110,7 +146,13 @@ export function Landing({ isBusy, error, sampleText, onBegin }: LandingProps) {
             <button
               type="button"
               className="surface__note-link"
-              onClick={() => setShowPrivacy(true)}
+              onClick={() => {
+                console.log('[SAFARI-DBG] "Privacy policy" onClick fired')
+                setShowPrivacy(true)
+              }}
+              onTouchEnd={(e) => {
+                console.log('[SAFARI-DBG] "Privacy policy" onTouchEnd fired, defaultPrevented=', e.defaultPrevented)
+              }}
             >
               Privacy policy
             </button>
@@ -118,8 +160,8 @@ export function Landing({ isBusy, error, sampleText, onBegin }: LandingProps) {
         </form>
 
         {showHowTo && createPortal(
-          <div className="privacy-modal" onClick={() => setShowHowTo(false)}>
-            <div className="privacy-modal__content" onClick={(e) => e.stopPropagation()}>
+          <div className="privacy-modal" onClick={() => { console.log('[SAFARI-DBG] HowTo backdrop onClick'); setShowHowTo(false) }}>
+            <div className="privacy-modal__content" onClick={(e) => { console.log('[SAFARI-DBG] HowTo content onClick — stopPropagation'); e.stopPropagation() }}>
               <h2 className="privacy-modal__title">How to Export Your Tabs</h2>
 
               <div className="privacy-modal__body">
@@ -207,7 +249,7 @@ export function Landing({ isBusy, error, sampleText, onBegin }: LandingProps) {
 
               <button
                 className="privacy-modal__close"
-                onClick={() => setShowHowTo(false)}
+                onClick={() => { console.log('[SAFARI-DBG] HowTo close onClick'); setShowHowTo(false) }}
                 type="button"
               >
                 Close
@@ -218,8 +260,8 @@ export function Landing({ isBusy, error, sampleText, onBegin }: LandingProps) {
         )}
 
         {showPrivacy && createPortal(
-          <div className="privacy-modal" onClick={() => setShowPrivacy(false)}>
-            <div className="privacy-modal__content" onClick={(e) => e.stopPropagation()}>
+          <div className="privacy-modal" onClick={() => { console.log('[SAFARI-DBG] Privacy backdrop onClick'); setShowPrivacy(false) }}>
+            <div className="privacy-modal__content" onClick={(e) => { console.log('[SAFARI-DBG] Privacy content onClick — stopPropagation'); e.stopPropagation() }}>
               <h2 className="privacy-modal__title">Privacy & Data Collection</h2>
 
               <div className="privacy-modal__body">
@@ -256,7 +298,7 @@ export function Landing({ isBusy, error, sampleText, onBegin }: LandingProps) {
 
               <button
                 className="privacy-modal__close"
-                onClick={() => setShowPrivacy(false)}
+                onClick={() => { console.log('[SAFARI-DBG] Privacy close onClick'); setShowPrivacy(false) }}
                 type="button"
               >
                 Close
