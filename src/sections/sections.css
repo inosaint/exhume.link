@@ -1209,3 +1209,33 @@
     animation: none;
   }
 }
+
+/* ── How To Modal extras ── */
+.howto-modal__img {
+  width: 100%;
+  max-width: 320px;
+  border-radius: 6px;
+  border: 1px solid var(--color-stone);
+  margin: var(--space-2) 0;
+}
+
+.howto-modal__steps {
+  margin: var(--space-2) 0;
+  padding-left: var(--space-5);
+  color: var(--color-text-muted);
+}
+
+.howto-modal__steps li {
+  margin-bottom: var(--space-1);
+  line-height: 1.6;
+}
+
+.privacy-modal__body a {
+  color: var(--color-accent);
+  text-decoration: underline;
+  transition: opacity 0.2s ease;
+}
+
+.privacy-modal__body a:hover {
+  opacity: 0.7;
+}
