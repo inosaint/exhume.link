@@ -1233,6 +1233,10 @@
 .privacy-modal__body a {
   color: var(--color-accent);
   text-decoration: underline;
+  cursor: pointer;
+  position: relative;
+  z-index: 1;
+  -webkit-tap-highlight-color: rgba(201, 169, 110, 0.2);
   transition: opacity 0.2s ease;
 }
 

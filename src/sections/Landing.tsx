@@ -120,7 +120,17 @@ export function Landing({ isBusy, error, sampleText, onBegin }: LandingProps) {
             <div className="privacy-modal__content" onClick={(e) => e.stopPropagation()}>
               <h2 className="privacy-modal__title">How to Export Your Tabs</h2>
 
-              <div className="privacy-modal__body">
+              <div
+                className="privacy-modal__body"
+                onClick={(e) => {
+                  const anchor = (e.target as HTMLElement).closest('a')
+                  if (anchor?.href) {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    window.open(anchor.href, '_blank', 'noopener,noreferrer')
+                  }
+                }}
+              >
                 <p>
                   The first step is getting a list of your open tab URLs. Here's how,
                   depending on your browser.
