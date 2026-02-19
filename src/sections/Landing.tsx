@@ -17,6 +17,7 @@ export function Landing({ isBusy, error, sampleText, onBegin }: LandingProps) {
   const [showPrivacy, setShowPrivacy] = useState(false)
   const [showHowTo, setShowHowTo] = useState(false)
 
+
   const hasUrl = useMemo(() => URL_PATTERN.test(text), [text])
   const canSubmit = hasUrl || !!file
   const isSubmitDisabled = isBusy || !canSubmit
