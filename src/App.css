@@ -47,6 +47,15 @@
   -webkit-backface-visibility: hidden;
 }
 
+/* Hide scrollbar on landing — content fits but can still scroll if needed */
+.app--landing .section-slide {
+  scrollbar-width: none;          /* Firefox */
+  -ms-overflow-style: none;       /* IE / old Edge */
+}
+.app--landing .section-slide::-webkit-scrollbar {
+  display: none;                  /* Chrome / Safari / new Edge */
+}
+
 /* ── Progress rail (top, horizontal) ── */
 .progress-rail {
   display: flex;
