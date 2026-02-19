@@ -159,7 +159,7 @@ export function Landing({ isBusy, error, sampleText, onBegin }: LandingProps) {
           </p>
         </form>
 
-        {showHowTo && createPortal(
+        {showHowTo && (console.log('[SAFARI-DBG] showHowTo=true, rendering portal'), createPortal(
           <div className="privacy-modal" onClick={() => { console.log('[SAFARI-DBG] HowTo backdrop onClick'); setShowHowTo(false) }}>
             <div className="privacy-modal__content" onClick={(e) => { console.log('[SAFARI-DBG] HowTo content onClick — stopPropagation'); e.stopPropagation() }}>
               <h2 className="privacy-modal__title">How to Export Your Tabs</h2>
@@ -257,9 +257,9 @@ export function Landing({ isBusy, error, sampleText, onBegin }: LandingProps) {
             </div>
           </div>,
           document.body
-        )}
+        ))}
 
-        {showPrivacy && createPortal(
+        {showPrivacy && (console.log('[SAFARI-DBG] showPrivacy=true, rendering portal'), createPortal(
           <div className="privacy-modal" onClick={() => { console.log('[SAFARI-DBG] Privacy backdrop onClick'); setShowPrivacy(false) }}>
             <div className="privacy-modal__content" onClick={(e) => { console.log('[SAFARI-DBG] Privacy content onClick — stopPropagation'); e.stopPropagation() }}>
               <h2 className="privacy-modal__title">Privacy & Data Collection</h2>
@@ -306,7 +306,7 @@ export function Landing({ isBusy, error, sampleText, onBegin }: LandingProps) {
             </div>
           </div>,
           document.body
-        )}
+        ))}
 
         {error && (
           <div className="error-toast" role="alert">

@@ -1078,10 +1078,10 @@
   justify-content: center;
   z-index: 1000;
   padding: var(--space-4);
-  animation: fadeIn 0.2s ease;
-  /* Force Safari to properly render modal */
-  transform: translateZ(0);
-  -webkit-transform: translateZ(0);
+  animation: fadeIn 0.2s ease forwards;
+  /* Use will-change instead of transform: translateZ(0) — the transform
+     creates a new containing block that breaks position:fixed in Safari */
+  will-change: opacity;
 }
 
 @keyframes fadeIn {
@@ -1102,13 +1102,11 @@
   max-height: 80vh;
   overflow-y: auto;
   padding: var(--space-6);
-  animation: slideUp 0.3s ease;
+  animation: slideUp 0.3s ease forwards;
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  /* Force Safari to properly render scrollable content */
   -webkit-overflow-scrolling: touch;
-  transform: translateZ(0);
-  -webkit-transform: translateZ(0);
+  will-change: transform, opacity;
 }
 
 @keyframes slideUp {
