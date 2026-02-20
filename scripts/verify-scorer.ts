@@ -2,7 +2,7 @@
  * Quick scorer verification script.
  * Run with: npx tsx scripts/verify-scorer.ts
  *
- * Expected output: "Warlock of the Endless Horde"
+ * Expected output: "Lich of the Shadows"
  */
 import { readFileSync } from 'fs'
 import { fileURLToPath } from 'url'
@@ -11,7 +11,7 @@ import { dirname, join } from 'path'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 
-const samplePath = join(__dirname, '..', 'browserdata', 'all_tabs_clean.txt')
+const samplePath = join(__dirname, '..', 'browserdata', 'lich_tabs.txt')
 const sampleText = readFileSync(samplePath, 'utf-8')
 
 async function main() {
@@ -49,7 +49,7 @@ async function main() {
     console.log(scoreDimensionsDebug)
   }
 
-  const expected = 'Warlock of the Endless Horde'
+  const expected = 'Lich of the Shadows'
   if (session.personality.title === expected) {
     console.log(`✅ PASS — matches expected "${expected}"`)
   } else {

@@ -2,7 +2,7 @@ import { useMemo, useState, useCallback, useEffect } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { type SectionId, SECTIONS } from './sections/config'
 import { analyzeInputToSession, extractUrlsFromText, type ExhumeSession } from './data/tabsAnalysis'
-import SAMPLE_TABS from '../browserdata/all_tabs_clean.txt?raw'
+import LICH_TABS from '../browserdata/lich_tabs.txt?raw'
 import { Landing } from './sections/Landing'
 import { Processing } from './sections/Processing'
 import { Personality } from './sections/Personality'
@@ -208,7 +208,7 @@ export default function App() {
               <Landing
                 isBusy={analysisStatus === 'running'}
                 error={analysisError}
-                sampleText={SAMPLE_TABS}
+                sampleText={LICH_TABS}
                 onBegin={handleBegin}
               />
             )}

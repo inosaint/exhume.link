@@ -855,3 +855,97 @@ Agent/Model: GPT-5.2 (Codex)
 - `src/sections/Landing.tsx`
 - `src/sections/sections.css`
 - `src/App.css`
+
+---
+
+# Unused Code/Data Review
+
+Date: 2026-02-20
+Agent/Model: GPT-5 (Codex)
+
+## Summary
+- Reviewed current branch for unused components, data, assets, and deps.
+- Flagged dead sections (Overview/Privacy/GrimReport), unused mock exports, and orphaned assets/deps for removal.
+- No code changes made beyond logging this review.
+
+## Files Updated
+- `memory.md`
+
+---
+
+# Remove Unused Dependency (agentation)
+
+Date: 2026-02-20
+Agent/Model: GPT-5 (Codex)
+
+## Summary
+- Removed unused `agentation` dependency from the project.
+- Updated lockfile accordingly.
+
+## Files Updated
+- `package.json`
+- `package-lock.json`
+- `memory.md`
+
+---
+
+# Lich Easter-Egg Dataset
+
+Date: 2026-02-20
+Agent/Model: GPT-5 (Codex)
+
+## Summary
+- Added a Lich-tuned sample URL list for the title-click easter egg.
+- Wired the landing sample import to use the new Lich dataset.
+- Lint still fails on pre-existing App/Cemetery issues; build passes.
+
+## Files Updated
+- `browserdata/lich_tabs.txt`
+- `src/App.tsx`
+- `memory.md`
+
+---
+
+# Scripts Pointed to Lich Dataset
+
+Date: 2026-02-20
+Agent/Model: GPT-5 (Codex)
+
+## Summary
+- Updated local debug/verify scripts to use `browserdata/lich_tabs.txt` as the sample input.
+- Adjusted expected scorer output to Lich of the Shadows.
+
+## Files Updated
+- `scripts/verify-scorer.ts`
+- `scripts/debug-categories.ts`
+- `scripts/debug-other.ts`
+- `memory.md`
+
+---
+
+# Project Timeline Doc
+
+Date: 2026-02-20
+Agent/Model: GPT-5 (Codex)
+
+## Summary
+- Generated a git-history-based timeline document with milestones and commit list.
+- Added flow A/B/C screenshot guidance and capture steps.
+
+## Files Updated
+- `docs/project-timeline.md`
+- `memory.md`
+
+---
+
+# Timeline Note on Playwright Screenshots
+
+Date: 2026-02-20
+Agent/Model: GPT-5 (Codex)
+
+## Summary
+- Added an explicit optional note about Playwright-based automated screenshots in the timeline doc.
+
+## Files Updated
+- `docs/project-timeline.md`
+- `memory.md`

@@ -232,8 +232,8 @@ export const SHARE_STATS = {
 }
 
 export const PERSONALITY_PROFILE = {
-  title: 'Warlock of the Endless Horde',
+  title: 'Zombie of the Shadows',
   description:
     'Your tabs are instruments of work. Tools, references, and opportunities bound by intent. You open with purpose, act decisively, and close the pact when the task is done.',
-  image: '/warlock.png',
+  image: '/zombie.png',
 }
