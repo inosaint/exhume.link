@@ -799,3 +799,59 @@ Agent/Model: GPT-5.2 (Codex)
 ## Notes
 - `npm run lint` passes.
 - `npm run build` passes.
+
+---
+
+# Landing Modal Click Guard (Safari)
+
+Date: 2026-02-19
+Agent/Model: GPT-5.2 (Codex)
+
+## Summary
+- Prevented form submission/propagation from the “How to export tabs” and “Privacy policy” buttons so modal state updates can render reliably.
+- Left existing Safari debug logging intact for verification.
+
+## Files Updated
+- `src/sections/Landing.tsx`
+
+## Notes
+- `npm run lint` fails due to pre-existing issues in `src/App.tsx` and `src/sections/Cemetery.tsx`.
+- `npm run build` passes.
+
+---
+
+# Safari Modal Root + Overflow Guard
+
+Date: 2026-02-20
+Agent/Model: GPT-5.2 (Codex)
+
+## Summary
+- Added a dedicated `#modal-root` and routed landing modals through it.
+- Switched modal overlay to `position: absolute` inside the fixed modal root to avoid Safari fixed-position clipping.
+- Toggled `modal-open` on both `html` and `body` while a modal is open to override overflow clipping in Safari.
+- Cleaned modal click handlers to remove debug logging.
+
+## Files Updated
+- `index.html`
+- `src/index.css`
+- `src/sections/sections.css`
+- `src/sections/Landing.tsx`
+
+## Notes
+- Safari click/overlay issues likely tied to overflow/scrollbar suppression; avoid `::-webkit-scrollbar { display: none; }` in scroll containers.
+
+---
+
+# Modal Class Rename + Safari Transform Override
+
+Date: 2026-02-20
+Agent/Model: GPT-5.2 (Codex)
+
+## Summary
+- Renamed modal classes from `privacy-modal*` to generic `modal*` across landing modals and styles.
+- Added a modal-open override to remove `translateZ(0)` transforms on `.section-slide` and `.section-viewport` while a modal is open to avoid Safari overlay clipping.
+
+## Files Updated
+- `src/sections/Landing.tsx`
+- `src/sections/sections.css`
+- `src/App.css`

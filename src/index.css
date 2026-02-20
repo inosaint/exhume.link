@@ -93,10 +93,33 @@ body {
   min-height: 100vh;
   min-height: 100svh; /* iOS address bar aware */
   height: 100%;
-  overflow: hidden;
-  overflow-x: hidden;
+  /* NOTE: overflow:hidden was removed from body because Safari clips
+     position:fixed portal children (modals) when body has overflow:hidden.
+     The .app div already has overflow:hidden and fills the viewport. */
+  overflow-x: clip;   /* prevent horizontal scroll without clipping fixed elements */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+html.modal-open,
+body.modal-open {
+  overflow: visible;
+  overflow-x: visible;
+}
+
+#modal-root {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  pointer-events: none;
+}
+
+#modal-root:empty {
+  display: none;
+}
+
+#modal-root > * {
+  pointer-events: auto;
 }
 
 /* ── Typography helpers ── */

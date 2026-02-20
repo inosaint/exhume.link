@@ -225,6 +225,8 @@
   text-transform: uppercase;
   padding: var(--space-2) var(--space-3);
   cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: rgba(201, 169, 110, 0.15);
   transition:
     border-color var(--duration-fast) var(--ease-out),
     color var(--duration-fast) var(--ease-out),
@@ -1045,13 +1047,15 @@
   }
 }
 
-/* ── Privacy Modal ── */
+/* ── Modal ── */
 .surface__note-link {
   background: none;
   border: none;
   color: var(--color-accent);
   text-decoration: underline;
   cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: rgba(201, 169, 110, 0.15);
   font-size: inherit;
   font-family: inherit;
   padding: 0;
@@ -1062,22 +1066,19 @@
   opacity: 0.7;
 }
 
-.privacy-modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+.modal {
+  position: absolute;
+  inset: 0;
   background: rgba(0, 0, 0, 0.85);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
   padding: var(--space-4);
-  animation: fadeIn 0.2s ease;
-  /* Force Safari to properly render modal */
-  transform: translateZ(0);
-  -webkit-transform: translateZ(0);
+  animation: fadeIn 0.2s ease forwards;
+  /* Use will-change instead of transform: translateZ(0) — transforms
+     can create containing blocks that break fixed overlays in Safari */
+  will-change: opacity;
 }
 
 @keyframes fadeIn {
@@ -1089,21 +1090,20 @@
   }
 }
 
-.privacy-modal__content {
+.modal__content {
   background: var(--color-bg-surface);
   border: 2px solid var(--color-stone);
   border-radius: 8px;
+  width: 100%;
   max-width: 600px;
   max-height: 80vh;
   overflow-y: auto;
   padding: var(--space-6);
-  animation: slideUp 0.3s ease;
+  animation: slideUp 0.3s ease forwards;
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  /* Force Safari to properly render scrollable content */
   -webkit-overflow-scrolling: touch;
-  transform: translateZ(0);
-  -webkit-transform: translateZ(0);
+  will-change: transform, opacity;
 }
 
 @keyframes slideUp {
@@ -1117,7 +1117,7 @@
   }
 }
 
-.privacy-modal__title {
+.modal__title {
   font-size: var(--text-xl);
   color: var(--color-accent);
   margin-bottom: var(--space-4);
@@ -1126,7 +1126,7 @@
   text-transform: uppercase;
 }
 
-.privacy-modal__body {
+.modal__body {
   color: var(--color-text-primary);
   text-align: left;
   line-height: 1.6;
@@ -1135,11 +1135,11 @@
   word-break: break-word;
 }
 
-.privacy-modal__body section {
+.modal__body section {
   margin-bottom: var(--space-4);
 }
 
-.privacy-modal__body h3 {
+.modal__body h3 {
   font-size: var(--text-base);
   color: var(--color-accent);
   margin-bottom: var(--space-2);
@@ -1147,38 +1147,38 @@
   text-transform: uppercase;
 }
 
-.privacy-modal__body p {
+.modal__body p {
   margin-bottom: var(--space-2);
   color: var(--color-text-muted);
   word-wrap: break-word;
   overflow-wrap: break-word;
 }
 
-.privacy-modal__body ul {
+.modal__body ul {
   margin: var(--space-2) 0;
   padding-left: var(--space-4);
   list-style: none;
 }
 
-.privacy-modal__body li {
+.modal__body li {
   margin-bottom: var(--space-2);
   color: var(--color-text-muted);
   position: relative;
   padding-left: var(--space-2);
 }
 
-.privacy-modal__body li::before {
+.modal__body li::before {
   content: '·';
   position: absolute;
   left: 0;
   color: var(--color-accent);
 }
 
-.privacy-modal__body strong {
+.modal__body strong {
   color: var(--color-text-primary);
 }
 
-.privacy-modal__close {
+.modal__close {
   width: 100%;
   margin-top: var(--space-4);
   padding: var(--space-3) var(--space-6);
@@ -1192,20 +1192,54 @@
   letter-spacing: 0.1em;
   text-transform: uppercase;
   cursor: pointer;
+  touch-action: manipulation;
   transition:
     border-color var(--duration-fast) var(--ease-out),
     color var(--duration-fast) var(--ease-out),
     background-color var(--duration-fast) var(--ease-out);
 }
 
-.privacy-modal__close:hover {
+.modal__close:hover {
   border-color: var(--color-accent-dim);
   color: var(--color-accent);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .privacy-modal,
-  .privacy-modal__content {
+  .modal,
+  .modal__content {
     animation: none;
   }
+}
+
+/* ── How To Modal extras ── */
+.howto-modal__img {
+  width: 100%;
+  max-width: 320px;
+  border-radius: 6px;
+  border: 1px solid var(--color-stone);
+  margin: var(--space-2) 0;
+}
+
+.howto-modal__steps {
+  margin: var(--space-2) 0;
+  padding-left: var(--space-5);
+  color: var(--color-text-muted);
+}
+
+.howto-modal__steps li {
+  margin-bottom: var(--space-1);
+  line-height: 1.6;
+}
+
+.modal__body a {
+  color: var(--color-accent);
+  text-decoration: underline;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: rgba(201, 169, 110, 0.2);
+  transition: opacity 0.2s ease;
+}
+
+.modal__body a:hover {
+  opacity: 0.7;
 }
