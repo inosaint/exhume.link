@@ -47,6 +47,13 @@
   -webkit-backface-visibility: hidden;
 }
 
+/* Safari: avoid transform-based containing blocks while a modal is open */
+html.modal-open .section-slide,
+html.modal-open .section-viewport {
+  transform: none;
+  -webkit-transform: none;
+}
+
 /* Hide scrollbar on landing — content fits but can still scroll if needed.
    NOTE: Do NOT use `display: none` on ::-webkit-scrollbar — it breaks
    click/touch event routing inside the scroll container in Safari. */

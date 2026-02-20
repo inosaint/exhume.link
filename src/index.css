@@ -101,6 +101,27 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+html.modal-open,
+body.modal-open {
+  overflow: visible;
+  overflow-x: visible;
+}
+
+#modal-root {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  pointer-events: none;
+}
+
+#modal-root:empty {
+  display: none;
+}
+
+#modal-root > * {
+  pointer-events: auto;
+}
+
 /* ── Typography helpers ── */
 h1, h2, h3, h4, h5 {
   font-family: var(--font-heading);
