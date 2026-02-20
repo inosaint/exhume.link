@@ -799,3 +799,21 @@ Agent/Model: GPT-5.2 (Codex)
 ## Notes
 - `npm run lint` passes.
 - `npm run build` passes.
+
+---
+
+# Landing Modal Click Guard (Safari)
+
+Date: 2026-02-19
+Agent/Model: GPT-5.2 (Codex)
+
+## Summary
+- Prevented form submission/propagation from the “How to export tabs” and “Privacy policy” buttons so modal state updates can render reliably.
+- Left existing Safari debug logging intact for verification.
+
+## Files Updated
+- `src/sections/Landing.tsx`
+
+## Notes
+- `npm run lint` fails due to pre-existing issues in `src/App.tsx` and `src/sections/Cemetery.tsx`.
+- `npm run build` passes.

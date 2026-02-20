@@ -111,7 +111,9 @@ export function Landing({ isBusy, error, sampleText, onBegin }: LandingProps) {
                 <button
                   type="button"
                   className="surface__sample"
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
                     console.log('[SAFARI-DBG] "How to export tabs" onClick fired')
                     setShowHowTo(true)
                   }}
@@ -146,7 +148,9 @@ export function Landing({ isBusy, error, sampleText, onBegin }: LandingProps) {
             <button
               type="button"
               className="surface__note-link"
-              onClick={() => {
+              onClick={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
                 console.log('[SAFARI-DBG] "Privacy policy" onClick fired')
                 setShowPrivacy(true)
               }}
